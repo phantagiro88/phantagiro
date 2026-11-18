@@ -1,0 +1,14 @@
+{
+  "name": "kebun-juta",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "build": "esbuild src/game.js --bundle --minify --format=iife --target=es2019 --outfile=public/game.js"
+  },
+  "dependencies": {
+    "three": "^0.170.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.0"
+  }
+}

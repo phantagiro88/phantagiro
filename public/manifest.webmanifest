@@ -1,0 +1,16 @@
+{
+  "name": "Kebun Juta",
+  "short_name": "Kebun Juta",
+  "description": "Tanam, tuai dan jual bunga dan buah untuk kumpul $1,000,000!",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#8fe0ff",
+  "theme_color": "#7ad86b",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
