@@ -17,6 +17,15 @@ const CROPS = [
   { id: 'tembikai', e: '🍉', n: { ms: 'Tembikai',  en: 'Melon' },      cost: 100000, sell: 420000, time: 420, unlock: 700000 }
 ];
 const byId = Object.fromEntries(CROPS.map(c => [c.id, c]));
+// Stesen haiwan: beri makan (kos) -> tunggu -> kutip hasil
+const ITEMS = { fish: { e: '🐟', sell: 90 }, egg: { e: '🥚', sell: 220 }, wool: { e: '🧶', sell: 2000 } };
+const STATIONS = [
+  { id: 'pond', item: 'fish', e: '🐟', n: { ms: 'Kolam Ikan', en: 'Fish Pond' },       cost: 120,  count: 4, time: 30, unlock: 800,   x: -2.5 },
+  { id: 'coop', item: 'egg',  e: '🥚', n: { ms: 'Reban Ayam', en: 'Chicken Coop' },     cost: 400,  count: 6, time: 45, unlock: 4000,  x: 0 },
+  { id: 'pen',  item: 'wool', e: '🧶', n: { ms: 'Kandang Biri-biri', en: 'Sheep Pen' }, cost: 2500, count: 5, time: 90, unlock: 25000, x: 2.5 }
+];
+const ST_Z = -3.3;
+const prod = id => byId[id] || ITEMS[id];
 const plotPrice = n => Math.round(30 * Math.pow(1.55, n));
 const fmt = n => '$' + Math.round(n).toLocaleString('en-US');
 
@@ -29,7 +38,7 @@ const L = {
     noMoney: '💰 Duit tak cukup', noMoneyPlot: '💰 Duit tak cukup untuk tanah baru',
     lock: (e, a) => `🔒 Jual sehingga ${a} untuk buka ${e}`, harvestFirst: '🧺 Tuai dulu, baru jual!',
     allFull: '🌱 Semua tanah dah penuh', notRipe: '⏳ Belum ada yang masak', gift: '🎁 Hadiah $10 untuk kamu!',
-    lockedSeed: '🔒 Benih ini belum dibuka', langBtn: 'BM'
+    lockedSeed: '🔒 Benih ini belum dibuka', stUnlocked: n => `🎉 ${n} dibuka!`, langBtn: 'BM'
   },
   en: {
     hint: '👆 Tap the soil to plant!', plantAll: '🌱 Plant all', harvestAll: '🧺 Harvest all', sell: '🏪 Sell',
@@ -38,12 +47,12 @@ const L = {
     noMoney: '💰 Not enough money', noMoneyPlot: '💰 Not enough money for new land',
     lock: (e, a) => `🔒 Sell up to ${a} to unlock ${e}`, harvestFirst: '🧺 Harvest first, then sell!',
     allFull: '🌱 All plots are full', notRipe: '⏳ Nothing is ripe yet', gift: '🎁 A $10 gift for you!',
-    lockedSeed: '🔒 This seed is still locked', langBtn: 'EN'
+    lockedSeed: '🔒 This seed is still locked', stUnlocked: n => `🎉 ${n} unlocked!`, langBtn: 'EN'
   }
 };
 
 /* ---------- simpan / muat ---------- */
-const fresh = () => ({ money: 20, earned: 0, basket: {}, plots: Array(START_PLOTS).fill(null), sel: 'daisy', sound: true, won: false, planted: false, lang: 'ms' });
+const fresh = () => ({ money: 20, earned: 0, basket: {}, plots: Array(START_PLOTS).fill(null), sel: 'daisy', st: {}, sound: true, won: false, planted: false, lang: 'ms' });
 function load() {
   try {
     const j = JSON.parse(localStorage.getItem(KEY));
@@ -254,18 +263,119 @@ function setRipe(g, ready) {
   g.userData.ripen.forEach(r => { r.m.material = ready ? r.ripe : r.young; });
 }
 
+
+/* ---------- stesen haiwan ---------- */
+function makeChicken() {
+  const c = new THREE.Group();
+  const body = mesh(ico(.16, 1), mat(0xffffff), 0, .2, 0); body.scale.set(1.2, 1, .9); c.add(body);
+  c.add(mesh(ico(.08, 0), mat(0xeeeeee), -.17, .28, 0));
+  const head = new THREE.Group(); head.position.set(.17, .33, 0);
+  head.add(mesh(ico(.085, 1), mat(0xffffff), 0, 0, 0));
+  const beak = mesh(cyl(0, .035, .08, 4), mat(0xffa000), .1, -.01, 0); beak.rotation.z = -Math.PI / 2; head.add(beak);
+  head.add(mesh(ico(.04, 0), mat(0xe53935), 0, .09, 0));
+  c.add(head);
+  [-.05, .05].forEach(z => c.add(mesh(cyl(.012, .012, .12, 4), mat(0xffa000), 0, .06, z)));
+  c.userData.head = head; return c;
+}
+function makeSheep() {
+  const sh = new THREE.Group();
+  const skin = mesh(ico(.24, 1), mat(0xf3d2b0), 0, .42, 0); skin.scale.set(1.3, 1, 1); sh.add(skin);
+  const wool = new THREE.Group(); wool.position.y = .46;
+  const core = mesh(ico(.34, 1), mat(0xfafafa), 0, 0, 0); core.scale.set(1.25, 1, 1); wool.add(core);
+  [[.22, .12, .15], [-.22, .1, .15], [.12, .15, -.18], [-.16, .12, -.17], [0, .24, 0]].forEach(([x, y, z]) => wool.add(mesh(ico(.2, 1), mat(0xffffff), x, y, z)));
+  sh.add(wool);
+  sh.add(mesh(ico(.14, 1), mat(0x455a64), .46, .5, 0));
+  [[.52, .62, .1], [.52, .62, -.1]].forEach(([x, y, z]) => sh.add(mesh(ico(.05, 0), mat(0x37474f), x - .08, y - .08, z)));
+  [[.2, .12], [.2, -.12], [-.2, .12], [-.2, -.12]].forEach(([x, z]) => sh.add(mesh(cyl(.035, .035, .28, 5), mat(0x4e342e), x, .14, z)));
+  sh.userData.wool = wool; return sh;
+}
+function buildStation(id) {
+  const g = new THREE.Group(), anim = { root: g };
+  if (id === 'pond') {
+    g.add(mesh(cyl(1.0, 1.05, .3, 18), mat(0x9e9e9e), 0, .15, 0));
+    g.add(mesh(cyl(.86, .86, .32, 24), mat(0x4fc3f7, { emissive: 0x0a3d5c }), 0, .15, 0));
+    [[.3, -.3], [-.4, .35]].forEach(([x, z]) => g.add(mesh(cyl(.2, .2, .02, 10), mat(0x43a047), x, .33, z)));
+    [[.95, .5], [1.05, .2], [-1.0, -.5]].forEach(([x, z]) => { g.add(mesh(cyl(.025, .025, .9, 5), mat(0x388e3c), x, .5, z)); g.add(mesh(cyl(.06, .06, .22, 6), mat(0x6d4c41), x, .95, z)); });
+    anim.fish = [];
+    for (let k = 0; k < 4; k++) {
+      const f = new THREE.Group(), b = mesh(ico(.12, 1), mat(k % 2 ? 0xff7043 : 0xffb300), 0, 0, 0); b.scale.set(1.7, .8, .8); f.add(b);
+      const tail = mesh(cyl(0, .09, .15, 4), mat(k % 2 ? 0xff7043 : 0xffb300), -.22, 0, 0); tail.rotation.z = Math.PI / 2; f.add(tail);
+      f.userData = { a: k / 4 * Math.PI * 2, r: .3 + .13 * (k % 2), sp: .7 + .15 * k };
+      g.add(f); anim.fish.push(f);
+    }
+  } else if (id === 'coop') {
+    g.add(mesh(box(1.5, .9, 1.1), mat(0xc0392b), 0, .45, -.5));
+    [[-1, .6], [1, -.6]].forEach(([sx, rz]) => { const r = mesh(box(.95, .08, 1.35), mat(0x8d3a2a), sx * .43, 1.05, -.5); r.rotation.z = rz * (sx > 0 ? 1 : 1) * (sx > 0 ? 1 : -1) * -1 * -1; g.add(r); });
+    g.children[1].rotation.z = .6; g.children[2].rotation.z = -.6;
+    g.add(mesh(box(.4, .5, .05), mat(0x5d4037), 0, .28, .06));
+    g.add(mesh(box(1.6, .06, .06), mat(0xffecb3), 0, 1.4, -.5));
+    const nest = mesh(cyl(.38, .42, .08, 12), mat(0xe6c35c), .95, .04, .55); g.add(nest);
+    anim.eggs = new THREE.Group();
+    for (let k = 0; k < 6; k++) { const a = k / 6 * Math.PI * 2, e = mesh(ico(.085, 1), mat(0xfff3d6), .95 + Math.cos(a) * .17, .15, .55 + Math.sin(a) * .17); e.scale.y = 1.3; anim.eggs.add(e); }
+    g.add(anim.eggs);
+    anim.chickens = [];
+    for (let k = 0; k < 3; k++) { const c = makeChicken(); c.userData.ph = k * 2.1; g.add(c); anim.chickens.push(c); }
+  } else {
+    const gr = mesh(box(1.9, .05, 1.9), mat(0x9be37f), 0, .03, 0); g.add(gr);
+    [.25, .5].forEach(y => {
+      [-.95, .95].forEach(z => g.add(mesh(box(2.05, .07, .07), mat(0xa1744a), 0, y, z)));
+      [-.95, .95].forEach(x => g.add(mesh(box(.07, .07, 1.95), mat(0xa1744a), x, y, 0)));
+    });
+    [[-.95, -.95], [.95, -.95], [-.95, .95], [.95, .95], [0, -.95], [0, .95], [-.95, 0], [.95, 0]].forEach(([x, z]) => g.add(mesh(box(.1, .7, .1), mat(0x8d6e63), x, .35, z)));
+    anim.sheep = [];
+    for (let k = 0; k < 2; k++) { const sh = makeSheep(); sh.userData.ph = k * 3.3; g.add(sh); anim.sheep.push(sh); }
+  }
+  return { g, anim };
+}
+function buildLocked(def) {
+  const g = new THREE.Group();
+  g.add(mesh(box(1.9, .08, 1.9), mat(0xc8b79b), 0, .04, 0));
+  g.add(mesh(cyl(.05, .05, 1.0, 5), mat(0x8d6e63), 0, .5, 0));
+  g.add(mesh(box(.9, .45, .07), mat(0xd7b98a), 0, 1.0, 0));
+  return g;
+}
+function animStation(s, time, pr, active, ready) {
+  const a = s.anim; if (!a) return;
+  a.root.scale.setScalar(ready ? 1 + Math.sin(time * 5) * .02 : 1);
+  a.root.rotation.z = (time - s.jiggle < .4) ? Math.sin((time - s.jiggle) * 40) * .06 : 0;
+  if (a.fish) {
+    a.fish.forEach(f => {
+      const u = f.userData, ang = u.a + time * u.sp * (ready ? 1.8 : 1);
+      f.position.set(Math.cos(ang) * u.r, ready ? .3 + Math.abs(Math.sin(time * 5 + u.a * 2)) * .55 : .3, Math.sin(ang) * u.r);
+      f.rotation.y = -(ang + Math.PI / 2);
+    });
+  } else if (a.chickens) {
+    a.eggs.visible = ready;
+    a.chickens.forEach(c => {
+      const ph = c.userData.ph, w = time * .5 + ph, x = Math.sin(w) * .75, z = .55 + Math.cos(w * .8) * .22;
+      const vx = Math.cos(w) * .75, vz = -Math.sin(w * .8) * .22 * .8;
+      c.position.set(x, 0, z); c.rotation.y = -Math.atan2(vz, vx);
+      c.userData.head.rotation.z = Math.max(0, Math.sin(time * 6 + ph)) * .5;
+    });
+  } else if (a.sheep) {
+    a.sheep.forEach(sh => {
+      const ph = sh.userData.ph, w = time * .25 + ph, x = Math.sin(w) * .45, z = Math.cos(w * .9) * .4;
+      const vx = Math.cos(w) * .45, vz = -Math.sin(w * .9) * .4 * .9;
+      sh.position.set(x, Math.abs(Math.sin(time * 3 + ph)) * .02, z); sh.rotation.y = -Math.atan2(vz, vx);
+      const w1 = ready ? 1 : (active ? .45 + .55 * pr : .45);
+      sh.userData.wool.scale.setScalar(w1);
+    });
+  }
+}
+
 /* ---------- kebun ---------- */
 const farm = new THREE.Group(); scene.add(farm);
-let slots = [], buySlot = null, picks = [], builtCount = -1, firstBuild = true;
+let slots = [], stSlots = [], buySlot = null, picks = [], builtCount = -1, builtMask = '', firstBuild = true;
+const stMask = () => STATIONS.map(d => S.earned >= d.unlock ? '1' : '0').join('');
 const slotPos = i => new THREE.Vector3((i % COLS - (COLS - 1) / 2) * GAP, 0, Math.floor(i / COLS) * GAP);
 const pickMat = new THREE.MeshBasicMaterial({ visible: false });
 const soilDark = mat(0x7b4f31), soilTop = mat(0x946038), soilReady = mat(0xffd45c, { emissive: 0x5a4000 });
 
 function rebuildFarm() {
-  slots.forEach(s => s.label.dispose()); if (buySlot) buySlot.label.dispose();
-  farm.clear(); slots = []; picks = []; buySlot = null;
+  slots.forEach(s => s.label.dispose()); if (buySlot) buySlot.label.dispose(); stSlots.forEach(s => s.label.dispose());
+  farm.clear(); slots = []; picks = []; buySlot = null; stSlots = [];
   const n = S.plots.length, tiles = n + (n < MAXPLOTS ? 1 : 0), rows = Math.ceil(tiles / COLS);
-  const w = COLS * GAP + .8, d = rows * GAP + .8, cz = (rows - 1) * GAP / 2;
+  const zMin = ST_Z - 1.4, zMax = (rows - 1) * GAP + 1.3, d = zMax - zMin, cz = (zMin + zMax) / 2, w = COLS * GAP + .8;
   const base = mesh(box(1, 1, 1), mat(0xa6ee8f), 0, -.15, cz); base.scale.set(w, .25, d); farm.add(base);
   const rim = mesh(box(1, 1, 1), mat(0x6b4a2e), 0, -.27, cz); rim.scale.set(w + .35, .2, d + .35); farm.add(rim);
   for (let i = 0; i < tiles; i++) {
@@ -279,14 +389,37 @@ function rebuildFarm() {
     if (isBuy) { buySlot = slot; label.set(['➕', fmt(plotPrice(n - START_PLOTS))]); label.sprite.position.y = 1.0; }
     else slots.push(slot);
   }
-  builtCount = n;
-  if (firstBuild) { firstBuild = false; camTarget.set(0, 0, (Math.min(rows, 3) - 1) * GAP / 2); }
+  STATIONS.forEach(def => {
+    const grp = new THREE.Group(); grp.position.set(def.x, 0, ST_Z); farm.add(grp);
+    const open = S.earned >= def.unlock, st = { def, grp, label: makeLabel(), open, anim: null, jiggle: -9 };
+    if (open) { const m = buildStation(def.id); grp.add(m.g); st.anim = m.anim; } else grp.add(buildLocked(def));
+    const pick = mesh(box(2.3, 1.6, 2.3), pickMat, 0, .8, 0); pick.userData = { st: def.id }; grp.add(pick); picks.push(pick);
+    st.label.sprite.position.set(0, 2.1, 0); grp.add(st.label.sprite);
+    stSlots.push(st);
+  });
+  builtCount = n; builtMask = stMask();
+  if (firstBuild) { firstBuild = false; camTarget.set(0, 0, (Math.min(rows, 3) - 1) * GAP / 2 - 1.2); }
   farmBounds = { w, d, cz };
 }
 let farmBounds = { w: 10, d: 5, cz: 2 };
 
+function syncStations(time, now) {
+  stSlots.forEach(s => {
+    const d = s.def, st = S.st[d.id];
+    if (!s.open) { s.label.set([d.e + '🔒', fmt(d.unlock)]); return; }
+    let pr = 0, ready = false;
+    if (st) { pr = Math.min(1, Math.max(0, (now - st.at) / (st.ready - st.at))); ready = pr >= 1; }
+    animStation(s, time, pr, !!st, ready);
+    s.label.set(ready ? ['✨'] : st ? [timeLeft(st.ready - now)] : [d.e, fmt(d.cost)]);
+    s.label.sprite.position.y = 2.1;
+  });
+}
 function syncPlots(time) {
-  if (builtCount !== S.plots.length) rebuildFarm();
+  if (builtCount !== S.plots.length || builtMask !== stMask()) {
+    const old = builtMask, nw = stMask();
+    rebuildFarm();
+    if (old) STATIONS.forEach((d, i) => { if (old[i] === '0' && nw[i] === '1') { toast(t('stUnlocked')(d.n[S.lang])); sfx.win(); } });
+  }
   const now = Date.now();
   S.plots.forEach((p, i) => {
     const s = slots[i]; if (!s) return;
@@ -310,6 +443,7 @@ function syncPlots(time) {
     s.label.set(ready ? ['✨'] : [timeLeft(p.ready - now)]);
     s.label.sprite.position.y = ready ? 2.5 : 2.1;
   });
+  syncStations(time, now);
   }
 function timeLeft(ms) { const s = Math.max(0, Math.ceil(ms / 1000)); return s >= 60 ? Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0') : s + 's'; }
 
@@ -370,8 +504,9 @@ $id('rotL').onclick = () => { azT -= Math.PI / 2; beep(500, .05); };
 $id('rotR').onclick = () => { azT += Math.PI / 2; beep(500, .05); };
 
 const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
-function slotScreen(i, lift = 1.4) {
-  const s = slots[i]; const v = s.grp.position.clone(); v.y += lift; v.project(camera);
+function slotScreen(i, lift = 1.4) { return groupScreen(slots[i].grp, lift); }
+function groupScreen(grp, lift = 1.4) {
+  const v = grp.position.clone(); v.y += lift; v.project(camera);
   const r = canvas.getBoundingClientRect();
   return { x: r.left + (v.x + 1) / 2 * r.width, y: r.top + (1 - v.y) / 2 * r.height };
 }
@@ -382,6 +517,7 @@ function onTap(cx, cy) {
   const hit = ray.intersectObjects(picks, false)[0]; if (!hit) return;
   const u = hit.object.userData;
   if (u.buy) { buyPlot(); return; }
+  if (u.st) { stationTap(u.st); return; }
   const i = u.i, p = S.plots[i];
   if (!p) { if (plantAt(i)) { sfx.plant(); refresh(); } }
   else if (Date.now() >= p.ready) { harvestAt(i); sfx.harvest(); refresh(); }
@@ -392,8 +528,8 @@ function onTap(cx, cy) {
    Logik game
    ===================================================================== */
 const unlocked = c => S.earned >= c.unlock;
-const basketValue = () => Object.entries(S.basket).reduce((a, [id, n]) => a + (byId[id] ? byId[id].sell * n : 0), 0);
-const growingCount = () => S.plots.filter(Boolean).length;
+const basketValue = () => Object.entries(S.basket).reduce((a, [id, n]) => a + (prod(id) ? prod(id).sell * n : 0), 0);
+const growingCount = () => S.plots.filter(Boolean).length + Object.values(S.st).filter(Boolean).length;
 function deny(msg) { sfx.no(); shake(moneyEl); if (msg) toast(msg); }
 
 function plantAt(i, quiet) {
@@ -408,6 +544,19 @@ function harvestAt(i) {
   const p = S.plots[i]; if (!p) return;
   S.basket[p.c] = (S.basket[p.c] || 0) + 1; S.plots[i] = null;
   if (slots[i]) { const sp = slotScreen(i); floatText('+1 ' + byId[p.c].e, sp.x, sp.y); }
+}
+function collectStation(s) {
+  const d = s.def; S.basket[d.item] = (S.basket[d.item] || 0) + d.count; S.st[d.id] = null;
+  const sp = groupScreen(s.grp, 1.8); floatText('+' + d.count + ' ' + ITEMS[d.item].e, sp.x, sp.y);
+}
+function stationTap(id) {
+  const s = stSlots.find(x => x.def.id === id), d = s.def, st = S.st[id], now = Date.now(), sp = groupScreen(s.grp, 1.8);
+  if (!s.open) { deny(t('lock')(d.e, fmt(d.unlock))); return; }
+  if (!st) {
+    if (S.money < d.cost) { deny(t('noMoney')); return; }
+    S.money -= d.cost; S.st[id] = { at: now, ready: now + d.time * 1000 }; floatText('🍽️', sp.x, sp.y); sfx.plant(); refresh();
+  } else if (now >= st.ready) { collectStation(s); sfx.harvest(); refresh(); }
+  else { st.ready -= 1500; floatText('❤️', sp.x, sp.y); s.jiggle = performance.now() / 1000; sfx.water(); save(); }
 }
 function buyPlot() {
   if (S.plots.length >= MAXPLOTS) return;
@@ -445,8 +594,8 @@ function updateHUD() {
     };
     shelf.appendChild(b);
   });
-  const items = Object.entries(S.basket).filter(([id, n]) => n > 0 && byId[id]);
-  basketEl.innerHTML = items.length ? items.map(([id, n]) => '<span>' + byId[id].e + '×' + n + '</span>').join('') : '<span class="empty">' + t('basketEmpty') + '</span>';
+  const items = Object.entries(S.basket).filter(([id, n]) => n > 0 && prod(id));
+  basketEl.innerHTML = items.length ? items.map(([id, n]) => '<span>' + prod(id).e + '×' + n + '</span>').join('') : '<span class="empty">' + t('basketEmpty') + '</span>';
   const v = basketValue(); $id('sellVal').textContent = fmt(v); sellBtn.classList.toggle('off', v <= 0);
   if (buySlot) buySlot.label.set(['➕', fmt(plotPrice(S.plots.length - START_PLOTS))]);
 }
@@ -466,6 +615,7 @@ $id('plantAll').onclick = () => {
 $id('harvestAll').onclick = () => {
   const now = Date.now(); let n = 0;
   S.plots.forEach((p, i) => { if (p && now >= p.ready) { harvestAt(i); n++; } });
+  stSlots.forEach(s => { const st = S.st[s.def.id]; if (s.open && st && now >= st.ready) { collectStation(s); n++; } });
   if (n) { sfx.harvest(); refresh(); } else { sfx.no(); toast(t('notRipe')); }
 };
 sellBtn.onclick = sellAll;
@@ -496,7 +646,7 @@ function frame(ms) {
 new ResizeObserver(fit).observe($id('stage'));
 window.addEventListener('resize', fit);
 applyLang(); rebuildFarm(); fit(); refresh(); requestAnimationFrame(frame);
-window.__game = { get S() { return S; }, CROPS, slots: () => slots, onTap, rebuildFarm, camera };
+window.__game = { get S() { return S; }, CROPS, STATIONS, slots: () => slots, stSlots: () => stSlots, onTap, rebuildFarm, camera };
 
 /* ---------- PWA: kemas kini automatik ---------- */
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
