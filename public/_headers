@@ -11,3 +11,10 @@
   Cache-Control: no-cache
 /hari-ini/manifest.webmanifest
   Cache-Control: no-cache
+
+/99-malam/sw.js
+  Cache-Control: no-cache
+/99-malam/index.html
+  Cache-Control: no-cache
+/99-malam/manifest.webmanifest
+  Cache-Control: no-cache
