@@ -117,7 +117,7 @@ var CATS={
   diri:{n:'Diri sendiri',c:'#3E7C6B'},
   kerja:{n:'Kerja',c:'#3B6FA0'}
 };
-var REP={none:'Tidak',daily:'Setiap hari',weekdays:'Isnin–Jumaat',weekly:'Setiap minggu'};
+var REP={none:'Tidak',daily:'Setiap hari',workdays:'Ahad–Khamis',days:'Pilih hari'};
 var HARI=['Ahad','Isnin','Selasa','Rabu','Khamis','Jumaat','Sabtu'];
 var HARI3=['Aha','Isn','Sel','Rab','Kha','Jum','Sab'];
 var BULAN=['Januari','Februari','Mac','April','Mei','Jun','Julai','Ogos','September','Oktober','November','Disember'];
@@ -132,6 +132,11 @@ var addDays=function(s,n){var d=parse(s);d.setDate(d.getDate()+n);return ymd(d)}
 var diff=function(a,b){return Math.round((parse(b)-parse(a))/864e5)};
 var dow=function(s){return parse(s).getDay()};
 var uid=function(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)};
+var HARI3b=['Ahd','Isn','Sel','Rab','Kha','Jum','Sab'];
+var repLabel=function(t){
+  if(t.repeat==='days'){return (t.days||[]).slice().sort().map(function(i){return HARI[i]}).join(', ')||'Pilih hari'}
+  return REP[t.repeat]||'';
+};
 var longDate=function(s){var d=parse(s);return HARI[d.getDay()]+', '+d.getDate()+' '+BULAN[d.getMonth()]};
 var shortDate=function(s){var d=parse(s);return d.getDate()+' '+BULAN[d.getMonth()].slice(0,3)};
 
@@ -144,6 +149,8 @@ function load(){
 function migrate(o){
   var map={kandungan:'bisnes',ibadah:'diri'};
   o.tasks.forEach(function(t){
+    if(t.repeat==='weekdays')t.repeat='workdays';
+    if(t.repeat==='weekly'){t.repeat='days';t.days=[dow(t.date)]}
     if(map[t.cat])t.cat=map[t.cat];
     else if(t.cat==='keluarga'&&/klinik/i.test(t.title||''))t.cat='kerja';
     else if(!CATS[t.cat])t.cat='bisnes';
@@ -169,7 +176,7 @@ function seed(){
   add('diri','Solat 5 waktu tepat pada masanya');
   add('diri','Baca Al-Quran / zikir');
   add('keluarga','Masa berkualiti dengan anak');
-  add('kerja','Semak jadual klinik esok',{repeat:'weekdays'});
+  add('kerja','Semak jadual klinik esok',{repeat:'workdays'});
   S.seeded=true;save();
 }
 
@@ -179,8 +186,8 @@ function occursOn(t,D){
   if(t.date>D)return false;
   var w=dow(D);
   if(t.repeat==='daily')return true;
-  if(t.repeat==='weekdays')return w>=1&&w<=5;
-  if(t.repeat==='weekly')return w===dow(t.date);
+  if(t.repeat==='workdays')return w<=4;
+  if(t.repeat==='days')return (t.days||[]).indexOf(w)>=0;
   return false;
 }
 function isDone(t,D){
@@ -241,7 +248,7 @@ function rowHtml(t,D,focus){
   var live=(D===today());
   var sub='<span><i class="dot" style="background:'+cat.c+'"></i>'+esc(cat.s||cat.n)+'</span>';
   if(late)sub+='<span class="late">Lewat '+late+' hari</span>';
-  if(t.repeat!=='none')sub+='<span>🔁 '+esc(REP[t.repeat])+'</span>';
+  if(t.repeat!=='none')sub+='<span>🔁 '+esc(repLabel(t))+'</span>';
   if(t.kind==='followup'&&t.name)sub+='<span>👤 '+esc(t.name)+'</span>';
   if(t.note)sub+='<span>📝 '+esc(t.note.slice(0,40))+(t.note.length>40?'…':'')+'</span>';
   var wa=t.phone?waLink(t.phone):'';
@@ -374,7 +381,8 @@ function render(){
 
 /* ---------- sheet ---------- */
 function openSheet(t,D){
-  form=t?JSON.parse(JSON.stringify(t)):{id:null,title:'',cat:'bisnes',kind:'task',name:'',phone:'',date:D,repeat:'none',note:'',star:false,doneOn:{}};
+  form=t?JSON.parse(JSON.stringify(t)):{id:null,title:'',cat:'bisnes',kind:'task',name:'',phone:'',date:D,repeat:'none',days:[],note:'',star:false,doneOn:{}};
+  if(!form.days)form.days=[];
   renderSheet();
 }
 function closeSheet(){form=null;$('#ovl').innerHTML=''}
@@ -409,6 +417,11 @@ function renderSheet(){
   h+='<div class="opts" style="margin-bottom:8px"><button type="button" class="opt '+(f.date===T?'on':'')+'" data-set="date:'+T+'">Hari ini</button><button type="button" class="opt '+(f.date===addDays(T,1)?'on':'')+'" data-set="date:'+addDays(T,1)+'">Esok</button></div>';
   h+='<input type="date" id="f-date" value="'+esc(f.date)+'">';
   h+='<label>Ulang</label>'+opts('repeat',REP,f.repeat);
+  if(f.repeat==='days'){
+    h+='<label>Hari mana? (boleh pilih lebih satu)</label><div class="opts">';
+    for(var i=0;i<7;i++)h+='<button type="button" class="opt '+((f.days||[]).indexOf(i)>=0?'on':'')+'" data-dt="'+i+'">'+HARI3b[i]+'</button>';
+    h+='</div>';
+  }
   h+='<label>Nota (pilihan)</label><textarea id="f-note">'+esc(f.note)+'</textarea>';
   h+='<div class="btns">'+(f.id?'<button class="btn del" data-act="del">Padam</button>':'')+'<button class="btn" data-act="cancel">Batal</button><button class="btn pri" data-act="save">Simpan</button></div>';
   h+='</div></div>';
@@ -423,6 +436,7 @@ function saveForm(){
   }else{
     if(!f.title.trim()){alert('Isi nama tugas.');return}
   }
+  if(f.repeat==='days'&&!(f.days||[]).length){alert('Pilih sekurang-kurangnya satu hari.');return}
   f.title=f.title.trim();f.name=f.name.trim();f.phone=f.phone.trim();f.note=f.note.trim();
   if(f.id){
     var i=S.tasks.findIndex(function(x){return x.id===f.id});
@@ -436,17 +450,25 @@ function saveForm(){
 
 /* ---------- events ---------- */
 document.addEventListener('click',function(e){
-  var el=e.target.closest('[data-act],[data-tab],[data-filter],[data-set]');
+  var el=e.target.closest('[data-act],[data-tab],[data-filter],[data-set],[data-dt]');
   if(!el){
     if(e.target.id==='ov'){closeSheet()}
     return;
   }
   if(el.dataset.tab){view=el.dataset.tab;filter='all';render();window.scrollTo(0,0);return}
   if(el.dataset.filter){filter=el.dataset.filter;render();return}
+  if(el.dataset.dt){
+    sync();var n=Number(el.dataset.dt),ix=(form.days||[]).indexOf(n);
+    form.days=form.days||[];
+    if(ix>=0)form.days.splice(ix,1);else form.days.push(n);
+    renderSheet();return;
+  }
   if(el.dataset.set){
     sync();
     var p=el.dataset.set.split(':'),k=p[0],v=p.slice(1).join(':');
-    form[k]=v;renderSheet();return;
+    form[k]=v;
+    if(k==='repeat'&&v==='days'&&!(form.days||[]).length)form.days=[dow(form.date)];
+    renderSheet();return;
   }
   var act=el.dataset.act,row=el.closest('.row'),id=row?row.dataset.id:null,D=row?row.dataset.day:today();
   if(act==='toggle'){if(D===today())toggle(id,D);return}
