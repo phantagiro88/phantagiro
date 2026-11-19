@@ -113,9 +113,9 @@ textarea{min-height:76px;resize:vertical}
 var KEY='hariini.v1';
 var CATS={
   bisnes:{n:'Bisnes',c:'#B8892B'},
-  kandungan:{n:'Kandungan',c:'#C2566B'},
-  ibadah:{n:'Ibadah',c:'#3E7C6B'},
-  keluarga:{n:'Keluarga & Klinik',s:'Keluarga',c:'#6B5CA5'}
+  keluarga:{n:'Keluarga',c:'#6B5CA5'},
+  diri:{n:'Diri sendiri',c:'#3E7C6B'},
+  kerja:{n:'Kerja',c:'#3B6FA0'}
 };
 var REP={none:'Tidak',daily:'Setiap hari',weekdays:'Isnin–Jumaat',weekly:'Setiap minggu'};
 var HARI=['Ahad','Isnin','Selasa','Rabu','Khamis','Jumaat','Sabtu'];
@@ -138,8 +138,16 @@ var shortDate=function(s){var d=parse(s);return d.getDate()+' '+BULAN[d.getMonth
 /* ---------- storage ---------- */
 function blank(){return {tasks:[],seeded:false,name:'Dr. Sakinah'}}
 function load(){
-  try{var r=localStorage.getItem(KEY);if(r){var o=JSON.parse(r);if(o&&Array.isArray(o.tasks)){o.name=o.name||'Dr. Sakinah';return o}}}catch(e){}
+  try{var r=localStorage.getItem(KEY);if(r){var o=JSON.parse(r);if(o&&Array.isArray(o.tasks)){o.name=o.name||'Dr. Sakinah';migrate(o);return o}}}catch(e){}
   return blank();
+}
+function migrate(o){
+  var map={kandungan:'bisnes',ibadah:'diri'};
+  o.tasks.forEach(function(t){
+    if(map[t.cat])t.cat=map[t.cat];
+    else if(t.cat==='keluarga'&&/klinik/i.test(t.title||''))t.cat='kerja';
+    else if(!CATS[t.cat])t.cat='bisnes';
+  });
 }
 var S=load();
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
@@ -155,13 +163,13 @@ function seed(){
   add('bisnes','Tunjuk pelan (STP) kepada 1 prospek');
   add('bisnes','Follow-up & follow-through');
   add('bisnes','Closing & servis pelanggan');
-  add('kandungan','Cari idea kandungan');
-  add('kandungan','Buat kandungan');
-  add('kandungan','Post kandungan');
-  add('ibadah','Solat 5 waktu tepat pada masanya');
-  add('ibadah','Baca Al-Quran / zikir');
+  add('bisnes','Cari idea kandungan');
+  add('bisnes','Buat kandungan');
+  add('bisnes','Post kandungan');
+  add('diri','Solat 5 waktu tepat pada masanya');
+  add('diri','Baca Al-Quran / zikir');
   add('keluarga','Masa berkualiti dengan anak');
-  add('keluarga','Semak jadual klinik esok',{repeat:'weekdays'});
+  add('kerja','Semak jadual klinik esok',{repeat:'weekdays'});
   S.seeded=true;save();
 }
 
@@ -346,7 +354,7 @@ function viewMore(){
   var h='<div class="date">Tetapan</div><h1>Lagi</h1>';
   h+='<label>Nama pada sapaan</label><input type="text" id="nm" value="'+esc(S.name)+'">';
   h+='<div class="btns"><button class="btn" data-act="seed">+ Senarai contoh</button></div>';
-  h+='<p class="note">Menambah tugas harian contoh (5 Asas, kandungan, ibadah, keluarga). Anda boleh ubah atau padam.</p>';
+  h+='<p class="note">Menambah tugas harian contoh (5 Asas, kandungan, solat, keluarga, kerja). Anda boleh ubah atau padam.</p>';
   h+='<label>Sandaran data</label><textarea id="bk" readonly>'+esc(JSON.stringify(S))+'</textarea>';
   h+='<div class="btns"><button class="btn" data-act="copy">Salin sandaran</button></div>';
   h+='<p class="note">Data disimpan dalam telefon ini sahaja. Simpan salinan ini di Notes sekali-sekala supaya selamat jika telefon ditukar.</p>';
@@ -491,7 +499,7 @@ document.addEventListener('visibilitychange',function(){if(!document.hidden&&!fo
 /* ---------- welcome ---------- */
 function welcome(){
   $('#ovl').innerHTML='<div class="ov"><div class="sheet"><div class="hero"><div class="em">☀️</div><h2>Selamat datang ke Hari Ini</h2></div>'+
-  '<p class="note" style="text-align:center">Satu tempat untuk tahu apa nak buat hari ini: bisnes, kandungan, ibadah, keluarga &amp; klinik. Mahu mula dengan senarai contoh?</p>'+
+  '<p class="note" style="text-align:center">Satu tempat untuk tahu apa nak buat hari ini: bisnes, keluarga, diri sendiri &amp; kerja. Mahu mula dengan senarai contoh?</p>'+
   '<div class="btns"><button class="btn" data-act="blank">Mula kosong</button><button class="btn pri" data-act="seedgo">Guna senarai contoh</button></div></div></div>';
 }
 document.addEventListener('click',function(e){
