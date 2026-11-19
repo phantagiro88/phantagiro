@@ -149,6 +149,7 @@ function load(){
 function migrate(o){
   var map={kandungan:'bisnes',ibadah:'diri'};
   o.tasks.forEach(function(t){
+    if(t.title)t.title=t.title.replace(/kandungan/gi,'content');
     if(t.repeat==='weekdays')t.repeat='workdays';
     if(t.repeat==='weekly'){t.repeat='days';t.days=[dow(t.date)]}
     if(map[t.cat])t.cat=map[t.cat];
@@ -170,9 +171,9 @@ function seed(){
   add('bisnes','Tunjuk pelan (STP) kepada 1 prospek');
   add('bisnes','Follow-up & follow-through');
   add('bisnes','Closing & servis pelanggan');
-  add('bisnes','Cari idea kandungan');
-  add('bisnes','Buat kandungan');
-  add('bisnes','Post kandungan');
+  add('bisnes','Cari idea content');
+  add('bisnes','Buat content');
+  add('bisnes','Post content');
   add('diri','Solat 5 waktu tepat pada masanya');
   add('diri','Baca Al-Quran / zikir');
   add('keluarga','Masa berkualiti dengan anak');
@@ -361,7 +362,7 @@ function viewMore(){
   var h='<div class="date">Tetapan</div><h1>Lagi</h1>';
   h+='<label>Nama pada sapaan</label><input type="text" id="nm" value="'+esc(S.name)+'">';
   h+='<div class="btns"><button class="btn" data-act="seed">+ Senarai contoh</button></div>';
-  h+='<p class="note">Menambah tugas harian contoh (5 Asas, kandungan, solat, keluarga, kerja). Anda boleh ubah atau padam.</p>';
+  h+='<p class="note">Menambah tugas harian contoh (5 Asas, content, solat, keluarga, kerja). Anda boleh ubah atau padam.</p>';
   h+='<label>Sandaran data</label><textarea id="bk" readonly>'+esc(JSON.stringify(S))+'</textarea>';
   h+='<div class="btns"><button class="btn" data-act="copy">Salin sandaran</button></div>';
   h+='<p class="note">Data disimpan dalam telefon ini sahaja. Simpan salinan ini di Notes sekali-sekala supaya selamat jika telefon ditukar.</p>';
