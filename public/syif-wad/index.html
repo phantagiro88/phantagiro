@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Syif Wad">
+<meta name="theme-color" content="#14262b">
+<title>Syif Wad</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<style>
+:root{--ink:#14262b;--teal:#2a9d8f;--mint:#d7efe9;--gold:#f4b942;--red:#e63946;--paper:#fffdf6;}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+html,body{margin:0;height:100%;background:var(--ink);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow:hidden}
+button{font:inherit;color:inherit;cursor:pointer}
+#app{position:fixed;inset:0;display:flex;flex-direction:column;background:#bfe3dc;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
+.hud{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--paper);border-bottom:3px solid var(--ink);flex:0 0 auto}
+.chip{border:3px solid var(--ink);border-radius:12px;background:#fff;padding:3px 9px;font-weight:800;font-size:14px;white-space:nowrap;box-shadow:0 3px 0 var(--ink)}
+.stress{flex:1;min-width:70px}
+.stress .lbl{font-size:10px;font-weight:800;letter-spacing:.05em}
+.bar{height:14px;border:3px solid var(--ink);border-radius:10px;background:#fff;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#2a9d8f,#f4b942,#e63946);background-size:600% 100%;transition:width .2s}
+.ibtn{border:3px solid var(--ink);border-radius:12px;background:var(--gold);min-width:42px;height:38px;padding:0 6px;white-space:nowrap;font-size:18px;box-shadow:0 3px 0 var(--ink)}
+.ibtn:active{transform:translateY(3px);box-shadow:none}
+.ibtn:disabled{background:#ccc;opacity:.6}
+.ward{flex:1;min-height:0;display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:1fr;gap:10px;padding:10px;
+ background:repeating-linear-gradient(0deg,rgba(255,255,255,.18) 0 2px,transparent 2px 64px),repeating-linear-gradient(90deg,rgba(255,255,255,.18) 0 2px,transparent 2px 64px),#bfe3dc}
+@media (orientation:portrait){.ward{grid-template-columns:repeat(2,1fr)}}
+.bed{position:relative;border:3px solid var(--ink);border-radius:16px;background:#f3fbf9;box-shadow:0 4px 0 var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;min-height:0}
+.bed::after{content:"";position:absolute;left:0;right:0;bottom:0;height:34%;background:linear-gradient(#6ec3b8,#4aa89c);border-top:3px solid var(--ink)}
+.bed .no{position:absolute;top:6px;left:9px;font:800 11px ui-monospace,monospace;opacity:.7}
+.bed .pt{font-size:clamp(30px,8vh,56px);line-height:1;z-index:1;transition:transform .2s}
+.bed .nm{font-size:11px;font-weight:700;z-index:1;margin-top:2px;background:#fffdf6cc;border-radius:8px;padding:0 6px}
+.bed.has{border-color:#ff6b35;background:#fff3e6}
+.bed.has .pt{animation:bob 1s ease-in-out infinite}
+.bed.urg{animation:shake .5s infinite;border-color:var(--red);background:#ffe3e5}
+.bed.good .pt{transform:scale(1.2)}
+.bub{position:absolute;top:6px;right:6px;width:48px;height:48px;border-radius:50%;display:none;place-items:center;z-index:2;border:3px solid var(--ink);background:conic-gradient(var(--c,#2a9d8f) calc(var(--p,100)*1%),#ddd 0)}
+.bub::before{content:"";position:absolute;inset:4px;border-radius:50%;background:#fff}
+.bub span{position:relative;font-size:20px}
+.bed.has .bub{display:grid}
+.tag{position:absolute;bottom:6px;left:0;right:0;text-align:center;z-index:2;font-size:11px;font-weight:800;color:#fff;text-shadow:0 1px 0 var(--ink),1px 0 0 var(--ink),-1px 0 0 var(--ink),0 -1px 0 var(--ink)}
+@keyframes bob{50%{transform:translateY(-4px)}}
+@keyframes shake{25%{transform:translateX(-2px)}75%{transform:translateX(2px)}}
+#call{position:absolute;left:50%;bottom:16px;transform:translateX(-50%);display:none;border:3px solid var(--ink);border-radius:18px;background:var(--gold);padding:12px 20px;font-weight:900;font-size:17px;box-shadow:0 5px 0 var(--ink);z-index:6;animation:ring .35s infinite;white-space:nowrap}
+#call.on{display:block}
+@keyframes ring{25%{transform:translateX(-50%) rotate(-3deg)}75%{transform:translateX(-50%) rotate(3deg)}}
+#toast{position:absolute;top:62px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:7px 14px;border-radius:12px;font-weight:700;font-size:13px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:9;max-width:90%;text-align:center}
+#toast.on{opacity:1}
+.ov{position:absolute;inset:0;display:none;z-index:10;background:rgba(20,38,43,.72);align-items:center;justify-content:center;padding:12px;overflow:auto}
+.ov.on{display:flex}
+.card{background:var(--paper);border:3px solid var(--ink);border-radius:20px;box-shadow:0 6px 0 var(--ink);padding:16px;width:min(560px,100%);max-height:100%;overflow:auto}
+h1{margin:0;font:900 clamp(34px,9vw,58px)/1 ui-monospace,"Courier New",monospace;letter-spacing:.04em;color:var(--ink);text-shadow:3px 3px 0 var(--gold)}
+h2{margin:10px 0 6px;font-size:13px;letter-spacing:.06em;text-transform:uppercase}
+.tagline{margin:6px 0 10px;font-weight:600;font-size:14px}
+.opts{display:grid;gap:8px}
+.opt{border:3px solid var(--ink);border-radius:14px;background:#fff;padding:8px 12px;text-align:left;font-weight:800;box-shadow:0 3px 0 var(--ink)}
+.opt small{display:block;font-weight:600;opacity:.75}
+.opt.sel{background:var(--gold)}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.av{font-size:30px;width:56px;height:56px;border:3px solid var(--ink);border-radius:14px;background:#fff;box-shadow:0 3px 0 var(--ink)}
+.av.sel{background:var(--gold)}
+.pill{border:3px solid var(--ink);border-radius:20px;background:#fff;padding:4px 14px;font-weight:800}
+.pill.sel{background:var(--gold)}
+.big{display:block;width:100%;border:3px solid var(--ink);border-radius:16px;background:var(--gold);padding:14px;font-weight:900;font-size:20px;letter-spacing:.06em;box-shadow:0 5px 0 var(--ink);margin-top:12px}
+.big:active{transform:translateY(4px);box-shadow:0 1px 0 var(--ink)}
+.small{font-size:12px;opacity:.75;margin-top:10px;text-align:center}
+.howto{font-size:13px;line-height:1.45;background:#fff;border:3px dashed var(--ink);border-radius:12px;padding:8px 10px;margin-top:10px}
+.mhead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.mhead b{font-size:18px}
+.x{border:3px solid var(--ink);background:#fff;border-radius:10px;width:36px;height:34px;font-weight:900}
+.hint{margin:0 0 10px;font-weight:600;font-size:14px}
+.track{position:relative;height:46px;border:3px solid var(--ink);border-radius:14px;background:#cfe0ff;overflow:hidden}
+.zone{position:absolute;top:0;bottom:0;background:#52c97a;border-left:3px solid var(--ink);border-right:3px solid var(--ink)}
+.mark{position:absolute;top:-3px;bottom:-3px;width:10px;margin-left:-5px;background:var(--red);border:3px solid var(--ink);border-radius:6px}
+.pips{margin:8px 0;font-size:22px;letter-spacing:4px;text-align:center;min-height:30px}
+.area{position:relative;height:190px;border:3px solid var(--ink);border-radius:14px;background:#ffe2cf;overflow:hidden;touch-action:none}
+.vein{position:absolute;left:0;right:0;top:50%;height:22px;margin-top:-11px;background:#6c8ee0;opacity:.35}
+.dot{position:absolute;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;border:3px solid var(--ink);background:#4f78e6;box-shadow:0 0 0 4px rgba(79,120,230,.3)}
+.tbar{height:10px;border:2px solid var(--ink);border-radius:6px;background:#fff;margin-top:8px;overflow:hidden}.tbar i{display:block;height:100%;background:var(--red);width:100%}
+.vit{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px}
+.vit div{border:3px solid var(--ink);border-radius:12px;background:#0f1f24;color:#7dffb0;text-align:center;font:800 15px ui-monospace,monospace;padding:6px 2px}
+.vit small{display:block;color:#9fb3b8;font-size:10px}
+.heart{width:150px;height:150px;margin:6px auto;border:4px solid var(--ink);border-radius:50%;background:#ff5a67;font-size:68px;display:grid;place-items:center;box-shadow:0 6px 0 var(--ink)}
+.fb{height:24px;text-align:center;font-weight:900}
+.xr{display:block;margin:0 auto 10px;width:min(230px,60vw);border:3px solid var(--ink);border-radius:12px}
+.res{text-align:center;padding:14px 4px}.res .e{font-size:54px}.res b{font-size:22px;display:block;margin:4px 0}
+.stars{font-size:34px;letter-spacing:4px}
+.stat{display:flex;justify-content:space-between;border-bottom:2px dashed #bbb;padding:5px 0;font-weight:700}
+.opt.ok{background:#8ce0a8}.opt.bad{background:#ff9aa2}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="hud">
+    <div class="chip" id="clock">⏰ 08:00</div>
+    <div class="chip" id="score">⭐ 0</div>
+    <div class="chip" id="elaun">🪙 0</div>
+    <div class="stress"><div class="lbl" id="stlbl">TEKANAN</div><div class="bar"><i id="stbar"></i></div></div>
+    <button class="ibtn" id="tea" title="Teh tarik">☕</button>
+    <button class="ibtn" id="pause" title="Jeda">⏸</button>
+  </div>
+  <div class="ward" id="ward"></div>
+  <button id="call"></button>
+  <div id="toast"></div>
+
+  <div class="ov on" id="menu">
+    <div class="card">
+      <h1 id="m_title">SYIF WAD</h1>
+      <p class="tagline" id="m_tag"></p>
+      <h2 id="m_role_h"></h2>
+      <div class="opts" id="roles"></div>
+      <h2 id="m_av_h"></h2>
+      <div class="row" id="avs"></div>
+      <div class="row" style="margin-top:10px"><button class="pill sel" id="l_ms">BM</button><button class="pill" id="l_en">EN</button><button class="pill sel" id="snd">🔊</button></div>
+      <div class="howto" id="m_how"></div>
+      <button class="big" id="go"></button>
+      <div class="small" id="m_disc"></div>
+      <div class="small" id="m_best"></div>
+    </div>
+  </div>
+
+  <div class="ov" id="modal"><div class="card"><div class="mhead"><b id="mtitle"></b><button class="x" id="mx">✕</button></div><div id="mbody"></div></div></div>
+
+  <div class="ov" id="paused"><div class="card" style="text-align:center"><h1 style="font-size:34px">⏸</h1><button class="big" id="resume"></button><button class="big" id="quit" style="background:#fff"></button></div></div>
+
+  <div class="ov" id="end"><div class="card" id="endcard"></div></div>
+</div>
+
+<script>
+(()=>{
+'use strict';
+const $=s=>document.querySelector(s);
+const SHIFT=240;               // saat sebenar untuk satu syif (08:00 → 17:00)
+const BEDN=6;
+const rnd=(a,b)=>a+Math.random()*(b-a);
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+
+/* ---------- bahasa ---------- */
+let L='ms';
+const D={
+ title:['SYIF WAD','WARD SHIFT'],
+ tag:['Katil penuh. Loceng berbunyi. Syif baru bermula.','Full beds. Bells ringing. A new shift begins.'],
+ pickRole:['Pilih peranan','Choose your role'],
+ pickAv:['Pilih watak','Choose your character'],
+ role_ho:['Pegawai Perubatan Siswazah','House Officer'],
+ role_ho_d:['Wad: darah, kanula, nota, X-ray','Ward: bloods, cannula, notes, X-ray'],
+ role_ed:['Doktor Kecemasan','Emergency Doctor'],
+ role_ed_d:['Resus, X-ray, kanula – banyak Kod Biru','Resus, X-ray, cannula – many Code Blues'],
+ role_nurse:['Jururawat Wad','Ward Nurse'],
+ role_nurse_d:['Darah, kanula, nota & sesekali Kod Biru','Bloods, cannula, notes & the odd Code Blue'],
+ how:['Ketik katil yang ada gelembung tugasan sebelum pesakit hilang sabar. Jawab telefon bila berdering. Jaga bar TEKANAN – kalau penuh, anda burnout! ☕ Teh tarik kurangkan tekanan (2 kali). Bertahan sehingga 17:00.','Tap a bed with a task bubble before the patient loses patience. Answer the phone when it rings. Watch the STRESS bar – if it fills, you burn out! ☕ Tea lowers stress (2 uses). Survive until 17:00.'],
+ start:['MULA SYIF','START SHIFT'],
+ disc:['Hospital, pesakit & kes adalah rekaan. Permainan ini bukan nasihat atau latihan perubatan.','Hospital, patients and cases are fictional. This game is not medical advice or training.'],
+ best:['Skor terbaik','Best score'],
+ stress:['TEKANAN','STRESS'],
+ call:['📞 Telefon berdering! Ketik untuk jawab','📞 Phone ringing! Tap to answer'],
+ callT:['Panggilan telefon','Phone call'],
+ resume:['SAMBUNG','RESUME'],quit:['KE MENU','TO MENU'],
+ again:['MAIN LAGI','PLAY AGAIN'],menu:['KE MENU','TO MENU'],
+ t_bloods:['Ambil darah','Bloods'],t_cannula:['Pasang kanula','Cannula'],t_notes:['Tulis nota','Notes'],t_resus:['KOD BIRU','CODE BLUE'],t_xray:['Baca X-ray','Read X-ray'],
+ bl_hint:['Tekan SUNTIK bila penanda merah berada dalam zon hijau. Perlu 2 kali kena (3 cubaan).','Press INJECT when the red marker is in the green zone. Need 2 hits (3 tries).'],
+ bl_btn:['SUNTIK','INJECT'],
+ ca_hint:['Ketik urat (bulatan biru) yang bergerak – 3 kali dalam masa suntuk!','Tap the moving vein (blue circle) – 3 times before time runs out!'],
+ no_hint:['Baca tanda vital, pilih nota yang betul.','Read the vitals, choose the right note.'],
+ re_hint:['Tekan jantung mengikut rentak – tekan bila ia membesar. Sasaran 14 tekanan baik.','Compress to the rhythm – tap as the heart swells. Goal: 14 good compressions.'],
+ re_btn:['TEKAN','PUSH'],
+ xr_hint:['Apa yang anda nampak pada X-ray dada ini? (kanan pesakit = kiri gambar)','What do you see on this chest X-ray? (patient\'s right = left of image)'],
+ good:['Tepat!','Spot on!'],early:['Awal','Early'],late:['Lewat','Late'],
+ r3:['Cemerlang!','Excellent!'],r2:['Okay lah','Okay'],r1:['Hampir…','Close…'],r0:['Gagal','Failed'],
+ missed:['Pesakit katil {n} menunggu terlalu lama!','Bed {n} waited too long!'],
+ callIgnored:['Telefon tak berjawab…','Missed call…'],
+ teaOk:['Teh tarik! Tekanan turun ☕','Tea break! Stress down ☕'],
+ done:['Syif Tamat!','Shift Over!'],burn:['Burnout!','Burnout!'],
+ doneMsg:['Anda bertahan sampai 17:00.','You made it to 17:00.'],
+ burnMsg:['Tekanan penuh sebelum syif habis. Jangan lupa rehat!','Stress maxed out before the shift ended. Remember to rest!'],
+ s_score:['Skor','Score'],s_done:['Tugasan siap','Tasks done'],s_missed:['Terlepas','Missed'],s_calls:['Panggilan betul','Calls right'],s_elaun:['Elaun diperoleh','Allowance earned'],s_total:['Jumlah elaun','Total allowance'],s_best:['Terbaik','Best'],
+ newbest:['🏆 Rekod baharu!','🏆 New record!'],
+ wrongNote:['Nota salah','Wrong note'],
+ correct:['Betul!','Correct!'],wrong:['Kurang tepat','Not quite']
+};
+const t=k=>D[k][L==='ms'?0:1];
+const ROLES={ho:'🩺',ed:'🚑',nurse:'💉'};
+const AVS=['🧕','👩‍⚕️','👨‍⚕️','🧑‍⚕️'];
+
+/* ---------- data ---------- */
+const TASKS={bloods:'🩸',cannula:'💉',notes:'📋',resus:'🚨',xray:'🫁'};
+const ROLEW={ho:{bloods:3,cannula:2,notes:3,xray:1,resus:.4},ed:{resus:2,xray:2,cannula:2,bloods:1,notes:1},nurse:{bloods:3,cannula:3,notes:2,resus:.8,xray:0}};
+const PATIENTS=[['👵','Pn. Aminah'],['👴','En. Raju'],['👩','Cik Mei Ling'],['👨','Tn. Ahmad'],['🧒','Adik Danish'],['👩‍🦱','Pn. Kavitha'],['🧓','Pak Long'],['👱','Cik Sarah']];
+
+const CALLS=[
+ {q:['Staf jururawat: "Doktor, pesakit katil 4 tekanan darah 82/50, nadi 120, kulit sejuk."','Staff nurse: "Doctor, bed 4 BP 82/50, pulse 120, cold peripheries."'],
+  o:[['Mulakan cecair IV dan datang sekarang','Start IV fluids and come now'],['Ambil semula BP sejam lagi','Recheck BP in an hour'],['Biarkan, nanti okay sendiri','Leave it, it will settle']],c:0},
+ {q:['Jururawat: "Pesakit sakit dada, minta ECG boleh?"','Nurse: "Patient has chest pain, can we get an ECG?"'],
+  o:[['Buat ECG segera dan saya datang review','Do the ECG now and I will review'],['Beri panadol dan tunggu pagi','Give paracetamol and wait till morning'],['Suruh pesakit berehat saja','Just tell them to rest']],c:0},
+ {q:['Jururawat: "Gula darah pesakit 2.4, mengantuk."','Nurse: "Patient\'s glucose is 2.4, drowsy."'],
+  o:[['Beri insulin','Give insulin'],['Rawat hipoglisemia segera dan semak semula gula','Treat the hypoglycaemia now and recheck glucose'],['Abaikan, tunggu round','Ignore, wait for the round']],c:1},
+ {q:['Waris pesakit: "Doktor, boleh terangkan keadaan ayah saya?"','Relative: "Doctor, can you explain my father\'s condition?"'],
+  o:[['Luangkan masa, terangkan dengan jelas dan ringkas','Make time, explain clearly and simply'],['Suruh tunggu di luar sampai esok','Tell them to wait outside till tomorrow'],['Cakap "saya tak tahu" lalu letak telefon','Say "I don\'t know" and hang up']],c:0},
+ {q:['Radiografer: "X-ray ada pneumotoraks besar, pesakit sesak."','Radiographer: "X-ray shows a large pneumothorax, patient breathless."'],
+  o:[['Datang segera, maklum MO dan sediakan prosedur','Come immediately, inform the MO and prepare the procedure'],['Esok pagi baru fikir','Think about it tomorrow'],['Suruh ambil X-ray lagi 3 hari lagi','Repeat X-ray in 3 days']],c:0},
+ {q:['Farmasi: "Dos ubat ini nampak terlalu tinggi."','Pharmacy: "This drug dose looks too high."'],
+  o:[['Semak semula preskripsi dan betulkan','Recheck the prescription and correct it'],['Teruskan, biasa je','Carry on, it\'s fine'],['Suruh farmasi tukar sendiri tanpa tanya','Let pharmacy change it without asking']],c:0},
+ {q:['Wad sebelah minta tolong, tapi anda sedang sibuk.','Next ward asks for help, but you are busy.'],
+  o:[['Maklum anda sibuk, minta rakan bantu atau beri masa anggaran','Say you\'re busy, ask a colleague or give an ETA'],['Tutup telefon','Hang up'],['Tinggalkan pesakit sekarang juga','Drop your patient right now']],c:0},
+ {q:['MO: "Sediakan senarai pesakit sebelum round."','MO: "Prepare the patient list before the round."'],
+  o:[['Siapkan senarai ringkas ikut keutamaan','Prepare a short list by priority'],['Cakap nanti saja masa round','Say you\'ll sort it during the round'],['Senarai tak perlu','No list needed']],c:0}
+];
+
+/* ---------- simpanan ringan ---------- */
+let SAVE={best:0,elaun:0,lang:'ms',avatar:AVS[0],role:'ho',snd:true};
+try{Object.assign(SAVE,JSON.parse(localStorage.getItem('syifwad')||'{}'));}catch(e){}
+const save=()=>{try{localStorage.setItem('syifwad',JSON.stringify(SAVE));}catch(e){}};
+L=SAVE.lang;
+
+/* ---------- bunyi ---------- */
+let AC=null;
+function beep(f=660,d=.1,type='sine',v=.07){
+  if(!SAVE.snd)return;
+  try{AC=AC||new (window.AudioContext||window.webkitAudioContext)();
+    const o=AC.createOscillator(),g=AC.createGain();o.type=type;o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(AC.destination);o.start();
+    g.gain.exponentialRampToValueAtTime(.0001,AC.currentTime+d);o.stop(AC.currentTime+d);}catch(e){}
+}
+const buzz=p=>{try{navigator.vibrate&&navigator.vibrate(p);}catch(e){}};
+
+/* ---------- keadaan ---------- */
+let S=null,raf=0,last=0,modal=null,toastT=0;
+const bedEls=[];
+
+function initBeds(){
+  const w=$('#ward');w.innerHTML='';bedEls.length=0;
+  for(let i=0;i<BEDN;i++){
+    const d=document.createElement('div');d.className='bed';
+    d.innerHTML=`<div class="no">#${i+1}</div><div class="pt"></div><div class="nm"></div><div class="bub"><span></span></div><div class="tag"></div>`;
+    d.addEventListener('pointerdown',()=>openTask(i));
+    w.appendChild(d);bedEls.push({d,pt:d.querySelector('.pt'),nm:d.querySelector('.nm'),bub:d.querySelector('.bub'),ico:d.querySelector('.bub span'),tag:d.querySelector('.tag'),sig:''});
+  }
+}
+function toast(msg){const e=$('#toast');e.textContent=msg;e.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>e.classList.remove('on'),1800);}
+
+/* ---------- menu ---------- */
+function buildMenu(){
+  $('#m_title').textContent=t('title');$('#m_tag').textContent=t('tag');
+  $('#m_role_h').textContent=t('pickRole');$('#m_av_h').textContent=t('pickAv');
+  $('#m_how').textContent=t('how');$('#go').textContent=t('start');$('#m_disc').textContent=t('disc');
+  $('#stlbl').textContent=t('stress');$('#resume').textContent=t('resume');$('#quit').textContent=t('quit');
+  $('#m_best').textContent=`${t('best')}: ${SAVE.best} · 🪙 ${SAVE.elaun}`;
+  const r=$('#roles');r.innerHTML='';
+  for(const k of Object.keys(ROLES)){
+    const b=document.createElement('button');b.className='opt'+(SAVE.role===k?' sel':'');
+    b.innerHTML=`${ROLES[k]} ${t('role_'+k)}<small>${t('role_'+k+'_d')}</small>`;
+    b.onclick=()=>{SAVE.role=k;save();buildMenu();};r.appendChild(b);
+  }
+  const a=$('#avs');a.innerHTML='';
+  for(const v of AVS){const b=document.createElement('button');b.className='av'+(SAVE.avatar===v?' sel':'');b.textContent=v;b.onclick=()=>{SAVE.avatar=v;save();buildMenu();};a.appendChild(b);}
+  $('#l_ms').classList.toggle('sel',L==='ms');$('#l_en').classList.toggle('sel',L==='en');
+  $('#snd').classList.toggle('sel',!!SAVE.snd);$('#snd').textContent=SAVE.snd?'🔊':'🔇';
+  document.documentElement.lang=L==='ms'?'ms':'en';
+}
+$('#l_ms').onclick=()=>{L='ms';SAVE.lang=L;save();buildMenu();};
+$('#l_en').onclick=()=>{L='en';SAVE.lang=L;save();buildMenu();};
+$('#snd').onclick=()=>{SAVE.snd=!SAVE.snd;save();buildMenu();beep(880,.08);};
+
+/* ---------- mula / tamat ---------- */
+function startShift(){
+  beep(520,.08);
+  closeModal();
+  const pts=shuffle(PATIENTS).slice(0,BEDN);
+  S={on:true,paused:false,el:0,score:0,elaun:0,stress:8,done:0,missed:0,calls:0,callsOk:0,teaLeft:2,
+     role:SAVE.role,beds:pts.map(p=>({pt:p[0],nm:p[1],task:null,flash:0,mood:''})),
+     nextSpawn:1.2,nextCall:rnd(14,22),call:null};
+  $('#menu').classList.remove('on');$('#end').classList.remove('on');$('#paused').classList.remove('on');
+  $('#call').classList.remove('on');
+  last=performance.now();cancelAnimationFrame(raf);raf=requestAnimationFrame(loop);
+  render(true);
+}
+function endShift(reason){
+  S.on=false;cancelAnimationFrame(raf);closeModal();$('#call').classList.remove('on');
+  const ok=reason==='done';
+  const stars=ok?1+(S.score>=1200?1:0)+(S.score>=2000?1:0):0;
+  const newBest=S.score>SAVE.best;
+  if(newBest)SAVE.best=S.score;
+  SAVE.elaun+=S.elaun;save();
+  $('#endcard').innerHTML=`<div class="res"><div class="e">${ok?'🌇':'😵‍💫'}</div><b>${t(ok?'done':'burn')}</b>
+   <div style="font-weight:600">${t(ok?'doneMsg':'burnMsg')}</div>
+   <div class="stars">${'⭐'.repeat(stars)}${'☆'.repeat(3-stars)}</div>${newBest?`<div style="font-weight:900">${t('newbest')}</div>`:''}</div>
+   <div class="stat"><span>${t('s_score')}</span><span>${S.score}</span></div>
+   <div class="stat"><span>${t('s_done')}</span><span>${S.done}</span></div>
+   <div class="stat"><span>${t('s_missed')}</span><span>${S.missed}</span></div>
+   <div class="stat"><span>${t('s_calls')}</span><span>${S.callsOk}/${S.calls}</span></div>
+   <div class="stat"><span>${t('s_elaun')}</span><span>🪙 ${S.elaun}</span></div>
+   <div class="stat"><span>${t('s_total')}</span><span>🪙 ${SAVE.elaun}</span></div>
+   <div class="stat"><span>${t('s_best')}</span><span>${SAVE.best}</span></div>
+   <button class="big" id="again">${t('again')}</button><button class="big" id="tomenu" style="background:#fff">${t('menu')}</button>`;
+  $('#end').classList.add('on');
+  $('#again').onclick=startShift;
+  $('#tomenu').onclick=()=>{$('#end').classList.remove('on');buildMenu();$('#menu').classList.add('on');};
+  beep(ok?784:196,.4,'triangle');
+}
+$('#go').onclick=startShift;
+
+/* ---------- gelung utama ---------- */
+function weightedType(){
+  const w=ROLEW[S.role];let tot=0;for(const k in w)tot+=w[k];let r=Math.random()*tot;
+  for(const k in w){r-=w[k];if(r<=0)return k;}return 'bloods';
+}
+function spawn(){
+  const free=S.beds.map((b,i)=>b.task?-1:i).filter(i=>i>=0);
+  if(!free.length)return;
+  const i=pick(free),type=weightedType(),ramp=S.el/SHIFT;
+  const urgent=type==='resus';
+  const pat=(urgent?20:36-11*ramp)*rnd(.9,1.1);
+  S.beds[i].task={type,left:pat,pat,urgent};S.beds[i].mood='';
+  if(urgent){beep(300,.25,'square',.05);}else beep(700,.06,'sine',.04);
+}
+function loop(ts){
+  if(!S||!S.on)return;
+  const dt=Math.min(.1,(ts-last)/1000);last=ts;
+  if(!S.paused){
+    S.el+=dt;const ramp=S.el/SHIFT;
+    S.nextSpawn-=dt;
+    if(S.nextSpawn<=0){spawn();S.nextSpawn=rnd(4.6,6.4)-2.8*ramp;}
+    let active=0;
+    S.beds.forEach((b,i)=>{
+      if(b.flash>0)b.flash-=dt;
+      if(!b.task)return;
+      active++;
+      b.task.left-=dt*((modal&&modal.bed===i)?.5:1);
+      if(b.task.left<=0){
+        const u=b.task.urgent;b.task=null;b.mood='😠';b.flash=1.2;
+        S.missed++;S.stress+=u?18:11;toast(t('missed').replace('{n}',i+1));buzz(120);beep(150,.25,'sawtooth',.06);
+        if(modal&&modal.bed===i)closeModal();
+      }
+    });
+    S.stress+=dt*.04*active;
+    // telefon
+    if(!S.call&&!modal&&S.el>=S.nextCall){
+      S.call={left:9,beep:0};$('#call').textContent=t('call');$('#call').classList.add('on');
+    }
+    if(S.call){
+      S.call.left-=dt;S.call.beep-=dt;
+      if(S.call.beep<=0){beep(880,.12,'square',.05);setTimeout(()=>beep(990,.12,'square',.05),180);buzz([80,60,80]);S.call.beep=1.2;}
+      if(S.call.left<=0){S.call=null;$('#call').classList.remove('on');S.calls++;S.stress+=7;S.nextCall=S.el+rnd(16,26);toast(t('callIgnored'));}
+    }
+    S.stress=clamp(S.stress,0,100);
+    if(S.stress>=100)return endShift('burn');
+    if(S.el>=SHIFT)return endShift('done');
+  }
+  render();
+  raf=requestAnimationFrame(loop);
+}
+
+function render(force){
+  const m=480+S.el/SHIFT*540,h=Math.floor(m/60),mi=Math.floor(m%60);
+  $('#clock').textContent=`⏰ ${String(h).padStart(2,'0')}:${String(mi).padStart(2,'0')}`;
+  $('#score').textContent='⭐ '+S.score;$('#elaun').textContent='🪙 '+S.elaun;
+  const bar=$('#stbar');bar.style.width=S.stress+'%';bar.style.backgroundSize=(10000/Math.max(S.stress,8))+'% 100%';
+  const tea=$('#tea');tea.textContent='☕'+(S.teaLeft?S.teaLeft:'');tea.disabled=S.teaLeft<=0;
+  S.beds.forEach((b,i)=>{
+    const e=bedEls[i],tk=b.task;
+    const face=tk?(tk.urgent?'😵':'🤒'):(b.flash>0&&b.mood?b.mood:'');
+    const base=tk||b.mood?b.pt:b.pt;
+    const sig=(tk?tk.type:'')+(tk&&tk.urgent?'u':'')+b.pt+(b.flash>0?b.mood:'');
+    if(force||e.sig!==sig){
+      e.sig=sig;e.pt.textContent=b.flash>0&&b.mood?b.mood:b.pt;e.nm.textContent=b.nm;
+      e.d.classList.toggle('has',!!tk);e.d.classList.toggle('urg',!!(tk&&tk.urgent));
+      e.d.classList.toggle('good',b.flash>0&&b.mood==='😊');
+      if(tk){e.ico.textContent=TASKS[tk.type];e.tag.textContent=t('t_'+tk.type);}else{e.tag.textContent='';}
+    }
+    if(tk){const p=clamp(tk.left/tk.pat*100,0,100);e.bub.style.setProperty('--p',p);e.bub.style.setProperty('--c',p>55?'#2a9d8f':p>28?'#f4a742':'#e63946');}
+  });
+}
+
+/* ---------- modal ---------- */
+function openModal(kind,bed,title,icon,builder){
+  closeModal();
+  $('#mtitle').textContent=icon+' '+title;
+  const body=$('#mbody');body.innerHTML='';
+  modal={kind,bed,cleanup:null};
+  modal.cleanup=builder(body)||null;
+  $('#modal').classList.add('on');
+}
+function closeModal(){
+  if(!modal)return;
+  const c=modal.cleanup;modal=null;
+  try{c&&c();}catch(e){}
+  $('#modal').classList.remove('on');$('#mbody').innerHTML='';
+}
+$('#mx').onclick=closeModal;
+
+function openTask(i){
+  if(!S||!S.on||S.paused||modal)return;
+  const b=S.beds[i];if(!b.task)return;
+  const type=b.task.type;
+  const mg={bloods:mgBloods,cannula:mgCannula,notes:mgNotes,resus:mgResus,xray:mgXray}[type];
+  openModal('task',i,t('t_'+type)+' · #'+(i+1)+' '+b.nm,TASKS[type],body=>mg(body,q=>finishTask(i,q,body)));
+}
+function finishTask(i,q,body){
+  const b=S.beds[i];if(!b.task)return;
+  const tk=b.task;
+  let pts=Math.round(100*q*(.6+.4*clamp(tk.left/tk.pat,0,1))*(tk.urgent?2:1));
+  const ok=q>=.5;
+  b.task=null;b.mood=ok?'😊':'😕';b.flash=1;
+  S.done++;S.score+=pts;S.elaun+=Math.round(pts/40);
+  S.stress=clamp(S.stress+(ok?-5*q-(tk.urgent?4:0):4),0,100);
+  beep(ok?880:200,.2,ok?'triangle':'sawtooth');
+  const lbl=q>=.9?'r3':q>=.5?'r2':q>0?'r1':'r0';
+  body.innerHTML=`<div class="res"><div class="e">${ok?'✅':'😬'}</div><b>${t(lbl)}</b><div>+${pts}</div></div>`;
+  setTimeout(()=>{if(modal&&modal.bed===i)closeModal();},850);
+}
+
+/* ---------- telefon ---------- */
+$('#call').addEventListener('pointerdown',()=>{
+  if(!S||!S.on||S.paused||!S.call||modal)return;
+  S.call=null;$('#call').classList.remove('on');S.calls++;S.nextCall=S.el+rnd(16,26);
+  const sc=pick(CALLS),opts=shuffle(sc.o.map((o,i)=>({o,ok:i===sc.c})));
+  openModal('call',-1,t('callT'),'📞',body=>{
+    body.innerHTML=`<p class="hint" style="font-size:16px">${sc.q[L==='ms'?0:1]}</p><div class="opts"></div>`;
+    const box=body.querySelector('.opts');let locked=false;
+    opts.forEach(x=>{
+      const b=document.createElement('button');b.className='opt';b.textContent=x.o[L==='ms'?0:1];
+      b.onclick=()=>{
+        if(locked)return;locked=true;
+        [...box.children].forEach((c,j)=>{if(opts[j].ok)c.classList.add('ok');});
+        if(x.ok){S.callsOk++;S.score+=120;S.elaun+=3;S.stress=clamp(S.stress-8,0,100);beep(880,.15,'triangle');}
+        else{b.classList.add('bad');S.stress=clamp(S.stress+10,0,100);beep(200,.2,'sawtooth');}
+        const me=modal;setTimeout(()=>{if(modal===me)closeModal();},x.ok?900:1700);
+      };box.appendChild(b);
+    });
+  });
+});
+
+/* ---------- jeda, teh ---------- */
+$('#pause').onclick=()=>{if(!S||!S.on)return;closeModal();S.paused=true;$('#paused').classList.add('on');};
+$('#resume').onclick=()=>{S.paused=false;last=performance.now();$('#paused').classList.remove('on');};
+$('#quit').onclick=()=>{S.on=false;cancelAnimationFrame(raf);$('#paused').classList.remove('on');$('#call').classList.remove('on');buildMenu();$('#menu').classList.add('on');};
+$('#tea').onclick=()=>{if(!S||!S.on||S.paused||S.teaLeft<=0)return;S.teaLeft--;S.stress=clamp(S.stress-18,0,100);toast(t('teaOk'));beep(520,.15,'triangle');};
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&S&&S.on&&!S.paused)$('#pause').onclick();});
+
+/* ================= MINIGAME ================= */
+const R=()=>S.el/SHIFT;
+
+function mgBloods(body,done){
+  body.innerHTML=`<p class="hint">${t('bl_hint')}</p><div class="track"><div class="zone"></div><div class="mark"></div></div><div class="pips"></div><button class="big">${t('bl_btn')}</button>`;
+  const zone=body.querySelector('.zone'),mark=body.querySelector('.mark'),pips=body.querySelector('.pips'),btn=body.querySelector('.big');
+  const zw=Math.max(.13,.22-R()*.07),need=2,max=3;let zc,hits=0,tries=0,pos=0,dir=1,id=0,lt=performance.now(),over=false;
+  const speed=.85+R()*.5;
+  const setZone=()=>{zc=rnd(.2,.8);zone.style.left=((zc-zw/2)*100)+'%';zone.style.width=(zw*100)+'%';};
+  const showPips=()=>{pips.textContent='💉'.repeat(0)+'●'.repeat(hits)+'○'.repeat(Math.max(0,max-tries));};
+  setZone();showPips();
+  const tick=n=>{const d=(n-lt)/1000;lt=n;pos+=dir*speed*d;if(pos>1){pos=1;dir=-1;}if(pos<0){pos=0;dir=1;}mark.style.left=(pos*100)+'%';id=requestAnimationFrame(tick);};
+  id=requestAnimationFrame(tick);
+  btn.addEventListener('pointerdown',()=>{
+    if(over)return;tries++;
+    if(Math.abs(pos-zc)<=zw/2){hits++;beep(900,.1,'triangle');}else beep(180,.15,'sawtooth');
+    showPips();setZone();
+    if(hits>=need||tries>=max){over=true;cancelAnimationFrame(id);done(hits>=need?1:hits/need*.45);}
+  });
+  return()=>{over=true;cancelAnimationFrame(id);};
+}
+
+function mgCannula(body,done){
+  body.innerHTML=`<p class="hint">${t('ca_hint')}</p><div class="area"><div class="vein"></div><div class="dot"></div></div><div class="pips"></div><div class="tbar"><i></i></div>`;
+  const area=body.querySelector('.area'),dot=body.querySelector('.dot'),pips=body.querySelector('.pips'),bar=body.querySelector('.tbar i');
+  const total=9,need=3;let hits=0,id=0,over=false;const t0=performance.now();const ph=rnd(0,6),sp=1+R()*.5;
+  const pos=n=>{const s=(n-t0)/1000*sp;return{x:50+38*Math.sin(s*1.4+ph),y:50+34*Math.sin(s*2.1+ph*2)};};
+  const showPips=()=>{pips.textContent='●'.repeat(hits)+'○'.repeat(need-hits);};showPips();
+  const tick=n=>{
+    const s=(n-t0)/1000;if(s>=total){over=true;done(hits>=need?1:hits>=2?.6:hits>=1?.3:0);return;}
+    const p=pos(n);dot.style.left=p.x+'%';dot.style.top=p.y+'%';bar.style.width=(100-s/total*100)+'%';id=requestAnimationFrame(tick);};
+  id=requestAnimationFrame(tick);
+  area.addEventListener('pointerdown',e=>{
+    if(over)return;const r=area.getBoundingClientRect(),p=pos(performance.now());
+    const px=e.clientX-r.left,py=e.clientY-r.top,tx=p.x/100*r.width,ty=p.y/100*r.height;
+    if(Math.hypot(px-tx,py-ty)<34){hits++;beep(900,.08,'triangle');showPips();if(hits>=need){over=true;cancelAnimationFrame(id);done(1);}}
+    else beep(180,.1,'sawtooth');
+  });
+  return()=>{over=true;cancelAnimationFrame(id);};
+}
+
+function mgNotes(body,done){
+  const C={
+   stable:{n:['Stabil','Stable'],bp:[[110,130],[70,85]],hr:[65,88],rr:[14,18],sp:[96,99],tp:[36.4,37]},
+   hypox:{n:['Hipoksia','Hypoxia'],bp:[[110,140],[70,90]],hr:[95,115],rr:[26,34],sp:[83,89],tp:[36.6,37.4]},
+   htn:{n:['Hipertensi teruk','Severe hypertension'],bp:[[185,205],[105,120]],hr:[70,95],rr:[14,18],sp:[95,99],tp:[36.4,37]},
+   sepsis:{n:['Curiga sepsis','Suspected sepsis'],bp:[[80,92],[45,58]],hr:[112,135],rr:[22,28],sp:[91,95],tp:[38.5,39.6]}};
+  const key=pick(Object.keys(C)),c=C[key],ri=(a)=>Math.round(rnd(a[0],a[1]));
+  const v={bp:ri(c.bp[0])+'/'+ri(c.bp[1]),hr:ri(c.hr),rr:ri(c.rr),sp:ri(c.sp)+'%',tp:rnd(c.tp[0],c.tp[1]).toFixed(1)+'°'};
+  body.innerHTML=`<p class="hint">${t('no_hint')}</p><div class="vit">
+   <div><small>BP</small>${v.bp}</div><div><small>HR</small>${v.hr}</div><div><small>RR</small>${v.rr}</div>
+   <div><small>SpO₂</small>${v.sp}</div><div><small>Temp</small>${v.tp}</div></div><div class="opts"></div>`;
+  const box=body.querySelector('.opts');let over=false;
+  shuffle(Object.keys(C)).forEach(k=>{
+    const b=document.createElement('button');b.className='opt';b.textContent=C[k].n[L==='ms'?0:1];
+    b.onclick=()=>{if(over)return;over=true;done(k===key?1:0);};box.appendChild(b);
+  });
+  return()=>{over=true;};
+}
+
+function mgResus(body,done){
+  body.innerHTML=`<p class="hint">${t('re_hint')}</p><div class="heart">❤️</div><div class="fb"></div><div class="pips"></div><div class="tbar"><i></i></div><button class="big">${t('re_btn')}</button>`;
+  const heart=body.querySelector('.heart'),fb=body.querySelector('.fb'),pips=body.querySelector('.pips'),bar=body.querySelector('.tbar i'),btn=body.querySelector('.big');
+  const period=545,goal=14,lead=900,total=17000;const start=performance.now()+lead;let good=0,id=0,over=false,lastBeat=-1;
+  const showPips=()=>{pips.textContent=good+' / '+goal;};showPips();
+  const tick=n=>{
+    if(over)return;const el=n-start;
+    if(el>=total){over=true;done(Math.min(1,good/goal));return;}
+    if(el>=0){const ph=(el%period)/period;heart.style.transform=`scale(${1+.18*Math.pow(1-ph,3)})`;
+      const bi=Math.floor(el/period);if(bi!==lastBeat){lastBeat=bi;beep(440,.05,'sine',.03);}
+      bar.style.width=(100-el/total*100)+'%';}
+    else{heart.style.transform='scale(1)';bar.style.width='100%';}
+    id=requestAnimationFrame(tick);};
+  id=requestAnimationFrame(tick);
+  btn.addEventListener('pointerdown',()=>{
+    if(over)return;const now=performance.now();if(now<start)return;
+    const d=(now-start)%period,off=Math.min(d,period-d);
+    if(off<=150){good++;fb.textContent=t('good');fb.style.color='#1b8a4a';beep(700,.06,'triangle');showPips();
+      if(good>=goal){over=true;cancelAnimationFrame(id);done(1);}}
+    else{fb.textContent=d<period/2?t('late'):t('early');fb.style.color='#c0392b';beep(160,.08,'sawtooth');}
+  });
+  return()=>{over=true;cancelAnimationFrame(id);};
+}
+
+function mgXray(body,done){
+  const F={normal:['Normal','Normal'],pneumo:['Pneumotoraks (kanan)','Pneumothorax (right)'],pneumonia:['Konsolidasi / pneumonia (kanan bawah)','Consolidation / pneumonia (right lower)'],cardio:['Kardiomegali','Cardiomegaly']};
+  const key=pick(Object.keys(F));let ribs='';
+  for(let i=0;i<7;i++){const y=44+i*20;ribs+=`<path d="M98 ${y} Q 52 ${y-12} 26 ${y+26}" /><path d="M102 ${y} Q 148 ${y-12} 174 ${y+26}" />`;}
+  const heart=key==='cardio'?'<ellipse cx="112" cy="140" rx="46" ry="40" fill="#8b949a" opacity=".85"/>':'<ellipse cx="108" cy="142" rx="24" ry="34" fill="#8b949a" opacity=".85"/>';
+  let extra='';
+  if(key==='pneumonia')extra='<ellipse cx="62" cy="158" rx="28" ry="22" fill="#e8edf0" opacity=".85" filter="url(#bl)"/>';
+  if(key==='pneumo')extra='<ellipse cx="46" cy="98" rx="24" ry="58" fill="#000" opacity=".92"/><path d="M68 50 Q 76 98 68 150" stroke="#d7dde0" stroke-width="2" fill="none"/>';
+  body.innerHTML=`<p class="hint">${t('xr_hint')}</p>
+   <svg class="xr" viewBox="0 0 200 220"><defs><filter id="bl"><feGaussianBlur stdDeviation="5"/></filter></defs>
+    <rect width="200" height="220" fill="#080b0d"/>
+    <path d="M26 46 Q100 8 174 46 L186 220 L14 220Z" fill="#2c343a"/>
+    <ellipse cx="66" cy="110" rx="40" ry="64" fill="#10161a"/><ellipse cx="134" cy="110" rx="40" ry="64" fill="#10161a"/>
+    <g stroke="#9aa4ab" stroke-width="3" fill="none" opacity=".45">${ribs}</g>
+    <rect x="96" y="14" width="8" height="206" fill="#808a91" opacity=".6"/>
+    ${heart}${extra}</svg><div class="opts"></div>`;
+  const box=body.querySelector('.opts');let over=false;
+  shuffle(Object.keys(F)).forEach(k=>{
+    const b=document.createElement('button');b.className='opt';b.textContent=F[k][L==='ms'?0:1];
+    b.onclick=()=>{if(over)return;over=true;done(k===key?1:0);};box.appendChild(b);
+  });
+  return()=>{over=true;};
+}
+
+/* ---------- mula ---------- */
+initBeds();buildMenu();
+if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){navigator.serviceWorker.register('sw.js').catch(function(){});}
+})();
+</script>
+</body>
+</html>

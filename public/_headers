@@ -18,3 +18,10 @@
   Cache-Control: no-cache
 /99-malam/manifest.webmanifest
   Cache-Control: no-cache
+
+/syif-wad/sw.js
+  Cache-Control: no-cache
+/syif-wad/index.html
+  Cache-Control: no-cache
+/syif-wad/manifest.webmanifest
+  Cache-Control: no-cache
