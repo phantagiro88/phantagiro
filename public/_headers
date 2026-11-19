@@ -4,3 +4,10 @@
   Cache-Control: no-cache
 /manifest.webmanifest
   Cache-Control: no-cache
+
+/hari-ini/sw.js
+  Cache-Control: no-cache
+/hari-ini/index.html
+  Cache-Control: no-cache
+/hari-ini/manifest.webmanifest
+  Cache-Control: no-cache
