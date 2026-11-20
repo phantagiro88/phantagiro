@@ -40,16 +40,17 @@ header.scrolled{border-bottom-color:var(--line)}
 .iconbtn{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--card);box-shadow:var(--shadow);font-size:20px}
 
 /* summary */
-.sum{background:var(--card);border-radius:20px;padding:16px;margin-top:6px;box-shadow:var(--shadow)}
-.sumgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px}
-.sumgrid div small{display:block;color:var(--mute);font-size:12px;text-transform:uppercase;letter-spacing:.04em}
-.sumgrid div b{font-size:20px}
-.bal{grid-column:1/-1;border-top:1px solid var(--line);padding-top:10px;display:flex;justify-content:space-between;align-items:baseline}
-.bal b{font-size:30px}
-.pos{color:var(--green)}.neg{color:var(--red)}
-.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:12px}
+.sum{background:var(--card);border-radius:16px;padding:10px 14px 9px;margin-top:8px;box-shadow:var(--shadow)}
+.sumgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:0 10px}
+.sumgrid div small{display:block;color:var(--mute);font-size:11px;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.sumgrid div b{font-size:16px;white-space:nowrap}
+.sumgrid .cur{font-size:11px;font-weight:500;color:var(--mute);margin-right:2px}
+.bal{text-align:right}
+.bal b{font-size:18px}
+.bar{height:6px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:8px}
 .bar i{display:block;height:100%;background:var(--gold);border-radius:99px;transition:width .3s}
-.barlbl{display:flex;justify-content:space-between;font-size:12.5px;color:var(--mute);margin-top:6px}
+.barlbl{display:flex;justify-content:space-between;font-size:12px;color:var(--mute);margin-top:4px}
+.pos{color:var(--green)}.neg{color:var(--red)}
 
 /* tag chips */
 .tags{display:flex;gap:8px;overflow-x:auto;padding:12px 0 2px;scrollbar-width:none}
@@ -122,7 +123,7 @@ label.f input:focus,label.f textarea:focus{border-color:var(--gold)}
 <header id="hdr"><div class="wrap"><div class="hrow">
   <button class="ptitle" data-act="period"><h1 class="serif" id="ptitle">Belanjawan</h1><small id="pdate"></small></button>
   <button class="iconbtn" data-act="menu" aria-label="Menu">⋯</button>
-</div></div></header>
+</div><div id="sum"></div></div></header>
 <main class="wrap" id="app"></main>
 <div id="sheetbg"></div><div id="sheet" role="dialog"></div>
 <div id="toast"></div>
@@ -202,7 +203,7 @@ function startFresh(sample){
 function render(){
   const app = $('#app');
   if (!S){
-    $('#ptitle').textContent = 'Belanjawan'; $('#pdate').textContent = '';
+    $('#ptitle').textContent = 'Belanjawan'; $('#pdate').textContent = ''; $('#sum').innerHTML = '';
     app.innerHTML = `<div class="empty"><div style="font-size:54px">🪙</div><h2 class="serif">Belanjawan saya</h2>
       <p>Catat semua pendapatan, belanja, simpanan dan hutang dalam satu tempat. Tulis <b>120x4</b> — app kira sendiri.</p>
       <button class="btn" data-act="start-sample">Mula dengan contoh</button>
@@ -216,12 +217,13 @@ function render(){
   const T = totals(p), bal = T.inc - T.out;
   const pct = T.out > 0 ? Math.min(100, T.paid / T.out * 100) : 0;
   const tagKeys = Object.keys(T.tags).sort((a,b)=>T.tags[b]-T.tags[a]);
-  let h = `<div class="sum"><div class="sumgrid">
-    <div><small>Pendapatan</small><b class="num pos">${rm(T.inc)}</b></div>
-    <div><small>Belanja + simpan + hutang</small><b class="num">${rm(T.out)}</b></div>
-    <div class="bal"><small style="color:var(--mute);font-size:12px;text-transform:uppercase;letter-spacing:.04em">Baki</small><b class="num serif ${bal<0?'neg':'pos'}">${bal<0?'−':''}${rm(Math.abs(bal))}</b></div></div>
+  $('#sum').innerHTML = `<div class="sum"><div class="sumgrid">
+    <div><small>Pendapatan</small><b class="num pos"><span class="cur">RM</span>${fmt(T.inc)}</b></div>
+    <div><small>Belanja</small><b class="num"><span class="cur">RM</span>${fmt(T.out)}</b></div>
+    <div class="bal"><small>Baki</small><b class="num serif ${bal<0?'neg':'pos'}">${bal<0?'−':''}<span class="cur">RM</span>${fmt(Math.abs(bal))}</b></div></div>
     <div class="bar"><i style="width:${pct}%"></i></div>
     <div class="barlbl"><span>Sudah bayar ${rm(T.paid)}</span><span>Belum ${rm(T.out - T.paid)}</span></div></div>`;
+  let h = '';
   if (tagKeys.length) h += `<div class="tags">` + tagKeys.map(k => `<button class="chip ${filterTag===k?'on':''}" data-act="ftag" data-tag="${esc(k)}"><span class="tag ${tagClass(k)}">${esc(k)}</span><b class="num">${fmt(T.tags[k])}</b></button>`).join('') + `</div>`;
 
   p.sections.forEach(sec => {
