@@ -90,6 +90,11 @@ h2{margin:10px 0 6px;font-size:13px;letter-spacing:.06em;text-transform:uppercas
 .res{text-align:center;padding:14px 4px}.res .e{font-size:54px}.res b{font-size:22px;display:block;margin:4px 0}
 .stars{font-size:34px;letter-spacing:4px}
 .stat{display:flex;justify-content:space-between;border-bottom:2px dashed #bbb;padding:5px 0;font-weight:700}
+.case{border:3px solid var(--ink);border-radius:12px;background:#0f1f24;color:#7dffb0;font:700 14px/1.4 ui-monospace,monospace;padding:10px;margin-bottom:10px}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.rx{border:3px solid var(--ink);border-radius:12px;background:#fff;padding:8px;font-size:13px;font-weight:700;line-height:1.55}
+.rx h4{margin:0 0 4px;font-size:11px;text-transform:uppercase;opacity:.6}
+.ecg{display:block;width:100%;border:3px solid var(--ink);border-radius:12px;margin-bottom:10px;background:#0b1a1e}
 .opt.ok{background:#8ce0a8}.opt.bad{background:#ff9aa2}
 </style>
 </head>
@@ -148,12 +153,12 @@ const D={
  tag:['Katil penuh. Loceng berbunyi. Syif baru bermula.','Full beds. Bells ringing. A new shift begins.'],
  pickRole:['Pilih peranan','Choose your role'],
  pickAv:['Pilih watak','Choose your character'],
- role_ho:['Pegawai Perubatan Siswazah','House Officer'],
- role_ho_d:['Wad: darah, kanula, nota, X-ray','Ward: bloods, cannula, notes, X-ray'],
- role_ed:['Doktor Kecemasan','Emergency Doctor'],
- role_ed_d:['Resus, X-ray, kanula – banyak Kod Biru','Resus, X-ray, cannula – many Code Blues'],
- role_nurse:['Jururawat Wad','Ward Nurse'],
- role_nurse_d:['Darah, kanula, nota & sesekali Kod Biru','Bloods, cannula, notes & the odd Code Blue'],
+ role_ho:['Pegawai Perubatan Siswazah (HO)','House Officer (HO)'],
+ role_ho_d:['Preskripsi, keputusan makmal, darah, kanula, nota','Prescribing, lab results, bloods, cannula, notes'],
+ role_mo:['Pegawai Perubatan (MO)','Medical Officer (MO)'],
+ role_mo_d:['Baca ECG, triaj, pelan pengurusan, X-ray, Kod Biru','Read ECG, triage, management plans, X-ray, Code Blue'],
+ role_nurse:['Jururawat','Nurse'],
+ role_nurse_d:['Tanda vital, ubat (5 Benar), kanula, darah','Vital signs, medication (5 Rights), cannula, bloods'],
  how:['Ketik katil yang ada gelembung tugasan sebelum pesakit hilang sabar. Jawab telefon bila berdering. Jaga bar TEKANAN – kalau penuh, anda burnout! ☕ Teh tarik kurangkan tekanan (2 kali). Bertahan sehingga 17:00.','Tap a bed with a task bubble before the patient loses patience. Answer the phone when it rings. Watch the STRESS bar – if it fills, you burn out! ☕ Tea lowers stress (2 uses). Survive until 17:00.'],
  start:['MULA SYIF','START SHIFT'],
  disc:['Hospital, pesakit & kes adalah rekaan. Permainan ini bukan nasihat atau latihan perubatan.','Hospital, patients and cases are fictional. This game is not medical advice or training.'],
@@ -164,6 +169,17 @@ const D={
  resume:['SAMBUNG','RESUME'],quit:['KE MENU','TO MENU'],
  again:['MAIN LAGI','PLAY AGAIN'],menu:['KE MENU','TO MENU'],
  t_bloods:['Ambil darah','Bloods'],t_cannula:['Pasang kanula','Cannula'],t_notes:['Tulis nota','Notes'],t_resus:['KOD BIRU','CODE BLUE'],t_xray:['Baca X-ray','Read X-ray'],
+ t_vitals:['Tanda vital','Vital signs'],t_meds:['Beri ubat','Medication'],t_rx:['Preskripsi','Prescribe'],t_lab:['Keputusan makmal','Lab result'],t_ecg:['Baca ECG','Read ECG'],t_triage:['Triaj','Triage'],t_plan:['Pelan pengurusan','Management plan'],
+ vi_hint:['Tekan & TAHAN untuk pam cuff, lepaskan bila penanda dalam zon hijau (2 cubaan).','Press & HOLD to inflate the cuff, release when the marker is in the green zone (2 tries).'],
+ vi_btn:['TAHAN UNTUK PAM','HOLD TO INFLATE'],vi_miss:['Terlepas – cuba lagi','Missed – try again'],
+ me_hint:['Semak 5 Benar: pesakit, ubat, dos, laluan. Bandingkan carta dengan label ubat.','Check the 5 Rights: patient, drug, dose, route. Compare the chart with the drug label.'],
+ me_chart:['Carta ubat','Drug chart'],me_label:['Label ubat','Drug label'],
+ me_ok:['Semua betul – beri ubat','All correct – give the drug'],me_pt:['Pesakit salah','Wrong patient'],me_drug:['Ubat salah','Wrong drug'],me_dose:['Dos salah','Wrong dose'],me_route:['Laluan salah','Wrong route'],
+ rx_hint:['Pilih ubat yang paling selamat dan sesuai untuk pesakit ini.','Choose the safest, most suitable drug for this patient.'],
+ lab_hint:['Apa tindakan anda terhadap keputusan ini?','What is your action for this result?'],
+ ec_hint:['Baca jalur ECG ini. Apakah iramanya?','Read this ECG strip. What is the rhythm?'],
+ tr_hint:['Siapa perlu dilihat DAHULU?','Who needs to be seen FIRST?'],
+ pl_hint:['Pilih langkah pengurusan yang paling tepat.','Choose the most appropriate next step.'],
  bl_hint:['Tekan SUNTIK bila penanda merah berada dalam zon hijau. Perlu 2 kali kena (3 cubaan).','Press INJECT when the red marker is in the green zone. Need 2 hits (3 tries).'],
  bl_btn:['SUNTIK','INJECT'],
  ca_hint:['Ketik urat (bulatan biru) yang bergerak – 3 kali dalam masa suntuk!','Tap the moving vein (blue circle) – 3 times before time runs out!'],
@@ -185,12 +201,12 @@ const D={
  correct:['Betul!','Correct!'],wrong:['Kurang tepat','Not quite']
 };
 const t=k=>D[k][L==='ms'?0:1];
-const ROLES={ho:'🩺',ed:'🚑',nurse:'💉'};
+const ROLES={nurse:'💉',ho:'🩺',mo:'📟'};
 const AVS=['🧕','👩‍⚕️','👨‍⚕️','🧑‍⚕️'];
 
 /* ---------- data ---------- */
-const TASKS={bloods:'🩸',cannula:'💉',notes:'📋',resus:'🚨',xray:'🫁'};
-const ROLEW={ho:{bloods:3,cannula:2,notes:3,xray:1,resus:.4},ed:{resus:2,xray:2,cannula:2,bloods:1,notes:1},nurse:{bloods:3,cannula:3,notes:2,resus:.8,xray:0}};
+const TASKS={bloods:'🩸',cannula:'💉',notes:'📋',resus:'🚨',xray:'🫁',vitals:'🌡️',meds:'💊',rx:'📝',lab:'🧪',ecg:'📈',triage:'🚦',plan:'🏥'};
+const ROLEW={nurse:{vitals:3,meds:3,cannula:2,bloods:2,resus:.6},ho:{rx:2.5,lab:2,bloods:2,cannula:2,notes:2,xray:.5,resus:.4},mo:{ecg:2.5,triage:2,plan:2,xray:2,resus:1.5}};
 const PATIENTS=[['👵','Pn. Aminah'],['👴','En. Raju'],['👩','Cik Mei Ling'],['👨','Tn. Ahmad'],['🧒','Adik Danish'],['👩‍🦱','Pn. Kavitha'],['🧓','Pak Long'],['👱','Cik Sarah']];
 
 const CALLS=[
@@ -209,12 +225,31 @@ const CALLS=[
  {q:['Wad sebelah minta tolong, tapi anda sedang sibuk.','Next ward asks for help, but you are busy.'],
   o:[['Maklum anda sibuk, minta rakan bantu atau beri masa anggaran','Say you\'re busy, ask a colleague or give an ETA'],['Tutup telefon','Hang up'],['Tinggalkan pesakit sekarang juga','Drop your patient right now']],c:0},
  {q:['MO: "Sediakan senarai pesakit sebelum round."','MO: "Prepare the patient list before the round."'],
-  o:[['Siapkan senarai ringkas ikut keutamaan','Prepare a short list by priority'],['Cakap nanti saja masa round','Say you\'ll sort it during the round'],['Senarai tak perlu','No list needed']],c:0}
+  o:[['Siapkan senarai ringkas ikut keutamaan','Prepare a short list by priority'],['Cakap nanti saja masa round','Say you\'ll sort it during the round'],['Senarai tak perlu','No list needed']],c:0},
+ {r:['nurse'],q:['Doktor: "Jururawat, tolong ambil vital semula dan maklum saya jika SpO₂ bawah 92."','Doctor: "Nurse, please repeat the vitals and tell me if SpO₂ drops below 92."'],
+  o:[['Ambil vital semula dan maklum segera jika rendah','Repeat vitals and report promptly if low'],['Ambil esok pagi','Check tomorrow morning'],['Abaikan permintaan','Ignore the request']],c:0},
+ {r:['nurse'],q:['Pesakit katil 2 tekan loceng: "Saya pening bila bangun."','Bed 2 presses the call bell: "I feel dizzy when I stand."'],
+  o:[['Datang, baringkan pesakit, ambil BP dan maklum doktor','Go over, lie the patient down, check BP and inform the doctor'],['Suruh jalan-jalan dulu','Tell them to walk it off'],['Matikan loceng','Switch off the bell']],c:0},
+ {r:['nurse'],q:['Farmasi: "Ubat pesakit katil 5 lambat sampai."','Pharmacy: "Bed 5\'s medication will be late."'],
+  o:[['Maklum doktor dan atur mengikut prosedur','Inform the doctor and arrange per procedure'],['Beri ubat lain pesakit sebelah','Give the next patient\'s drug instead'],['Biarkan, tak payah cakap','Leave it, say nothing']],c:0},
+ {r:['ho'],q:['Jururawat: "HO, pesakit katil 3 demam 39° dan menggigil."','Nurse: "HO, bed 3 has a fever of 39° and rigors."'],
+  o:[['Datang review, ambil kultur darah dan maklum MO jika tidak stabil','Review, take blood cultures and inform the MO if unstable'],['Beri panadol dan balik tidur','Give paracetamol and go back to sleep'],['Tunggu 24 jam','Wait 24 hours']],c:0},
+ {r:['ho'],q:['MO: "HO, mana keputusan ujian darah katil 3?"','MO: "HO, where are bed 3\'s blood results?"'],
+  o:[['Semak sistem makmal dan laporkan ringkas','Check the lab system and report briefly'],['Cakap belum minta darah tanpa semak','Say they weren\'t requested without checking'],['Salahkan jururawat','Blame the nurse']],c:0},
+ {r:['ho'],q:['Waris minta pesakit discharge awal tanpa review.','Relatives ask for early discharge without review.'],
+  o:[['Terangkan keperluan review dan bincang dengan MO','Explain the need for review and discuss with the MO'],['Setuju terus','Just agree'],['Marah waris','Scold the relatives']],c:0},
+ {r:['mo'],q:['HO: "MO, pesakit saya GCS menurun."','HO: "MO, my patient\'s GCS is dropping."'],
+  o:[['Datang segera, semak ABC dan gula, maklum ICU jika perlu','Come now, check ABC and glucose, inform ICU if needed'],['Suruh HO tunggu sejam','Tell the HO to wait an hour'],['Suruh baringkan saja','Just tell them to lie flat']],c:0},
+ {r:['mo'],q:['Pakar kardiologi: "Ceritakan kes ringkas."','Cardiologist: "Give me a brief case summary."'],
+  o:[['Bentangkan ringkas ikut format SBAR','Present briefly in SBAR format'],['Bercakap panjang tanpa susunan','Ramble without structure'],['Letak telefon','Hang up']],c:0},
+ {r:['mo'],q:['ICU: "Ada katil kosong, nak hantar pesakit sekarang?"','ICU: "A bed is free, send the patient now?"'],
+  o:[['Sahkan, siapkan nota pindah dan hantar bersama jururawat','Confirm, finish the transfer note and send with a nurse'],['Hantar sendirian tanpa maklum','Send alone without handover'],['Tolak sebab malas','Decline because you can\'t be bothered']],c:0}
 ];
 
 /* ---------- simpanan ringan ---------- */
 let SAVE={best:0,elaun:0,lang:'ms',avatar:AVS[0],role:'ho',snd:true};
 try{Object.assign(SAVE,JSON.parse(localStorage.getItem('syifwad')||'{}'));}catch(e){}
+if(!ROLES[SAVE.role])SAVE.role=SAVE.role==='ed'?'mo':'ho';
 const save=()=>{try{localStorage.setItem('syifwad',JSON.stringify(SAVE));}catch(e){}};
 L=SAVE.lang;
 
@@ -397,8 +432,9 @@ function openTask(i){
   if(!S||!S.on||S.paused||modal)return;
   const b=S.beds[i];if(!b.task)return;
   const type=b.task.type;
-  const mg={bloods:mgBloods,cannula:mgCannula,notes:mgNotes,resus:mgResus,xray:mgXray}[type];
-  openModal('task',i,t('t_'+type)+' · #'+(i+1)+' '+b.nm,TASKS[type],body=>mg(body,q=>finishTask(i,q,body)));
+  const mg={bloods:mgBloods,cannula:mgCannula,notes:mgNotes,resus:mgResus,xray:mgXray,vitals:mgVitals,meds:mgMeds,ecg:mgEcg,
+    rx:(b,d)=>mgChoice(b,d,RX,'rx_hint'),lab:(b,d)=>mgChoice(b,d,LAB,'lab_hint'),triage:(b,d)=>mgChoice(b,d,TRIAGE,'tr_hint'),plan:(b,d)=>mgChoice(b,d,PLAN,'pl_hint')}[type];
+  openModal('task',i,t('t_'+type)+' · #'+(i+1)+' '+b.nm,TASKS[type],body=>mg(body,q=>finishTask(i,q,body),i));
 }
 function finishTask(i,q,body){
   const b=S.beds[i];if(!b.task)return;
@@ -418,7 +454,7 @@ function finishTask(i,q,body){
 $('#call').addEventListener('pointerdown',()=>{
   if(!S||!S.on||S.paused||!S.call||modal)return;
   S.call=null;$('#call').classList.remove('on');S.calls++;S.nextCall=S.el+rnd(16,26);
-  const sc=pick(CALLS),opts=shuffle(sc.o.map((o,i)=>({o,ok:i===sc.c})));
+  const rolePool=CALLS.filter(c=>c.r&&c.r.includes(S.role)),sc=(Math.random()<.65)?pick(rolePool):pick(CALLS.filter(c=>!c.r)),opts=shuffle(sc.o.map((o,i)=>({o,ok:i===sc.c})));
   openModal('call',-1,t('callT'),'📞',body=>{
     body.innerHTML=`<p class="hint" style="font-size:16px">${sc.q[L==='ms'?0:1]}</p><div class="opts"></div>`;
     const box=body.querySelector('.opts');let locked=false;
@@ -547,6 +583,109 @@ function mgXray(body,done){
     const b=document.createElement('button');b.className='opt';b.textContent=F[k][L==='ms'?0:1];
     b.onclick=()=>{if(over)return;over=true;done(k===key?1:0);};box.appendChild(b);
   });
+  return()=>{over=true;};
+}
+
+/* ===== minigame ikut peranan ===== */
+function mgChoice(body,done,pool,hintKey){
+  const sc=pick(pool),opts=shuffle(sc.o.map((o,i)=>({o,ok:i===sc.c})));
+  body.innerHTML=`<p class="hint">${t(hintKey)}</p>${sc.q?`<div class="case">${sc.q[L==='ms'?0:1]}</div>`:''}<div class="opts"></div>`;
+  const box=body.querySelector('.opts');let over=false;
+  opts.forEach(x=>{const b=document.createElement('button');b.className='opt';b.textContent=x.o[L==='ms'?0:1];
+    b.onclick=()=>{if(over)return;over=true;done(x.ok?1:0);};box.appendChild(b);});
+  return()=>{over=true;};
+}
+const RX=[
+ {q:['Pesakit pneumonia komuniti. ALERGI: penisilin.','Community-acquired pneumonia. ALLERGY: penicillin.'],o:[['Amoxicillin','Amoxicillin'],['Co-amoxiclav','Co-amoxiclav'],['Azithromycin','Azithromycin'],['Paracetamol sahaja','Paracetamol only']],c:2},
+ {q:['Sakit sendi. Penyakit buah pinggang kronik (eGFR rendah).','Joint pain. Chronic kidney disease (low eGFR).'],o:[['Ibuprofen','Ibuprofen'],['Diclofenac','Diclofenac'],['Paracetamol','Paracetamol'],['Asid mefenamik','Mefenamic acid']],c:2},
+ {q:['Sakit kepala. Pesakit sedang makan warfarin.','Headache. Patient is on warfarin.'],o:[['Aspirin','Aspirin'],['Ibuprofen','Ibuprofen'],['Paracetamol','Paracetamol'],['Diclofenac','Diclofenac']],c:2},
+ {q:['Asma akut: berbunyi dan sesak. Tiada alergi.','Acute asthma: wheeze and breathless. No allergies.'],o:[['Propranolol','Propranolol'],['Salbutamol nebuliser','Salbutamol nebuliser'],['Ibuprofen','Ibuprofen'],['Morfin','Morphine']],c:1},
+ {q:['Darah tinggi, mengandung 20 minggu.','Hypertension, 20 weeks pregnant.'],o:[['Enalapril','Enalapril'],['Labetalol','Labetalol'],['Atorvastatin','Atorvastatin'],['Warfarin','Warfarin']],c:1}
+];
+const LAB=[
+ {q:['K⁺ 6.8 mmol/L, gelombang T tinggi pada ECG.','K⁺ 6.8 mmol/L, peaked T waves on ECG.'],o:[['Rawat hiperkalemia segera dan pantau ECG','Treat hyperkalaemia urgently and monitor ECG'],['Ulang ujian minggu depan','Repeat the test next week'],['Beri tambahan kalium','Give extra potassium']],c:0},
+ {q:['Hb 6.2 g/dL. Pesakit pucat dan berdebar.','Hb 6.2 g/dL. Patient pale and palpitating.'],o:[['Maklum MO dan pertimbang transfusi darah','Inform the MO and consider a transfusion'],['Suruh makan bayam','Advise eating spinach'],['Abaikan','Ignore it']],c:0},
+ {q:['Glukosa 2.1 mmol/L, pesakit mengantuk.','Glucose 2.1 mmol/L, patient drowsy.'],o:[['Rawat hipoglisemia dan semak semula gula','Treat the hypoglycaemia and recheck glucose'],['Beri insulin','Give insulin'],['Tunggu esok pagi','Wait until morning']],c:0},
+ {q:['Kreatinin naik dua kali ganda, pesakit dehidrasi.','Creatinine doubled, patient dehydrated.'],o:[['Semak cecair dan ubat nefrotoksik, ulang ujian','Review fluids and nephrotoxic drugs, repeat the test'],['Tambah NSAID','Add an NSAID'],['Tiada tindakan','No action']],c:0},
+ {q:['Troponin meningkat, pesakit sakit dada.','Troponin raised, patient has chest pain.'],o:[['Buat ECG dan maklum MO segera','Do an ECG and inform the MO now'],['Discharge pesakit','Discharge the patient'],['Beri antasid sahaja','Give an antacid only']],c:0}
+];
+const TRIAGE=[
+ {o:[['Lelaki 55: sakit dada menjalar ke lengan, berpeluh','Man 55: chest pain radiating to arm, sweating'],['Wanita 30: selesema 3 hari, tiada demam','Woman 30: 3-day cold, no fever'],['Budak 8: luka kecil di lutut','Boy 8: small graze on knee']],c:0},
+ {o:[['Lelaki 40: sakit belakang kronik, stabil','Man 40: chronic back pain, stable'],['Wanita 70: SpO₂ 86%, sesak','Woman 70: SpO₂ 86%, breathless'],['Lelaki 25: demam 38°, boleh makan','Man 25: fever 38°, eating well']],c:1},
+ {o:[['Wanita 60: tekanan darah 150/90, tiada simptom','Woman 60: BP 150/90, asymptomatic'],['Lelaki 35: minta discharge awal','Man 35: asking for early discharge'],['Lelaki 68: GCS jatuh dari 15 ke 9','Man 68: GCS dropped from 15 to 9']],c:2},
+ {o:[['Wanita 45: muntah darah, nadi 125','Woman 45: vomiting blood, pulse 125'],['Lelaki 30: sakit kepala ringan','Man 30: mild headache'],['Wanita 50: loya selepas kemo, boleh minum','Woman 50: nausea after chemo, able to drink']],c:0},
+ {o:[['Budak 6: ruam gatal, ceria','Boy 6: itchy rash, playful'],['Wanita 28: cirit-birit ringan','Woman 28: mild diarrhoea'],['Lelaki 52: kaki bengkak sebelah, tiba-tiba sesak','Man 52: unilateral leg swelling, sudden breathlessness']],c:2}
+];
+const PLAN=[
+ {q:['Hipotensi, trakea tersasar, bunyi nafas hilang sebelah kanan.','Hypotension, deviated trachea, absent breath sounds on the right.'],o:[['Dekompresi jarum segera','Immediate needle decompression'],['Tunggu X-ray dahulu','Wait for an X-ray first'],['Beri antibiotik sahaja','Give antibiotics only']],c:0},
+ {q:['ECG menunjukkan STEMI, sakit dada 40 minit.','ECG shows STEMI, chest pain for 40 minutes.'],o:[['Aktifkan laluan STEMI dan rujuk kardiologi','Activate the STEMI pathway and call cardiology'],['Ulang ECG esok','Repeat the ECG tomorrow'],['Beri laksatif','Give a laxative']],c:0},
+ {q:['Selepas suntikan: bibir bengkak, berbunyi, BP rendah.','After an injection: swollen lips, wheeze, low BP.'],o:[['Adrenalin IM segera','IM adrenaline immediately'],['Beri antihistamin oral sahaja','Oral antihistamine only'],['Perhatikan 6 jam','Observe for 6 hours']],c:0},
+ {q:['Gula 28, ketone tinggi, dehidrasi (DKA).','Glucose 28, high ketones, dehydrated (DKA).'],o:[['Cecair IV dan insulin infusi ikut protokol','IV fluids and insulin infusion per protocol'],['Beri metformin dan discharge','Give metformin and discharge'],['Suruh minum air manis','Tell them to drink sweet water']],c:0},
+ {q:['Demam, hipotensi, laktat 4 (sepsis).','Fever, hypotension, lactate 4 (sepsis).'],o:[['Antibiotik spektrum luas dan cecair dalam masa sejam','Broad-spectrum antibiotics and fluids within the hour'],['Tunggu kultur 48 jam','Wait 48 hours for cultures'],['Beri panadol sahaja','Paracetamol only']],c:0}
+];
+
+function mgVitals(body,done){
+  body.innerHTML=`<p class="hint">${t('vi_hint')}</p><div class="track"><div class="zone"></div><div class="mark" style="left:0"></div></div><div class="gauge" style="text-align:center;font:900 28px ui-monospace,monospace;margin:8px 0">0 mmHg</div><div class="pips"></div><button class="big">${t('vi_btn')}</button>`;
+  const zone=body.querySelector('.zone'),mark=body.querySelector('.mark'),gauge=body.querySelector('.gauge'),pips=body.querySelector('.pips'),btn=body.querySelector('.big');
+  const MAX=220,zw=24;let val=0,zc,pump=false,tries=0,id=0,lt=performance.now(),over=false;
+  const setZone=()=>{zc=rnd(110,175);zone.style.left=((zc-zw/2)/MAX*100)+'%';zone.style.width=(zw/MAX*100)+'%';};
+  setZone();
+  const judge=()=>{
+    if(!pump||over)return;pump=false;tries++;
+    const hit=Math.abs(val-zc)<=zw/2;
+    if(hit){over=true;cancelAnimationFrame(id);beep(900,.1,'triangle');done(tries===1?1:.7);return;}
+    beep(180,.15,'sawtooth');
+    if(tries>=2){over=true;cancelAnimationFrame(id);done(0);return;}
+    pips.textContent=t('vi_miss');val=0;setZone();
+  };
+  const tick=n=>{const d=(n-lt)/1000;lt=n;
+    if(pump){val+=78*d;if(val>=MAX){val=MAX;judge();}}
+    else if(val>0&&!over){val=Math.max(0,val-120*d);}
+    mark.style.left=(val/MAX*100)+'%';gauge.textContent=Math.round(val)+' mmHg';
+    if(!over)id=requestAnimationFrame(tick);};
+  id=requestAnimationFrame(tick);
+  btn.addEventListener('pointerdown',()=>{if(over)return;pump=true;pips.textContent='';});
+  const up=()=>judge();
+  window.addEventListener('pointerup',up);window.addEventListener('pointercancel',up);
+  return()=>{over=true;cancelAnimationFrame(id);window.removeEventListener('pointerup',up);window.removeEventListener('pointercancel',up);};
+}
+
+const DRUGS=[['Paracetamol','500 mg','PO'],['Amoxicillin','500 mg','PO'],['Furosemide','40 mg','IV'],['Metformin','500 mg','PO'],['Enoxaparin','40 mg','SC'],['Ceftriaxone','1 g','IV'],['Salbutamol','2.5 mg','Neb'],['Omeprazole','20 mg','PO']];
+function mgMeds(body,done,bed){
+  const nm=S.beds[bed].nm,d=pick(DRUGS),chart={n:nm,d:d[0],g:d[1],r:d[2]},lab={n:nm,d:d[0],g:d[1],r:d[2]};
+  const err=pick(['ok','ok','patient','drug','dose','route']);
+  if(err==='patient')lab.n=pick(PATIENTS.map(x=>x[1]).filter(x=>x!==nm));
+  if(err==='drug')lab.d=pick(DRUGS.filter(x=>x[0]!==d[0]))[0];
+  if(err==='dose')lab.g=pick(['5 mg','10 mg','50 mg','100 mg','250 mg','1 g','2.5 mg','40 mg','20 mg','500 mg'].filter(x=>x!==d[1]));
+  if(err==='route')lab.r=pick(['PO','IV','SC','IM','Neb'].filter(x=>x!==d[2]));
+  const card=(h,c)=>`<div class="rx"><h4>${h}</h4>👤 ${c.n}<br>💊 ${c.d}<br>⚖️ ${c.g}<br>➡️ ${c.r}</div>`;
+  body.innerHTML=`<p class="hint">${t('me_hint')}</p><div class="pair">${card(t('me_chart'),chart)}${card(t('me_label'),lab)}</div><div class="opts"></div>`;
+  const box=body.querySelector('.opts');let over=false;
+  [['ok','me_ok'],['patient','me_pt'],['drug','me_drug'],['dose','me_dose'],['route','me_route']].forEach(([k,lbl])=>{
+    const b=document.createElement('button');b.className='opt';b.textContent=t(lbl);
+    b.onclick=()=>{if(over)return;over=true;done(k===err?1:0);};box.appendChild(b);
+  });
+  return()=>{over=true;};
+}
+
+function mgEcg(body,done){
+  const T={normal:['Irama sinus normal','Normal sinus rhythm'],af:['Fibrilasi atrium (AF)','Atrial fibrillation (AF)'],stemi:['STEMI (ST meninggi)','STEMI (ST elevation)'],vt:['Takikardia ventrikel (VT)','Ventricular tachycardia (VT)']};
+  const key=pick(Object.keys(T)),base=62,W=400,pts=[];
+  const add=(x,y)=>pts.push(x.toFixed(1)+','+(base+y).toFixed(1));
+  if(key==='vt'){for(let x=0;x<=W;x+=3)add(x,Math.sin(x/11)*36);}
+  else{let x=4;
+    while(x<W){
+      if(key==='af'){const rr=rnd(30,66);add(x,0);add(x+2,4);add(x+5,-40);add(x+8,10);add(x+10,0);add(x+16,-4);add(x+22,0);
+        for(let k=x+26;k<x+rr;k+=4)add(k,rnd(-2.5,2.5));x+=rr;}
+      else{add(x,0);add(x+6,0);add(x+9,-6);add(x+12,0);add(x+18,0);add(x+20,4);add(x+23,-40);add(x+26,10);add(x+28,0);
+        if(key==='stemi'){add(x+31,-14);add(x+36,-18);add(x+44,-22);add(x+52,-12);add(x+58,0);x+=64;}
+        else{add(x+34,0);add(x+38,-8);add(x+44,-9);add(x+50,0);x+=62;}}
+    }}
+  let grid='';for(let g=0;g<=W;g+=20)grid+=`<line x1="${g}" y1="0" x2="${g}" y2="124" />`;for(let g=0;g<=124;g+=20)grid+=`<line x1="0" y1="${g}" x2="${W}" y2="${g}" />`;
+  body.innerHTML=`<p class="hint">${t('ec_hint')}</p><svg class="ecg" viewBox="0 0 ${W} 124"><g stroke="#1d4048" stroke-width="1">${grid}</g><polyline points="${pts.join(' ')}" fill="none" stroke="#7dffb0" stroke-width="2" stroke-linejoin="round"/></svg><div class="opts"></div>`;
+  const box=body.querySelector('.opts');let over=false;
+  shuffle(Object.keys(T)).forEach(k=>{const b=document.createElement('button');b.className='opt';b.textContent=T[k][L==='ms'?0:1];
+    b.onclick=()=>{if(over)return;over=true;done(k===key?1:0);};box.appendChild(b);});
   return()=>{over=true;};
 }
 
