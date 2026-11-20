@@ -809,7 +809,8 @@ function kidAI(k,dt){
     const d=stepTo(k,CX+Math.cos(k.a)*30,CY+Math.sin(k.a)*24+10,60,dt);
     if(d<14){
       const c=k.carry||0;if(c>0){S.stock+=c;S.st.wood+=c;floatText(k.x,k.y-26,'+'+c+' kayu','#d9a441')}
-      k.carry=0;k.job='idle';k.wait=.6;
+      const cs=k.carryS||0;if(cs>0){S.stone+=cs;S.st.stone+=cs;floatText(k.x+10,k.y-36,'+'+cs+' batu','#aab4c0')}
+      k.carry=0;k.carryS=0;k.job='idle';k.wait=.6;
     }
     return;
   }
@@ -826,22 +827,36 @@ function kidAI(k,dt){
     k.sw=.15*(Math.sin(performance.now()/120)>0?1:0);
     k.ct-=dt;
     if(k.ct<=0){
-      t.hp--;t.shake=.25;t.kc=null;puff(t.x,t.y-16,'#a98258',3,40);
-      if(t.hp<=0){if(Math.random()<.1)t.dead=true;else t.regrow=130}
-      k.carry=Math.max(1,Math.round((1+Math.floor(S.up.latih/2))*helperMul()*.5));k.tree=null;k.job='back';
+      t.hp--;t.kc=null;
+      if(k.rk){
+        puff(t.x,t.y-4,'#9aa1aa',3,40);sfx('mine');
+        if(t.hp<=0)t.regrow=90;
+        k.carryS=Math.max(1,Math.round((1+Math.floor(S.up.latih/3))*helperMul()*.5));
+      }else{
+        t.shake=.25;puff(t.x,t.y-16,'#a98258',3,40);
+        if(t.hp<=0){if(Math.random()<.1)t.dead=true;else t.regrow=130}
+        k.carry=Math.max(1,Math.round((1+Math.floor(S.up.latih/2))*helperMul()*.5));
+      }
+      k.tree=null;k.job='back';
     }
     return;
   }
   /* idle */
   if(dusk||k.wait>0){kidHome(k,dt);return}
   k.wait=1.2;
-  let b=null,bd=1e9;
-  for(const t of trees){
-    if(t.hp<=0||(t.kc&&t.kc!==k&&t.kc.job==='go'))continue;
-    if(Math.abs(t.x-CX)>380||Math.abs(t.y-CY)>380||dist(t.x,t.y,CX,CY)>380)continue;
-    const d=dist(k.x,k.y,t.x,t.y);if(d<bd){bd=d;b=t}
-  }
-  if(b){b.kc=k;k.tree=b;k.job='go';tip('kidf','Anak-anak yang selamat menebang pokok pada waktu siang dan melawan makhluk pada waktu malam.')}
+  const pickT=list=>{
+    let b=null,bd=1e9;
+    for(const t of list){
+      if(t.hp<=0||(t.kc&&t.kc!==k&&t.kc.job==='go'))continue;
+      if(Math.abs(t.x-CX)>380||Math.abs(t.y-CY)>380||dist(t.x,t.y,CX,CY)>380)continue;
+      const d=dist(k.x,k.y,t.x,t.y);if(d<bd){bd=d;b=t}
+    }
+    return b;
+  };
+  let b=null;k.rk=false;
+  if(Math.random()<.35){b=pickT(rocks);if(b)k.rk=true}
+  if(!b)b=pickT(trees);
+  if(b){b.kc=k;k.tree=b;k.job='go';tip('kidf','Anak-anak yang selamat menebang pokok dan mengikis batu pada waktu siang, dan melawan makhluk pada waktu malam.')}
   else kidHome(k,dt);
 }
 function plantTree(){
@@ -1175,6 +1190,7 @@ function drawKid(k){
     const fc=k.fx||1;
     if(k.job==='fight'||k.job==='chop'){ctx.strokeStyle=k.job==='fight'?'#d8dce4':'#8a6a42';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(k.x+fc*5,k.y-6);ctx.lineTo(k.x+fc*(k.sw>0?15:10),k.y-(k.sw>0?10:18));ctx.stroke()}
     if(k.carry>0){ctx.fillStyle='#8b6239';ctx.fillRect(k.x-7,k.y-26+bob,14,4)}
+    if(k.carryS>0){ctx.fillStyle='#8a929b';ctx.fillRect(k.x-6,k.y-27+bob,12,5)}
   }
   if(k.sw>0)k.sw-=.016;
 }
@@ -1670,14 +1686,14 @@ function hud(){
 /* ---------- upgrade sheet ---------- */
 function renderUp(){
   $('upStock').textContent=S.stock;$('upStone').textContent=S.stone;
-  const L=$('upList');L.innerHTML='';
-  stageBlock(L,'Tempa kapak','Kapak semasa: '+AXN[S.axt]+'. Setiap jenis kapak menebang lebih laju, memberi lebih banyak kayu dan lebih kuat melawan makhluk.',AXST,S.axt,axOk(),buildAx);
+  const L=$('upList');L.innerHTML='';const T=document.createElement('div');
+  stageBlock(T,'Tempa kapak','Kapak semasa: '+AXN[S.axt]+'. Setiap jenis kapak menebang lebih laju, memberi lebih banyak kayu dan lebih kuat melawan makhluk.',AXST,S.axt,axOk(),buildAx);
   {
     const oc=600+200*S.off,os=300+100*S.off,row=document.createElement('div');row.className='up';
     row.innerHTML='<h3>Persembahan unggun<span>'+S.off+'/8</span></h3><p>Serahkan '+oc+' kayu dan '+os+' batu kepada api purba. Dapat 1 bintang kekal untuk Kedai bintang.</p>';
     const b=document.createElement('button');b.textContent=S.off>=8?'Penuh':'Serah';b.disabled=S.off>=8||S.stock<oc||S.stone<os;
     b.onclick=()=>{if(S.off<8&&S.stock>=oc&&S.stone>=os){S.stock-=oc;S.stone-=os;S.off++;meta.stars++;saveMeta();sfx('mission');toast('Api purba menerima persembahan. +1 bintang');puff(CX,CY,'#ffd27a',18,90);renderUp()}};
-    row.appendChild(b);L.appendChild(row);
+    row.appendChild(b);row.dataset.done=S.off>=8?'1':'';T.appendChild(row);
   }
   if(S.ws>0){const nt=document.createElement('p');nt.style.cssText='margin:0;font-size:16px;color:#ff9a3c';nt.textContent='Diskaun bengkel: '+S.ws*10+'% untuk semua naik taraf';L.appendChild(nt)}
   for(const u of UPG){
@@ -1687,13 +1703,18 @@ function renderUp(){
     const b=document.createElement('button');
     b.textContent=maxed?'Penuh':c+' kayu';b.disabled=maxed||S.stock<c;
     b.onclick=()=>{if(S.stock>=c&&!maxed){S.stock-=c;S.up[u.id]++;sfx('buy');if(u.id==='fire')S.fuel=Math.min(maxFuel(),S.fuel+40);renderUp()}};
-    row.appendChild(b);L.appendChild(row);
+    row.appendChild(b);row.dataset.done=maxed?'1':'';T.appendChild(row);
   }
+  const kids=[...T.children];
+  for(const e of kids.filter(e=>!e.dataset.done))L.appendChild(e);
+  const dn=kids.filter(e=>e.dataset.done);
+  if(dn.length){const hh=document.createElement('p');hh.style.cssText='margin:10px 0 0;font-size:15px;letter-spacing:1.4px;text-transform:uppercase;color:rgba(236,228,207,.5)';hh.textContent='Sudah selesai';L.appendChild(hh);for(const e of dn)L.appendChild(e)}
 }
 let tab='up';
 function stageBlock(L,title,intro,stages,cur,unlocked,build){
   const h=document.createElement('div');h.className='mis';
   h.innerHTML='<h3>'+title+'<span>'+cur+'/'+stages.length+'</span></h3><p>'+intro+'</p>';
+  h.dataset.done=cur>=stages.length?'1':'';
   stages.forEach((st,i)=>{
     const row=document.createElement('div');row.className='up';
     const done=i<cur,now=unlocked&&i===cur;
@@ -1708,21 +1729,23 @@ function stageBlock(L,title,intro,stages,cur,unlocked,build){
 }
 function renderMis(){
   $('upStock').textContent=S.stock;$('upStone').textContent=S.stone;
-  const L=$('upList');L.innerHTML='';
-  stageBlock(L,'Bina rumah','Tapak rumah di sebelah timur unggun. Tebang pokok untuk kayu, kikis batu untuk batu, kemudian bina tahap demi tahap.',STAGES,S.house,true,buildStage);
-  stageBlock(L,'Bina bengkel',S.house>=4?'Tapak bengkel di bawah rumah. Setiap tahap menjadikan naik taraf lebih murah.':'Siapkan rumah dahulu untuk membuka misi ini.',WSTAGES,S.ws,S.house>=4,buildWs);
-  stageBlock(L,'Bina ladang buah',S.house>=1?'Tapak ladang di selatan unggun. Buah masak memulihkan lapar dan nyawa.':'Siapkan rumah tahap 1 dahulu.',OGST,S.og,S.house>=1,buildOg);
-  stageBlock(L,'Bina kilang kayu',S.ws>=1?'Tapak kilang di timur bengkel. Perlu sekurang-kurangnya 2 anak. Berjalan ke kilang untuk ambil kayu.':'Siapkan bengkel tahap 1 dahulu.',SMST,S.sm,S.ws>=1,buildSm);
-  stageBlock(L,'Bina pos kawalan',S.house>=4?'Empat menara pengawal di sekeliling unggun. Setiap pos menembak makhluk secara automatik.':'Siapkan rumah dahulu.',PWST,S.pw,S.house>=4,buildPw);
+  const L=$('upList');L.innerHTML='';const T=document.createElement('div');
+  stageBlock(T,'Bina rumah','Tapak rumah di sebelah timur unggun. Tebang pokok untuk kayu, kikis batu untuk batu, kemudian bina tahap demi tahap.',STAGES,S.house,true,buildStage);
+  stageBlock(T,'Bina bengkel',S.house>=4?'Tapak bengkel di bawah rumah. Setiap tahap menjadikan naik taraf lebih murah.':'Siapkan rumah dahulu untuk membuka misi ini.',WSTAGES,S.ws,S.house>=4,buildWs);
+  stageBlock(T,'Bina ladang buah',S.house>=1?'Tapak ladang di selatan unggun. Buah masak memulihkan lapar dan nyawa.':'Siapkan rumah tahap 1 dahulu.',OGST,S.og,S.house>=1,buildOg);
+  stageBlock(T,'Bina kilang kayu',S.ws>=1?'Tapak kilang di timur bengkel. Perlu sekurang-kurangnya 2 anak. Berjalan ke kilang untuk ambil kayu.':'Siapkan bengkel tahap 1 dahulu.',SMST,S.sm,S.ws>=1,buildSm);
+  stageBlock(T,'Bina pos kawalan',S.house>=4?'Empat menara pengawal di sekeliling unggun. Setiap pos menembak makhluk secara automatik.':'Siapkan rumah dahulu.',PWST,S.pw,S.house>=4,buildPw);
   for(let i=0;i<S.pw;i++){
     const m2=pwMax();if(S.ph[i]>=m2)continue;
     const c=Math.ceil(PWST[i].w*.3*(1-S.ph[i]/m2)),row=document.createElement('div');row.className='up';
     row.innerHTML='<h3>Baiki '+PWST[i].n+'<span>'+Math.round(S.ph[i]/m2*100)+'%</span></h3><p>'+(S.ph[i]<=0?'Rosak. Tidak menembak.':'Rosak sebahagian.')+'</p>';
     const b=document.createElement('button');b.textContent=c+' kayu';b.disabled=S.stock<c;
     b.onclick=()=>{if(S.stock>=c){S.stock-=c;S.ph[i]=m2;sfx('build');renderMis()}};
-    row.appendChild(b);L.appendChild(row);
+    row.appendChild(b);T.appendChild(row);
   }
-  stageBlock(L,'Bina kampung',(S.house>=4&&S.ks>=3)?'Tapak kampung di barat unggun.':'Siapkan rumah dan selamatkan 3 kanak-kanak.',VLST,S.vl,S.house>=4&&S.ks>=3,buildVl);
+  stageBlock(T,'Bina kampung',(S.house>=4&&S.ks>=3)?'Tapak kampung di barat unggun.':'Siapkan rumah dan selamatkan 3 kanak-kanak.',VLST,S.vl,S.house>=4&&S.ks>=3,buildVl);
+  const tk=[...T.children];
+  for(const e of tk.filter(e=>!e.dataset.done))L.appendChild(e);
   const h=document.createElement('div');h.className='mis';
   h.innerHTML='<h3>Misi sampingan<span>'+MIS.filter(m=>S.md[m.id]).length+'/'+MIS.length+'</span></h3>';
   L.appendChild(h);
@@ -1733,6 +1756,8 @@ function renderMis(){
     row.innerHTML='<h3>'+m.n+'<span>'+(done?'Selesai':v+'/'+m.g)+'</span></h3><p>Ganjaran '+rewardText(m.r)+'</p>';
     L.appendChild(row);
   }
+  const dn=tk.filter(e=>e.dataset.done);
+  if(dn.length){const hh=document.createElement('p');hh.style.cssText='margin:10px 0 0;font-size:15px;letter-spacing:1.4px;text-transform:uppercase;color:rgba(236,228,207,.5)';hh.textContent='Bangunan siap';L.appendChild(hh);for(const e of dn)L.appendChild(e)}
 }
 function renderTab(){
   $('tabUp').classList.toggle('on',tab==='up');$('tabMis').classList.toggle('on',tab==='mis');
