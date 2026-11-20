@@ -312,9 +312,9 @@ const UPG=[
   {id:'senjata',n:'Senjata anak',d:'Anak-anak yang selamat melawan makhluk dengan lebih kuat.',max:6,cost:l=>16+l*16},
   {id:'poskuat',n:'Pos diperkuat',d:'Pos kawalan lebih tahan dan menembak lebih kuat (12% setiap tahap).',max:10,cost:l=>120+l*90},
   {id:'kulit',n:'Kulit batu',d:'Kurangkan kerosakan diterima (4% setiap tahap). Guna batu.',max:10,stone:1,cost:l=>60+l*50},
-  {id:'bara',n:'Unggun batu',d:'Api membakar makhluk lebih pedih (20% setiap tahap). Guna batu.',max:8,stone:1,cost:l=>70+l*55},
+  {id:'bara',n:'Unggun batu',d:'Api membakar makhluk lebih pedih (20% setiap tahap).',max:8,cost:l=>70+l*55},
   {id:'lontar',n:'Mata kapak batu',d:'+6 kerosakan serangan setiap tahap. Guna batu.',max:10,stone:1,cost:l=>90+l*60},
-  {id:'tuah',n:'Peti bertuah',d:'Ganjaran peti harta +15% setiap tahap. Guna batu.',max:6,stone:1,cost:l=>80+l*70},
+  {id:'tuah',n:'Peti bertuah',d:'Ganjaran peti harta +15% setiap tahap.',max:6,cost:l=>80+l*70},
   {id:'apib',n:'Cincin batu api',d:'Lingkaran cahaya unggun lebih luas (+12 setiap tahap). Guna batu.',max:6,stone:1,cost:l=>100+l*65}
 ];
 const UMAX={kulit:12,bara:10,lontar:12,tuah:8,apib:8,axe:12,bag:10,fire:10,spear:16,boots:8,lamp:7,shield:10,pick:9,obor:7,forage:7,bekal:7,latih:8,senjata:12};
@@ -1014,10 +1014,10 @@ function update(dt){
   if(S.vl>=2&&Math.abs(pl.x-WLX)<60&&Math.abs(pl.y-WLY)<50&&pl.hp<MAXHP())pl.hp=Math.min(MAXHP(),pl.hp+5*dt);
   if(S.vl>=3){
     twT-=dt;
-    if(twT<=0&&mons.length&&(S.stone>=1||S.stock>=1)){
+    if(twT<=0&&mons.length&&S.stock>=1){
       let b=null,bd=310;
       for(const m of mons){const d=dist(TWX,TWY-34,m.x,m.y);if(d<bd){bd=d;b=m}}
-      if(b){twT=1.1;const dm=14+.45*N;S.pwA+=1+N/60;if(S.pwA>=1){S.pwA-=1;if(S.stone>=1)S.stone--;else S.stock--}b.hp-=dm;b.hit=.15;fx.push({k:'l',x:TWX,y:TWY-36,x2:b.x,y2:b.y-b.r,life:.14});floatText(b.x,b.y-b.r*2-6,'-'+Math.round(dm),'#ffe08a');sfx('tower')}else twT=.4
+      if(b){twT=1.1;const dm=14+.45*N;S.pwA+=1+N/60;if(S.pwA>=1){S.pwA-=1;S.stock--}b.hp-=dm;b.hit=.15;fx.push({k:'l',x:TWX,y:TWY-36,x2:b.x,y2:b.y-b.r,life:.14});floatText(b.x,b.y-b.r*2-6,'-'+Math.round(dm),'#ffe08a');sfx('tower')}else twT=.4
     }
   }
   for(let i=0;i<S.pw;i++){
@@ -1025,7 +1025,7 @@ function update(dt){
     if(S.ph[i]>0&&(S.stone>=1||S.stock>=1)&&pwT[i]<=0&&mons.length){
       const P=TWS[i];let b=null,bd=290;
       for(const m of mons){const d=dist(P[0],P[1]-34,m.x,m.y);if(d<bd){bd=d;b=m}}
-      if(b){pwT[i]=1;const dm=(18+.5*N+2*S.pw)*(1+.12*S.up.poskuat);S.pwA+=1+N/60;if(S.pwA>=1){S.pwA-=1;if(S.stone>=1)S.stone--;else S.stock--}tip('amm','Menara menggunakan batu sebagai peluru (kayu jika batu habis).');b.hp-=dm;b.hit=.15;fx.push({k:'l',x:P[0],y:P[1]-36,x2:b.x,y2:b.y-b.r,life:.14});floatText(b.x,b.y-b.r*2-6,'-'+Math.round(dm),'#ffe08a');sfx('tower')}else pwT[i]=.4
+      if(b){pwT[i]=1;const dm=(18+.5*N+2*S.pw)*(1+.12*S.up.poskuat);S.pwA+=1+N/60;if(S.pwA>=1){S.pwA-=1;if(S.stone>=1)S.stone--;else S.stock--}tip('amm','Pos kawalan menggunakan batu sebagai peluru (kayu jika batu habis). Menara kampung menggunakan kayu.');b.hp-=dm;b.hit=.15;fx.push({k:'l',x:P[0],y:P[1]-36,x2:b.x,y2:b.y-b.r,life:.14});floatText(b.x,b.y-b.r*2-6,'-'+Math.round(dm),'#ffe08a');sfx('tower')}else pwT[i]=.4
     }
   }
   /* kids */
@@ -1678,10 +1678,10 @@ function renderMis(){
   stageBlock(T,'Bina pos kawalan',S.house>=4?'Empat menara pengawal di sekeliling unggun. Setiap pos menembak makhluk secara automatik.':'Siapkan rumah dahulu.',PWST,S.pw,S.house>=4,buildPw);
   for(let i=0;i<S.pw;i++){
     const m2=pwMax();if(S.ph[i]>=m2)continue;
-    const c=Math.ceil(PWST[i].w*.3*(1-S.ph[i]/m2)*1.3),row=document.createElement('div');row.className='up';
+    const c=Math.ceil(PWST[i].w*.3*(1-S.ph[i]/m2)),row=document.createElement('div');row.className='up';
     row.innerHTML='<h3>Baiki '+PWST[i].n+'<span>'+Math.round(S.ph[i]/m2*100)+'%</span></h3><p>'+(S.ph[i]<=0?'Rosak. Tidak menembak.':'Rosak sebahagian.')+'</p>';
-    const b=document.createElement('button');b.textContent=c+' batu';b.disabled=S.stone<c;
-    b.onclick=()=>{if(S.stone>=c){S.stone-=c;S.ph[i]=m2;sfx('build');renderMis()}};
+    const b=document.createElement('button');b.textContent=c+' kayu';b.disabled=S.stock<c;
+    b.onclick=()=>{if(S.stock>=c){S.stock-=c;S.ph[i]=m2;sfx('build');renderMis()}};
     row.appendChild(b);T.appendChild(row);
   }
   stageBlock(T,'Bina kampung',(S.house>=4&&S.ks>=3)?'Tapak kampung di barat unggun.':'Siapkan rumah dan selamatkan 3 kanak-kanak.',VLST,S.vl,S.house>=4&&S.ks>=3,buildVl);
