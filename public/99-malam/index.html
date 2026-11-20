@@ -168,6 +168,7 @@ button:disabled{opacity:.35;cursor:default}
     <div class="stock">Kayu <b id="upStock">0</b> &nbsp; Batu <b id="upStone">0</b></div>
     <div id="upList"></div>
     <button class="primary" id="upClose">Sambung bermain</button>
+    <button id="toMenu">Menu utama</button>
   </div>
 </div>
 
@@ -1824,9 +1825,17 @@ $('starClose').onclick=()=>hide('starSheet');
 $('plantBtn').onclick=plantTree;
 document.querySelectorAll('#diffRow button').forEach(b=>{b.onclick=()=>{pickDiff=+b.dataset.d;sset('n99_diff',pickDiff);markDiff();sfx('click')}});
 markDiff();
+let resumeLive=false;
+$('toMenu').onclick=()=>{
+  if(!S||S.over)return;
+  sfx('click');sset('n99_save',snapshot());sset('n99_ckpt',ckpt);
+  hide('upSheet');S.paused=true;resumeLive=true;
+  const c=$('contBtn');c.style.display='';c.textContent='Sambung (malam '+(S.n+1)+')';
+  markDiff();show('menu');
+};
 function startPlay(){hide('menu');if(S){S.paused=false}}
-$('newBtn').onclick=()=>{newGame();startPlay()};
-$('contBtn').onclick=()=>{const d=sget('n99_save');if(d){loadFrom(d);ckpt=sget('n99_ckpt')||snapshot();startPlay()}};
+$('newBtn').onclick=()=>{resumeLive=false;newGame();startPlay()};
+$('contBtn').onclick=()=>{if(resumeLive&&S&&!S.over){resumeLive=false;startPlay();return}const d=sget('n99_save');if(d){loadFrom(d);ckpt=sget('n99_ckpt')||snapshot();startPlay()}};
 
 /* ---------- loop ---------- */
 let last=performance.now(),frame=0;
