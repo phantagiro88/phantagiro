@@ -25,3 +25,10 @@
   Cache-Control: no-cache
 /syif-wad/manifest.webmanifest
   Cache-Control: no-cache
+
+/belanjawan/sw.js
+  Cache-Control: no-cache
+/belanjawan/index.html
+  Cache-Control: no-cache
+/belanjawan/manifest.webmanifest
+  Cache-Control: no-cache
