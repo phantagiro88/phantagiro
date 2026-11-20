@@ -81,6 +81,9 @@ button:disabled{opacity:.35;cursor:default}
 .act.small{width:62px;height:62px;bottom:calc(env(safe-area-inset-bottom) + 108px);font-size:15px}
 .act b{font-size:13px;color:rgba(236,228,207,.85);letter-spacing:.5px}
 #diffRow button{padding:10px 2px;font-size:16px}
+#upSheet .card{height:100%;max-height:760px;overflow:hidden}
+#upSheet .card>*{flex-shrink:0}
+#upSheet #upList{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;touch-action:pan-y;-webkit-overflow-scrolling:touch}
 .lbl{font-size:15px;font-weight:600;letter-spacing:1.4px;text-transform:uppercase;color:rgba(236,228,207,.6);margin-bottom:-6px}
 .stock{font-size:20px;font-weight:600;letter-spacing:.8px}
 .stock b{color:var(--ember)}
@@ -167,8 +170,7 @@ button:disabled{opacity:.35;cursor:default}
     <div class="tabs"><button id="tabUp" class="on">Naik taraf</button><button id="tabMis">Misi</button></div>
     <div class="stock">Kayu <b id="upStock">0</b> &nbsp; Batu <b id="upStone">0</b></div>
     <div id="upList"></div>
-    <button class="primary" id="upClose">Sambung bermain</button>
-    <button id="toMenu">Menu utama</button>
+    <div class="row" style="flex-shrink:0"><button class="primary" id="upClose">Sambung bermain</button><button id="toMenu">Menu utama</button></div>
   </div>
 </div>
 
