@@ -71,7 +71,7 @@ header{display:flex;align-items:center;gap:8px;padding:8px 12px 4px}
 #sellBtn.off{filter:grayscale(1);opacity:.5}
 
 #toast{position:fixed;left:50%;top:22%;transform:translate(-50%,-10px);background:#fffffff2;padding:10px 20px;border-radius:99px;
-  font-weight:800;font-size:1.1rem;box-shadow:0 6px 20px #0004;opacity:0;pointer-events:none;transition:.25s;z-index:20;text-align:center;max-width:90vw}
+  font-weight:800;font-size:1.1rem;box-shadow:0 6px 20px #0004;opacity:0;pointer-events:none;transition:.25s;z-index:60;text-align:center;max-width:90vw}
 #toast.show{opacity:1;transform:translate(-50%,0)}
 #fx{position:fixed;inset:0;pointer-events:none;z-index:30;overflow:hidden}
 .fl{position:fixed;font-size:1.7rem;font-weight:900;animation:rise .9s ease-out forwards;text-shadow:0 2px 3px #fff;white-space:nowrap}
@@ -87,6 +87,22 @@ header{display:flex;align-items:center;gap:8px;padding:8px 12px 4px}
 .card button{display:block;width:100%;margin-top:10px;padding:14px;border-radius:18px;font-weight:900;font-size:1.1rem;background:linear-gradient(#ffd45c,#ffa800);box-shadow:0 5px 0 #c27d00}
 .card button.alt{background:#eaf7e4;box-shadow:0 5px 0 #b9dfab}
 
+#shop{position:fixed;inset:0;background:#0007;z-index:50;display:flex;align-items:flex-end;justify-content:center}
+#shop[hidden]{display:none}
+.sheet{background:#fff;width:100%;max-width:560px;max-height:85dvh;overflow:auto;border-radius:26px 26px 0 0;padding:16px 14px calc(16px + env(safe-area-inset-bottom))}
+.sheethead{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.sheethead h2{margin:0;font-size:1.4rem}
+#rank{margin:2px 0 12px;font-size:1rem;color:#6b5b4b}
+.up{display:flex;align-items:center;gap:10px;background:#f7f2ea;border-radius:18px;padding:10px;margin-bottom:10px;border:3px solid #eadcc6}
+.ue{font-size:2.2rem}
+.ui{flex:1;min-width:0}
+.ui b{display:block;font-size:1.05rem}
+.ui small{display:block;color:#6b5b4b;font-size:.85rem;margin:2px 0}
+.pips{font-size:.7rem;letter-spacing:1px;color:#e0a100}
+.buy{padding:10px 12px;border-radius:14px;font-weight:900;background:linear-gradient(#ffd45c,#ffa800);box-shadow:0 4px 0 #c27d00;white-space:nowrap}
+.buy.poor{filter:grayscale(1);opacity:.55}
+.buy:disabled{background:#cfd8dc;box-shadow:0 4px 0 #9aa5ab;opacity:1;filter:none}
+.reset{display:block;margin:10px auto 0;padding:10px 16px;border-radius:14px;background:#fdecea;font-weight:800;color:#b71c1c}
 @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-6px)}80%{transform:translateX(6px)}}
 @keyframes hintbounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
 .card{animation-name:cardbounce}
@@ -100,10 +116,11 @@ header{display:flex;align-items:center;gap:8px;padding:8px 12px 4px}
 <div id="app">
   <header>
     <div class="money" id="money"><span class="ic">💰</span><b id="moneyTxt">$0</b></div>
+    <button class="round" id="shopBtn" aria-label="Shop">🛒</button>
     <button class="round" id="lang" aria-label="Language">BM</button>
     <button class="round" id="snd" aria-label="Sound">🔊</button>
   </header>
-  <div class="goal"><div class="goalbar"><i id="goalFill"></i></div><span class="trophy">🏆 $1,000,000</span></div>
+  <div class="goal"><div class="goalbar"><i id="goalFill"></i></div><span class="trophy" id="trophy">🏆 $1M</span></div>
   <main id="stage">
     <canvas id="c"></canvas>
     <div class="rot">
@@ -130,9 +147,16 @@ header{display:flex;align-items:center;gap:8px;padding:8px 12px 4px}
   <div class="card">
     <div class="big">🏆</div>
     <h1 data-i18n="winTitle"></h1>
-    <p data-i18n="winText"></p>
+    <p id="winText"></p>
     <button id="keepPlaying" data-i18n="keep"></button>
-    <button class="alt" id="restart" data-i18n="restart"></button>
+  </div>
+</div>
+<div id="shop" hidden>
+  <div class="sheet">
+    <div class="sheethead"><h2 data-i18n="shopTitle"></h2><button class="round" id="shopClose" aria-label="Close">✕</button></div>
+    <div id="rank"></div>
+    <div id="ups"></div>
+    <button class="reset" id="reset"></button>
   </div>
 </div>
 <script src="game.js"></script>

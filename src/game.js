@@ -3,7 +3,7 @@ import * as THREE from 'three';
 /* =====================================================================
    Kebun Juta - game kebun 3D. Kumpul $1,000,000 dengan jual bunga & buah.
    ===================================================================== */
-const GOAL = 1000000, START_PLOTS = 4, MAXPLOTS = 24, COLS = 4, GAP = 2.3, KEY = 'kebunjuta.v1';
+const GOALS = [1e6, 1e7, 1e8, 1e9, 1e10, 1e11, 1e12], START_PLOTS = 4, MAXPLOTS = 36, COLS = 4, GAP = 2.3, KEY = 'kebunjuta.v1';
 
 // unlock = jumlah duit yang pernah dijual sebelum benih ini dibuka
 const CROPS = [
@@ -14,27 +14,46 @@ const CROPS = [
   { id: 'mangga',   e: '🥭', n: { ms: 'Mangga',    en: 'Mango' },      cost: 1000,   sell: 2800,   time: 60,  unlock: 7000 },
   { id: 'kelapa',   e: '🥥', n: { ms: 'Kelapa',    en: 'Coconut' },    cost: 5000,   sell: 16000,  time: 120, unlock: 35000 },
   { id: 'sakura',   e: '🌸', n: { ms: 'Sakura',    en: 'Sakura' },     cost: 25000,  sell: 90000,  time: 240, unlock: 180000 },
-  { id: 'tembikai', e: '🍉', n: { ms: 'Tembikai',  en: 'Melon' },      cost: 100000, sell: 420000, time: 420, unlock: 700000 }
+  { id: 'tembikai', e: '🍉', n: { ms: 'Tembikai',  en: 'Melon' },      cost: 100000, sell: 420000, time: 420, unlock: 700000 },
+  { id: 'nanas',    e: '🍍', n: { ms: 'Nanas',     en: 'Pineapple' },  cost: 500000,   sell: 2400000,   time: 600,  unlock: 3000000 },
+  { id: 'anggur',   e: '🍇', n: { ms: 'Anggur',    en: 'Grapes' },     cost: 3000000,  sell: 16000000,  time: 900,  unlock: 20000000 },
+  { id: 'permata',  e: '💎', n: { ms: 'Permata',   en: 'Gem Tree' },   cost: 20000000, sell: 120000000, time: 1200, unlock: 150000000 }
 ];
 const byId = Object.fromEntries(CROPS.map(c => [c.id, c]));
 // Stesen haiwan: beri makan (kos) -> tunggu -> kutip hasil
-const ITEMS = { fish: { e: '🐟', sell: 90 }, egg: { e: '🥚', sell: 220 }, wool: { e: '🧶', sell: 2000 } };
-const STATIONS = [
-  { id: 'pond', item: 'fish', e: '🐟', n: { ms: 'Kolam Ikan', en: 'Fish Pond' },       cost: 120,  count: 4, time: 30, unlock: 800,   x: -2.5 },
-  { id: 'coop', item: 'egg',  e: '🥚', n: { ms: 'Reban Ayam', en: 'Chicken Coop' },     cost: 400,  count: 6, time: 45, unlock: 4000,  x: 0 },
-  { id: 'pen',  item: 'wool', e: '🧶', n: { ms: 'Kandang Biri-biri', en: 'Sheep Pen' }, cost: 2500, count: 5, time: 90, unlock: 25000, x: 2.5 }
-];
 const ST_Z = -3.3;
+const ITEMS = { fish: { e: '🐟', sell: 90 }, egg: { e: '🥚', sell: 220 }, wool: { e: '🧶', sell: 2000 }, milk: { e: '🥛', sell: 35000 }, honey: { e: '🍯', sell: 400000 } };
+const STATIONS = [
+  { id: 'pond', item: 'fish', e: '🐟', n: { ms: 'Kolam Ikan', en: 'Fish Pond' },       cost: 120,  count: 4, time: 30, unlock: 800,   x: -2.5, z: ST_Z },
+  { id: 'coop', item: 'egg',  e: '🥚', n: { ms: 'Reban Ayam', en: 'Chicken Coop' },     cost: 400,  count: 6, time: 45, unlock: 4000,  x: 0, z: ST_Z },
+  { id: 'pen',  item: 'wool', e: '🧶', n: { ms: 'Kandang Biri-biri', en: 'Sheep Pen' }, cost: 2500, count: 5, time: 90, unlock: 25000, x: 2.5, z: ST_Z },
+  { id: 'cow',  item: 'milk',  e: '🐄', n: { ms: 'Ladang Lembu', en: 'Cow Farm' },     cost: 60000,  count: 6, time: 120, unlock: 1500000,  x: -1.25, z: ST_Z - 3.4 },
+  { id: 'bee',  item: 'honey', e: '🐝', n: { ms: 'Sarang Lebah', en: 'Beehive' },      cost: 400000, count: 8, time: 150, unlock: 12000000, x: 1.25,  z: ST_Z - 3.4 }
+];
 const prod = id => byId[id] || ITEMS[id];
 const plotPrice = n => Math.round(30 * Math.pow(1.55, n));
-const fmt = n => '$' + Math.round(n).toLocaleString('en-US');
+const fmt = n => {
+  n = Math.round(n);
+  for (const [v, u] of [[1e12, 'T'], [1e9, 'B'], [1e6, 'M']]) if (n >= v) return '$' + (+(n / v).toFixed(n >= v * 100 ? 0 : n >= v * 10 ? 1 : 2)) + u;
+  return '$' + n.toLocaleString('en-US');
+};
+const goalIdxMax = () => GOALS.length;
 
 /* ---------- bahasa ---------- */
 const L = {
   ms: {
     hint: '👆 Tekan tanah untuk tanam!', plantAll: '🌱 Tanam semua', harvestAll: '🧺 Tuai semua', sell: '🏪 Jual',
-    basketEmpty: '🧺 kosong', winTitle: 'Tahniah!', winText: 'Kamu dah kumpul <b>$1,000,000</b>!<br>Kamu petani paling hebat! 🌟',
-    keep: '🌱 Teruskan main', restart: '🔄 Mula semula',
+    basketEmpty: '🧺 kosong', winTitle: 'Tahniah!',
+    winText: (cur, next, rank) => `Kamu dah kumpul <b>${cur}</b>!<br>Pangkat baru: <b>${rank}</b> 🌟` + (next ? `<br>Matlamat seterusnya: <b>${next}</b>` : '<br>Kamu dah capai kemuncak! 👑'),
+    keep: '🌱 Teruskan main', reset: '🔄 Mula semula', resetSure: '⚠️ Pasti? Tekan sekali lagi',
+    shopTitle: '🛒 Kedai Naik Taraf', rankLabel: 'Pangkat', buyMax: 'Penuh',
+    ranks: ['Petani Muda', 'Jutawan Kebun', 'Raja Kebun', 'Sultan Kebun', 'Maharaja Kebun', 'Legenda Kebun', 'Dewa Kebun', 'Penguasa Alam'],
+    upName: { fert: 'Baja Ajaib', price: 'Harga Pasar', helper: 'Robot Pembantu' },
+    upDesc: {
+      fert: l => `Tanaman & haiwan lebih laju ×${(1 + .2 * l).toFixed(1)}`,
+      price: l => `Harga jual ×${(1 + .1 * l).toFixed(1)}`,
+      helper: l => ['Belum ada robot', 'Robot tuai sendiri', 'Tuai + tanam semula sendiri', 'Tuai + tanam + jual sendiri'][l]
+    },
     noMoney: '💰 Duit tak cukup', noMoneyPlot: '💰 Duit tak cukup untuk tanah baru',
     lock: (e, a) => `🔒 Jual sehingga ${a} untuk buka ${e}`, harvestFirst: '🧺 Tuai dulu, baru jual!',
     allFull: '🌱 Semua tanah dah penuh', notRipe: '⏳ Belum ada yang masak', gift: '🎁 Hadiah $10 untuk kamu!',
@@ -42,8 +61,17 @@ const L = {
   },
   en: {
     hint: '👆 Tap the soil to plant!', plantAll: '🌱 Plant all', harvestAll: '🧺 Harvest all', sell: '🏪 Sell',
-    basketEmpty: '🧺 empty', winTitle: 'Congratulations!', winText: 'You collected <b>$1,000,000</b>!<br>You are the best farmer! 🌟',
-    keep: '🌱 Keep playing', restart: '🔄 Start over',
+    basketEmpty: '🧺 empty', winTitle: 'Congratulations!',
+    winText: (cur, next, rank) => `You collected <b>${cur}</b>!<br>New rank: <b>${rank}</b> 🌟` + (next ? `<br>Next goal: <b>${next}</b>` : '<br>You reached the top! 👑'),
+    keep: '🌱 Keep playing', reset: '🔄 Start over', resetSure: '⚠️ Sure? Tap once more',
+    shopTitle: '🛒 Upgrade Shop', rankLabel: 'Rank', buyMax: 'Max',
+    ranks: ['Young Farmer', 'Garden Millionaire', 'Garden King', 'Garden Sultan', 'Garden Emperor', 'Garden Legend', 'Garden God', 'Ruler of All'],
+    upName: { fert: 'Magic Fertilizer', price: 'Market Price', helper: 'Helper Robot' },
+    upDesc: {
+      fert: l => `Plants & animals faster ×${(1 + .2 * l).toFixed(1)}`,
+      price: l => `Selling price ×${(1 + .1 * l).toFixed(1)}`,
+      helper: l => ['No robot yet', 'Robot harvests by itself', 'Harvests + replants by itself', 'Harvests + replants + sells by itself'][l]
+    },
     noMoney: '💰 Not enough money', noMoneyPlot: '💰 Not enough money for new land',
     lock: (e, a) => `🔒 Sell up to ${a} to unlock ${e}`, harvestFirst: '🧺 Harvest first, then sell!',
     allFull: '🌱 All plots are full', notRipe: '⏳ Nothing is ripe yet', gift: '🎁 A $10 gift for you!',
@@ -52,11 +80,16 @@ const L = {
 };
 
 /* ---------- simpan / muat ---------- */
-const fresh = () => ({ money: 20, earned: 0, basket: {}, plots: Array(START_PLOTS).fill(null), sel: 'daisy', st: {}, sound: true, won: false, planted: false, lang: 'ms' });
+const fresh = () => ({ money: 20, earned: 0, basket: {}, plots: Array(START_PLOTS).fill(null), sel: 'daisy', st: {}, lc: {}, up: { fert: 0, price: 0, helper: 0 }, goalIdx: 0, sound: true, won: false, planted: false, lang: 'ms' });
 function load() {
   try {
     const j = JSON.parse(localStorage.getItem(KEY));
-    if (j && Array.isArray(j.plots) && byId[j.sel]) return Object.assign(fresh(), j);
+    if (j && Array.isArray(j.plots) && byId[j.sel]) {
+      const o = Object.assign(fresh(), j);
+      o.up = Object.assign({ fert: 0, price: 0, helper: 0 }, o.up);
+      if (j.goalIdx === undefined) { o.goalIdx = GOALS.filter(g => o.money >= g).length; if (o.won && o.goalIdx < 1) o.goalIdx = 1; }
+      return o;
+    }
   } catch (e) {}
   return fresh();
 }
@@ -244,6 +277,30 @@ function buildPlant(id) {
       });
       break;
     }
+    case 'nanas': {
+      for (let k = 0; k < 6; k++) { const a = k / 6 * Math.PI * 2, lf = mesh(cyl(0, .1, .55, 4), mat(0x2e7d32), Math.cos(a) * .28, .28, Math.sin(a) * .28); lf.rotation.z = -Math.cos(a) * .6; lf.rotation.x = Math.sin(a) * .6; g.add(lf); }
+      const fruit = mesh(ico(.3, 1), mat(0xfbc02d), 0, .62, 0); fruit.scale.set(1, 1.4, 1); g.add(fruit); bloom.push(fruit);
+      for (let k = 0; k < 5; k++) { const a = k / 5 * Math.PI * 2, c = mesh(cyl(0, .06, .35, 4), mat(0x388e3c), Math.cos(a) * .08, 1.2, Math.sin(a) * .08); c.rotation.z = -Math.cos(a) * .5; c.rotation.x = Math.sin(a) * .5; g.add(c); bloom.push(c); }
+      break;
+    }
+    case 'anggur': {
+      [-.55, .55].forEach(x => g.add(mesh(cyl(.05, .06, 1.3, 6), mat(0x795548), x, .65, 0)));
+      g.add(mesh(box(1.3, .07, .07), mat(0x795548), 0, 1.3, 0));
+      const fol = mesh(ico(.55, 1), mat(0x43a047), 0, 1.32, 0); fol.scale.set(1.6, .5, .7); g.add(fol);
+      [[-.35, 0], [.05, .1], [.4, -.05]].forEach(([x, z]) => {
+        [[0, 1.1], [-.07, 1.0], [.07, 1.0], [0, .9], [-.04, .8], [.04, .8], [0, .72]].forEach(([dx, y]) => { const b = mesh(ico(.065, 1), mat(0x7b1fa2), x + dx, y, z); g.add(b); bloom.push(b); });
+      });
+      break;
+    }
+    case 'permata': {
+      g.add(mesh(cyl(.1, .16, .9, 6), mat(0x90a4ae), 0, .45, 0));
+      const octa = r => geo('o' + r, () => new THREE.OctahedronGeometry(r, 0));
+      [[0, 1.45, 0, .42, 0x4dd0e1], [.5, 1.1, .15, .3, 0xf06292], [-.45, 1.2, -.1, .32, 0xba68c8], [.1, 1.0, -.5, .26, 0xffd54f], [-.2, .95, .5, .26, 0x69f0ae]].forEach(([x, y, z, r, c]) => {
+        const m = mesh(octa(r), mat(0x78909c), x, y, z); m.scale.y = 1.7; g.add(m);
+        ripen.push({ m, young: mat(0x78909c), ripe: mat(c, { emissive: c, emissiveIntensity: .45 }) });
+      });
+      break;
+    }
     case 'tembikai': {
       const v = mesh(ico(.6, 1), mat(0x388e3c), 0, .3, 0); v.scale.set(1.4, .5, 1.4); g.add(v);
       g.add(mesh(ico(.35, 1), mat(0x4caf50), -.5, .25, -.2));
@@ -315,7 +372,7 @@ function buildStation(id) {
     g.add(anim.eggs);
     anim.chickens = [];
     for (let k = 0; k < 3; k++) { const c = makeChicken(); c.userData.ph = k * 2.1; g.add(c); anim.chickens.push(c); }
-  } else {
+  } else if (id === 'pen') {
     const gr = mesh(box(1.9, .05, 1.9), mat(0x9be37f), 0, .03, 0); g.add(gr);
     [.25, .5].forEach(y => {
       [-.95, .95].forEach(z => g.add(mesh(box(2.05, .07, .07), mat(0xa1744a), 0, y, z)));
@@ -324,6 +381,41 @@ function buildStation(id) {
     [[-.95, -.95], [.95, -.95], [-.95, .95], [.95, .95], [0, -.95], [0, .95], [-.95, 0], [.95, 0]].forEach(([x, z]) => g.add(mesh(box(.1, .7, .1), mat(0x8d6e63), x, .35, z)));
     anim.sheep = [];
     for (let k = 0; k < 2; k++) { const sh = makeSheep(); sh.userData.ph = k * 3.3; g.add(sh); anim.sheep.push(sh); }
+  } else if (id === 'cow') {
+    g.add(mesh(box(1.9, .05, 1.9), mat(0x9be37f), 0, .03, 0));
+    [.25, .5].forEach(y => { [-.95, .95].forEach(z => g.add(mesh(box(2.05, .07, .07), mat(0xa1744a), 0, y, z))); [-.95, .95].forEach(x => g.add(mesh(box(.07, .07, 1.95), mat(0xa1744a), x, y, 0))); });
+    [[-.95, -.95], [.95, -.95], [-.95, .95], [.95, .95], [0, -.95], [0, .95], [-.95, 0], [.95, 0]].forEach(([x, z]) => g.add(mesh(box(.1, .7, .1), mat(0x8d6e63), x, .35, z)));
+    const cow = new THREE.Group();
+    cow.add(mesh(box(.95, .55, .5), mat(0xffffff), 0, .65, 0));
+    [[.12, .7], [-.28, .76]].forEach(([x, y]) => cow.add(mesh(box(.3, .3, .52), mat(0x263238), x, y, 0)));
+    cow.add(mesh(box(.3, .3, .32), mat(0xffffff), .62, .8, 0));
+    cow.add(mesh(box(.14, .18, .28), mat(0xf8bbd0), .8, .74, 0));
+    [.12, -.12].forEach(z => cow.add(mesh(cyl(0, .04, .14, 4), mat(0xfff8e1), .55, 1.0, z)));
+    [[.3, .17], [.3, -.17], [-.3, .17], [-.3, -.17]].forEach(([x, z]) => cow.add(mesh(cyl(.06, .06, .42, 6), mat(0xffffff), x, .21, z)));
+    cow.add(mesh(ico(.11, 1), mat(0xf8bbd0), -.12, .36, 0));
+    cow.add(mesh(cyl(.02, .02, .4, 4), mat(0x263238), -.5, .68, 0));
+    g.add(cow); anim.cow = cow;
+    anim.goods = new THREE.Group();
+    [[.7, .6], [.85, .3], [.7, 0]].forEach(([x, z]) => { anim.goods.add(mesh(cyl(.1, .1, .24, 10), mat(0xcfd8dc), x, .15, z)); anim.goods.add(mesh(cyl(.11, .11, .05, 10), mat(0xe53935), x, .29, z)); });
+    g.add(anim.goods);
+  } else {
+    [[-.35, -.35], [.35, -.35], [-.35, .35], [.35, .35]].forEach(([x, z]) => g.add(mesh(cyl(.04, .05, .45, 5), mat(0x8d6e63), x, .22, z)));
+    g.add(mesh(box(1.0, .08, 1.0), mat(0xa1744a), 0, .45, 0));
+    [[.46, .62], [.4, .9], [.34, 1.16]].forEach(([r, y]) => { g.add(mesh(cyl(r, r + .04, .27, 12), mat(0xffca28), 0, y, 0)); g.add(mesh(cyl(r + .03, r + .03, .04, 12), mat(0x8d6e63), 0, y - .14, 0)); });
+    g.add(mesh(cyl(.12, .3, .2, 12), mat(0xffb300), 0, 1.4, 0)); g.add(mesh(ico(.1, 1), mat(0x8d6e63), 0, 1.54, 0));
+    g.add(mesh(box(.2, .1, .08), mat(0x3e2723), 0, .58, .45));
+    const fc = [0xf06292, 0xba68c8, 0xffffff, 0xff8a65, 0x64b5f6, 0xfff176];
+    for (let k = 0; k < 6; k++) { const a = k / 6 * Math.PI * 2 + .3; g.add(mesh(cyl(.02, .02, .3, 4), mat(0x43a047), Math.cos(a) * 1.1, .15, Math.sin(a) * 1.1)); g.add(mesh(ico(.1, 1), mat(fc[k]), Math.cos(a) * 1.1, .34, Math.sin(a) * 1.1)); }
+    anim.bees = [];
+    for (let k = 0; k < 6; k++) {
+      const b = new THREE.Group(); b.add(mesh(ico(.07, 1), mat(0xffd600), 0, 0, 0)); b.add(mesh(ico(.045, 1), mat(0x212121), -.05, 0, 0)); b.add(mesh(ico(.045, 1), mat(0x212121), .07, 0, 0));
+      const wing = mesh(box(.06, .008, .12), mat(0xffffff, { transparent: true, opacity: .7 }), 0, .06, 0); b.add(wing);
+      b.userData = { a: k / 6 * Math.PI * 2, r: .7 + .15 * (k % 3), h: .9 + .12 * (k % 2), sp: 1.1 + .1 * k, wing };
+      g.add(b); anim.bees.push(b);
+    }
+    anim.goods = new THREE.Group();
+    [[.9, .8], [1.1, .55], [.75, 1.05]].forEach(([x, z]) => { anim.goods.add(mesh(cyl(.12, .12, .2, 10), mat(0xff8f00), x - 1.2, .1, z - .3)); anim.goods.add(mesh(cyl(.13, .13, .05, 10), mat(0x6d4c41), x - 1.2, .22, z - .3)); });
+    g.add(anim.goods);
   }
   return { g, anim };
 }
@@ -352,6 +444,17 @@ function animStation(s, time, pr, active, ready) {
       c.position.set(x, 0, z); c.rotation.y = -Math.atan2(vz, vx);
       c.userData.head.rotation.z = Math.max(0, Math.sin(time * 6 + ph)) * .5;
     });
+  } else if (a.cow) {
+    a.goods.visible = ready;
+    const w = time * .25, vx = Math.cos(w) * .3 * .25, vz = -Math.sin(time * .2) * .3 * .2;
+    a.cow.position.set(Math.sin(w) * .3 - .1, 0, Math.cos(time * .2) * .3); a.cow.rotation.y = -Math.atan2(vz, vx);
+  } else if (a.bees) {
+    a.goods.visible = ready;
+    a.bees.forEach(b => {
+      const u = b.userData, ang = u.a + time * u.sp;
+      b.position.set(Math.cos(ang) * u.r, u.h + Math.sin(time * 3 + u.a) * .12, Math.sin(ang) * u.r); b.rotation.y = -(ang + Math.PI / 2);
+      u.wing.rotation.z = Math.sin(time * 60 + u.a) * .5;
+    });
   } else if (a.sheep) {
     a.sheep.forEach(sh => {
       const ph = sh.userData.ph, w = time * .25 + ph, x = Math.sin(w) * .45, z = Math.cos(w * .9) * .4;
@@ -375,7 +478,7 @@ function rebuildFarm() {
   slots.forEach(s => s.label.dispose()); if (buySlot) buySlot.label.dispose(); stSlots.forEach(s => s.label.dispose());
   farm.clear(); slots = []; picks = []; buySlot = null; stSlots = [];
   const n = S.plots.length, tiles = n + (n < MAXPLOTS ? 1 : 0), rows = Math.ceil(tiles / COLS);
-  const zMin = ST_Z - 1.4, zMax = (rows - 1) * GAP + 1.3, d = zMax - zMin, cz = (zMin + zMax) / 2, w = COLS * GAP + .8;
+  const zMin = Math.min(...STATIONS.map(d => d.z)) - 1.4, zMax = (rows - 1) * GAP + 1.3, d = zMax - zMin, cz = (zMin + zMax) / 2, w = COLS * GAP + .8;
   const base = mesh(box(1, 1, 1), mat(0xa6ee8f), 0, -.15, cz); base.scale.set(w, .25, d); farm.add(base);
   const rim = mesh(box(1, 1, 1), mat(0x6b4a2e), 0, -.27, cz); rim.scale.set(w + .35, .2, d + .35); farm.add(rim);
   for (let i = 0; i < tiles; i++) {
@@ -390,7 +493,7 @@ function rebuildFarm() {
     else slots.push(slot);
   }
   STATIONS.forEach(def => {
-    const grp = new THREE.Group(); grp.position.set(def.x, 0, ST_Z); farm.add(grp);
+    const grp = new THREE.Group(); grp.position.set(def.x, 0, def.z); farm.add(grp);
     const open = S.earned >= def.unlock, st = { def, grp, label: makeLabel(), open, anim: null, jiggle: -9 };
     if (open) { const m = buildStation(def.id); grp.add(m.g); st.anim = m.anim; } else grp.add(buildLocked(def));
     const pick = mesh(box(2.3, 1.6, 2.3), pickMat, 0, .8, 0); pick.userData = { st: def.id }; grp.add(pick); picks.push(pick);
@@ -528,7 +631,10 @@ function onTap(cx, cy) {
    Logik game
    ===================================================================== */
 const unlocked = c => S.earned >= c.unlock;
-const basketValue = () => Object.entries(S.basket).reduce((a, [id, n]) => a + (prod(id) ? prod(id).sell * n : 0), 0);
+const sellMult = () => 1 + .1 * S.up.price;
+const speed = () => 1 + .2 * S.up.fert;
+const basketValue = () => Math.round(Object.entries(S.basket).reduce((a, [id, n]) => a + (prod(id) ? prod(id).sell * n : 0), 0) * sellMult());
+const goal = () => GOALS[Math.min(S.goalIdx, GOALS.length - 1)];
 const growingCount = () => S.plots.filter(Boolean).length + Object.values(S.st).filter(Boolean).length;
 function deny(msg) { sfx.no(); shake(moneyEl); if (msg) toast(msg); }
 
@@ -537,12 +643,12 @@ function plantAt(i, quiet) {
   if (!unlocked(c)) { if (!quiet) deny(t('lock')(c.e, fmt(c.unlock))); return false; }
   if (S.money < c.cost) { if (!quiet) deny(t('noMoney')); return false; }
   const now = Date.now();
-  S.money -= c.cost; S.plots[i] = { c: c.id, at: now, ready: now + c.time * 1000 }; S.planted = true;
+  S.money -= c.cost; S.plots[i] = { c: c.id, at: now, ready: now + c.time * 1000 / speed() }; S.planted = true; S.lc[i] = c.id;
   return true;
 }
 function harvestAt(i) {
   const p = S.plots[i]; if (!p) return;
-  S.basket[p.c] = (S.basket[p.c] || 0) + 1; S.plots[i] = null;
+  S.basket[p.c] = (S.basket[p.c] || 0) + 1; S.plots[i] = null; S.lc[i] = p.c;
   if (slots[i]) { const sp = slotScreen(i); floatText('+1 ' + byId[p.c].e, sp.x, sp.y); }
 }
 function collectStation(s) {
@@ -554,7 +660,7 @@ function stationTap(id) {
   if (!s.open) { deny(t('lock')(d.e, fmt(d.unlock))); return; }
   if (!st) {
     if (S.money < d.cost) { deny(t('noMoney')); return; }
-    S.money -= d.cost; S.st[id] = { at: now, ready: now + d.time * 1000 }; floatText('🍽️', sp.x, sp.y); sfx.plant(); refresh();
+    S.money -= d.cost; S.st[id] = { at: now, ready: now + d.time * 1000 / speed() }; floatText('🍽️', sp.x, sp.y); sfx.plant(); refresh();
   } else if (now >= st.ready) { collectStation(s); sfx.harvest(); refresh(); }
   else { st.ready -= 1500; floatText('❤️', sp.x, sp.y); s.jiggle = performance.now() / 1000; sfx.water(); save(); }
 }
@@ -564,26 +670,84 @@ function buyPlot() {
   if (S.money < price) { deny(t('noMoneyPlot')); return; }
   S.money -= price; S.plots.push(null); sfx.plant(); refresh();
 }
-function sellAll() {
+function sellAll(quiet) {
   const v = basketValue();
-  if (v <= 0) { sfx.no(); shake(basketEl); toast(t('harvestFirst')); return; }
-  S.money += v; S.earned += v; S.basket = {}; sfx.sell(); coinBurst(sellBtn); refresh();
-  if (!S.won && S.money >= GOAL) { S.won = true; save(); showWin(); }
+  if (v <= 0) { if (!quiet) { sfx.no(); shake(basketEl); toast(t('harvestFirst')); } return; }
+  S.money += v; S.earned += v; S.basket = {};
+  if (quiet) { moneyEl.classList.add('pop'); setTimeout(() => moneyEl.classList.remove('pop'), 300); } else { sfx.sell(); coinBurst(sellBtn); }
+  checkGoal(); refresh();
 }
-function showWin() { $id('win').hidden = false; sfx.win(); confetti(); }
+function checkGoal() {
+  let reached = 0;
+  while (S.goalIdx < GOALS.length && S.money >= GOALS[S.goalIdx]) { reached = GOALS[S.goalIdx]; S.goalIdx++; S.won = true; }
+  if (reached) { save(); showWin(reached); }
+}
+function showWin(reached) {
+  const lg = L[S.lang], next = S.goalIdx < GOALS.length ? fmt(GOALS[S.goalIdx]) : null;
+  $id('winText').innerHTML = lg.winText(fmt(reached), next, lg.ranks[Math.min(S.goalIdx, lg.ranks.length - 1)]);
+  $id('win').hidden = false; sfx.win(); confetti();
+}
+
+/* ---------- robot pembantu ---------- */
+function autoWork() {
+  const h = S.up.helper; if (!h) return;
+  const now = Date.now(); let changed = false;
+  S.plots.forEach((p, i) => {
+    if (p && now >= p.ready) { S.basket[p.c] = (S.basket[p.c] || 0) + 1; S.plots[i] = null; S.lc[i] = p.c; changed = true; }
+    if (!S.plots[i] && h >= 2 && S.lc[i]) {
+      const c = byId[S.lc[i]];
+      if (c && S.money >= c.cost) { S.money -= c.cost; S.plots[i] = { c: c.id, at: now, ready: now + c.time * 1000 / speed() }; changed = true; }
+    }
+  });
+  stSlots.forEach(s => {
+    if (!s.open) return;
+    const d = s.def, st = S.st[d.id];
+    if (st && now >= st.ready) { S.basket[d.item] = (S.basket[d.item] || 0) + d.count; S.st[d.id] = null; changed = true; }
+    if (!S.st[d.id] && h >= 2 && S.money >= d.cost) { S.money -= d.cost; S.st[d.id] = { at: now, ready: now + d.time * 1000 / speed() }; changed = true; }
+  });
+  if (h >= 3 && basketValue() > 0) { sellAll(true); return; }
+  if (changed) refresh();
+}
+
+/* ---------- kedai naik taraf ---------- */
+const UPS = [
+  { id: 'fert', e: '🧪', max: 10, cost: l => Math.round(20000 * Math.pow(2.2, l) / 1000) * 1000 },
+  { id: 'price', e: '📈', max: 10, cost: l => Math.round(50000 * Math.pow(2.5, l) / 1000) * 1000 },
+  { id: 'helper', e: '🤖', max: 3, cost: l => [100000, 1500000, 20000000][l] }
+];
+function renderShop() {
+  const lg = L[S.lang];
+  $id('rank').innerHTML = lg.rankLabel + ': <b>' + lg.ranks[Math.min(S.goalIdx, lg.ranks.length - 1)] + '</b>';
+  const box = $id('ups'); box.innerHTML = '';
+  UPS.forEach(u => {
+    const lv = S.up[u.id], maxed = lv >= u.max, cost = maxed ? 0 : u.cost(lv);
+    const row = document.createElement('div'); row.className = 'up';
+    row.innerHTML = '<span class="ue">' + u.e + '</span><div class="ui"><b>' + lg.upName[u.id] + '</b><small>' + lg.upDesc[u.id](lv) + '</small><div class="pips">' + '●'.repeat(lv) + '○'.repeat(u.max - lv) + '</div></div>';
+    const b = document.createElement('button'); b.className = 'buy' + (!maxed && S.money < cost ? ' poor' : '');
+    b.textContent = maxed ? lg.buyMax : fmt(cost); b.disabled = maxed;
+    b.onclick = () => {
+      if (S.money < cost) { sfx.no(); toast(t('noMoney')); return; }
+      S.money -= cost; S.up[u.id]++; sfx.sell(); refresh(); renderShop();
+    };
+    row.appendChild(b); box.appendChild(row);
+  });
+  $id('reset').textContent = resetArmed ? lg.resetSure : lg.reset;
+}
+let resetArmed = false, resetT;
 
 /* ---------- HUD ---------- */
 function applyLang() {
   document.documentElement.lang = S.lang;
-  document.querySelectorAll('[data-i18n]').forEach(el => { el.innerHTML = t(el.dataset.i18n); });
+  document.querySelectorAll('[data-i18n]').forEach(el => { const v = t(el.dataset.i18n); if (typeof v === 'string') el.innerHTML = v; });
   $id('lang').textContent = t('langBtn');
 }
 function updateHUD() {
   $id('moneyTxt').textContent = fmt(S.money);
-  $id('goalFill').style.width = Math.max(2, Math.min(100, S.money / GOAL * 100)) + '%';
+  $id('goalFill').style.width = Math.max(2, Math.min(100, S.money / goal() * 100)) + '%';
+  $id('trophy').textContent = '🏆 ' + fmt(goal());
   $id('hint').hidden = S.planted;
   $id('snd').textContent = S.sound ? '🔊' : '🔇';
-  shelf.innerHTML = '';
+  const sl = shelf.scrollLeft; shelf.innerHTML = '';
   CROPS.forEach(c => {
     const b = document.createElement('button'), lock = !unlocked(c);
     b.className = 'seed' + (S.sel === c.id ? ' sel' : '') + (lock ? ' lock' : '') + (!lock && S.money < c.cost ? ' poor' : '');
@@ -594,6 +758,7 @@ function updateHUD() {
     };
     shelf.appendChild(b);
   });
+  shelf.scrollLeft = sl;
   const items = Object.entries(S.basket).filter(([id, n]) => n > 0 && prod(id));
   basketEl.innerHTML = items.length ? items.map(([id, n]) => '<span>' + prod(id).e + '×' + n + '</span>').join('') : '<span class="empty">' + t('basketEmpty') + '</span>';
   const v = basketValue(); $id('sellVal').textContent = fmt(v); sellBtn.classList.toggle('off', v <= 0);
@@ -618,16 +783,24 @@ $id('harvestAll').onclick = () => {
   stSlots.forEach(s => { const st = S.st[s.def.id]; if (s.open && st && now >= st.ready) { collectStation(s); n++; } });
   if (n) { sfx.harvest(); refresh(); } else { sfx.no(); toast(t('notRipe')); }
 };
-sellBtn.onclick = sellAll;
+sellBtn.onclick = () => sellAll();
 $id('snd').onclick = () => { S.sound = !S.sound; updateHUD(); save(); beep(600, .08); };
-$id('lang').onclick = () => { S.lang = S.lang === 'ms' ? 'en' : 'ms'; applyLang(); updateHUD(); save(); beep(600, .06); };
+$id('lang').onclick = () => { S.lang = S.lang === 'ms' ? 'en' : 'ms'; applyLang(); updateHUD(); if (!$id('shop').hidden) renderShop(); save(); beep(600, .06); };
 $id('keepPlaying').onclick = () => { $id('win').hidden = true; };
-$id('restart').onclick = () => { const snd = S.sound, lg = S.lang; S = fresh(); S.sound = snd; S.lang = lg; $id('win').hidden = true; refresh(); };
+$id('shopBtn').onclick = () => { renderShop(); $id('shop').hidden = false; beep(600, .06); };
+$id('shopClose').onclick = () => { $id('shop').hidden = true; };
+$id('shop').addEventListener('click', e => { if (e.target.id === 'shop') $id('shop').hidden = true; });
+$id('reset').onclick = () => {
+  if (!resetArmed) { resetArmed = true; renderShop(); clearTimeout(resetT); resetT = setTimeout(() => { resetArmed = false; if (!$id('shop').hidden) renderShop(); }, 3500); return; }
+  resetArmed = false; const snd = S.sound, lg = S.lang; S = fresh(); S.sound = snd; S.lang = lg;
+  $id('shop').hidden = true; applyLang(); refresh();
+};
 
 /* ---------- gelung ---------- */
 let lastSave = 0, lastGift = 0;
 setInterval(() => {
   if (S.money < 5 && !growingCount() && !basketValue() && Date.now() - lastGift > 3000) { lastGift = Date.now(); S.money += 10; toast(t('gift')); updateHUD(); }
+  autoWork();
   if (Date.now() - lastSave > 5000) { save(); lastSave = Date.now(); }
 }, 500);
 document.addEventListener('visibilitychange', () => { if (document.hidden) save(); });
