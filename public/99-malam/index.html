@@ -310,7 +310,8 @@ const UPG=[
   {id:'forage',n:'Pemetik buah',d:'Buah memberi lebih banyak tenaga dan tumbuh semula lebih cepat.',max:4,cost:l=>10+l*10},
   {id:'bekal',n:'Bekal makanan',d:'Anda menjadi lapar 10% lebih perlahan setiap tahap.',max:4,cost:l=>12+l*12},
   {id:'latih',n:'Latihan anak',d:'Anak-anak yang selamat menebang lebih laju dan membawa lebih banyak kayu.',max:4,cost:l=>16+l*16},
-  {id:'senjata',n:'Senjata anak',d:'Anak-anak yang selamat melawan makhluk dengan lebih kuat.',max:6,cost:l=>16+l*16}
+  {id:'senjata',n:'Senjata anak',d:'Anak-anak yang selamat melawan makhluk dengan lebih kuat.',max:6,cost:l=>16+l*16},
+  {id:'poskuat',n:'Pos diperkuat',d:'Pos kawalan lebih tahan dan menembak lebih kuat (12% setiap tahap).',max:10,cost:l=>120+l*90}
 ];
 const UMAX={axe:12,bag:10,fire:10,spear:16,boots:8,lamp:7,shield:10,pick:9,obor:7,forage:7,bekal:7,latih:8,senjata:12};
 UPG.forEach(u=>{u.max=UMAX[u.id]||u.max;const c0=u.cost;u.cost=l=>Math.round(c0(l)*(1+l*l*.02))});
@@ -372,6 +373,8 @@ const AXST=[
 ];
 const AXN=['Kapak batu','Kapak besi','Kapak keluli','Kapak perak','Kapak naga'];
 const AXC=['#9aa1aa','#d8dce4','#8fb4d6','#f0f0f8','#ff7a3c'];
+const pwMax=()=>Math.round(250*(1+.25*S.up.poskuat));
+const scaleP=()=>1+.05*(S.lv-1)+.012*Object.values(S.up).reduce((a,b)=>a+b,0)+.05*S.axt;
 const MAXHP=()=>100+(S?6*(S.lv-1)+10*pk('hati'):0);
 const xpNeed=l=>25+l*l*4;
 const XPV={wolf:5,deer:9,wraith:8,bear:16,spitter:10,boss:80};
@@ -473,7 +476,7 @@ const TORCH_COST=3;
 const maxT=()=>6+S.up.obor;
 const torchLife=()=>70+15*S.up.obor;
 const ST0=()=>({wood:0,stone:0,berry:0,chest:0,torch:0,plant:0,harv:0,saw:0,bm:0});
-const EXTRA=()=>({house:0,stone:0,bk:0,md:{},rain:false,mineWarn:0,hintT:6,diff:pickDiff,kills:0,dw:false,torches:[],ws:0,st:ST0(),og:0,sm:0,vl:0,sap:[],seeds:0,pt:[],smBuf:0,smT:0,bm:false,xp:0,lv:1,axt:0,pw:0,off:0,cont:false});
+const EXTRA=()=>({house:0,stone:0,bk:0,md:{},rain:false,mineWarn:0,hintT:6,diff:pickDiff,kills:0,dw:false,torches:[],ws:0,st:ST0(),og:0,sm:0,vl:0,sap:[],seeds:0,pt:[],smBuf:0,smT:0,bm:false,xp:0,lv:1,axt:0,pw:0,off:0,cont:false,ph:[0,0,0,0],pwA:0,raid:false});
 
 /* ---------- state ---------- */
 let S=null;
@@ -484,7 +487,7 @@ const bagCap=()=>20+12*S.up.bag+(S.house>=1?8:0);
 const stoneCap=()=>10+6*S.up.bag;
 const safeR=()=>S.fuel>0?60+(S.fuel/maxFuel())*60+14*S.up.fire:0;
 
-function freshUp(){return{axe:0,bag:0,fire:0,spear:0,boots:0,lamp:0,shield:0,pick:0,obor:0,forage:0,bekal:0,latih:0,senjata:0}}
+function freshUp(){return{axe:0,bag:0,fire:0,spear:0,boots:0,lamp:0,shield:0,pick:0,obor:0,forage:0,bekal:0,latih:0,senjata:0,poskuat:0}}
 function newGame(){
   S={n:0,t:0,up:freshUp(),stock:14,ks:0,kl:2,fuel:100,speed:1,paused:false,over:false,nightStarted:false,helperT:0,refT:0,msgT:0,warnT:0,bagWarn:0,running:true,...EXTRA()};
   S.stock+=15*pk('bekal');S.up.axe=pk('kapak');S.up.senjata=pk('anak');S.seeds=3+4*pk('benih');
@@ -493,9 +496,9 @@ function newGame(){
   resetWorld();
 }
 let ckpt=null;
-function snapshot(){return{n:S.n,up:{...S.up},stock:S.stock,ks:S.ks,kl:S.kl,house:S.house,stone:S.stone,bk:S.bk,md:{...S.md},diff:S.diff,kills:S.kills,ws:S.ws,st:{...S.st},og:S.og,sm:S.sm,vl:S.vl,seeds:S.seeds,sap:S.sap.map(o=>({...o})),pt:S.pt.map(o=>({...o})),xp:S.xp,lv:S.lv,axt:S.axt,pw:S.pw,off:S.off}}
+function snapshot(){return{n:S.n,up:{...S.up},stock:S.stock,ks:S.ks,kl:S.kl,house:S.house,stone:S.stone,bk:S.bk,md:{...S.md},diff:S.diff,kills:S.kills,ws:S.ws,st:{...S.st},og:S.og,sm:S.sm,vl:S.vl,seeds:S.seeds,sap:S.sap.map(o=>({...o})),pt:S.pt.map(o=>({...o})),xp:S.xp,lv:S.lv,axt:S.axt,pw:S.pw,off:S.off,ph:S.ph.slice()}}
 function loadFrom(d){
-  S={n:d.n,t:0,up:{...freshUp(),...d.up},stock:d.stock,ks:d.ks,kl:d.kl,fuel:100,speed:1,paused:false,over:false,nightStarted:false,helperT:0,refT:0,msgT:0,warnT:0,bagWarn:0,running:true,...EXTRA(),house:d.house||0,stone:d.stone||0,bk:d.bk||0,md:migMd(d.md),diff:(d.diff===0||d.diff===1||d.diff===2||d.diff===3)?d.diff:1,kills:d.kills||0,ws:d.ws||0,st:{...ST0(),...(d.st||{})},og:d.og||0,sm:d.sm||0,vl:d.vl||0,seeds:d.seeds||0,sap:(d.sap||[]).map(o=>({...o})),pt:(d.pt||[]).map(o=>({...o})),xp:d.xp||0,lv:d.lv||1,axt:d.axt||0,pw:d.pw||0,off:d.off||0,cont:(d.n||0)>=GOAL};
+  S={n:d.n,t:0,up:{...freshUp(),...d.up},stock:d.stock,ks:d.ks,kl:d.kl,fuel:100,speed:1,paused:false,over:false,nightStarted:false,helperT:0,refT:0,msgT:0,warnT:0,bagWarn:0,running:true,...EXTRA(),house:d.house||0,stone:d.stone||0,bk:d.bk||0,md:migMd(d.md),diff:(d.diff===0||d.diff===1||d.diff===2||d.diff===3)?d.diff:1,kills:d.kills||0,ws:d.ws||0,st:{...ST0(),...(d.st||{})},og:d.og||0,sm:d.sm||0,vl:d.vl||0,seeds:d.seeds||0,sap:(d.sap||[]).map(o=>({...o})),pt:(d.pt||[]).map(o=>({...o})),xp:d.xp||0,lv:d.lv||1,axt:d.axt||0,pw:d.pw||0,off:d.off||0,cont:(d.n||0)>=GOAL,ph:(d.ph&&d.ph.length===4)?d.ph.slice():[0,1,2,3].map(i=>i<(d.pw||0)?Math.round(250*(1+.25*((d.up&&d.up.poskuat)||0))):0)};
   S.fuel=maxFuel();
   resetWorld();
 }
@@ -670,7 +673,7 @@ const TYPES={
 };
 function spawnMon(type,x,y){
   const N=S.n+1,T=TYPES[type];
-  const eg=S.cont?1+(N-99)*.04:1,bh=(S.bm?1.25:1)*eg,bd=(S.bm?1.2:1)*Math.min(eg,3);
+  const eg=S.cont?1+(N-99)*.04:1,sc=scaleP(),bh=(S.bm?1.25:1)*eg*sc,bd=(S.bm?1.2:1)*Math.min(eg,3)*(1+(sc-1)*.5);
   const m={type,x,y,hp:T.hp(N)*D().hp*bh,max:T.hp(N)*D().hp*bh,sp:T.sp(N),dmg:T.dmg(N)*D().dmg*bd,r:T.r,brave:T.brave,cd:rnd(0,.6),face:1,hit:0,ph:Math.random()*6};
   if(N>=8&&type!=='boss'&&type!=='spitter'&&Math.random()<Math.min(.35,.1+N*.006)){m.fr=true;m.brave=Math.max(m.brave,.7);m.sp*=1.2;m.dmg*=1.2;m.hp=m.max=m.hp*1.15}
   if(type==='spitter')tip('spit','Roh racun menembak dari jauh. Kejar ia, atau berlindung di dalam rumah.');
@@ -700,6 +703,12 @@ function nightStart(){
   if(S.bm){sfx('bm');qToast('Bulan merah naik! Makhluk lebih ganas, tetapi menjatuhkan kayu.')}
   if(S.rain)setTimeout(()=>toast(S.house>=4?'Hujan turun.':'Hujan turun. Api lebih cepat habis.'),1800);
   S.spawnT=1.5;
+  S.raid=N>=15&&N%10!==0&&Math.random()<.22;
+  if(S.raid){
+    const a=Math.random()*TAU,cnt=Math.min(24,6+Math.floor(N/4));
+    for(let i=0;i<cnt;i++){const aa=a+(Math.random()-.5)*.7,d=rnd(620,720);spawnMon(pickType(),clamp(CX+Math.cos(aa)*d,30,W-30),clamp(CY+Math.sin(aa)*d,30,H-30))}
+    sfx('bm');qToast('Serbuan! Gerombolan makhluk menyerang dari satu arah.');
+  }
   if(N>=20&&N%5===0&&N%10!==0){const e=spawnRing('bear');e.elite=true;e.hp=e.max=e.hp*2.5;e.r=26;e.dmg*=1.3;setTimeout(()=>qToast('Beruang purba muncul! Kalahkan untuk 1 bintang.'),2400)}
   if(N%10===0||N===GOAL){
     sfx('boss');const b=spawnRing('boss');
@@ -710,6 +719,7 @@ function nightStart(){
 function dawn(){
   S.n++;S.nightStarted=false;S.rain=false;S.dw=false;
   if(S.bm){S.bm=false;S.st.bm++;S.stock+=25;qToast('Bulan merah dilalui. +25 kayu')}
+  if(S.raid){S.raid=false;meta.stars++;saveMeta();qToast('Serbuan ditewaskan. +1 bintang')}
   noteBest();gainXp(8);
   for(const m of mons)puff(m.x,m.y,'#9bb0c8',8,50);
   mons.length=0;orbs.length=0;
@@ -752,7 +762,8 @@ function mkBuild(key,list,ok,pos,name,fin){
 const buildOg=mkBuild('og',OGST,()=>S.house>=1,[OGX,OGY],'Ladang',()=>{S.stock+=30;toast('Ladang buah siap! +30 kayu')});
 const buildSm=mkBuild('sm',SMST,()=>S.ws>=1,[SMX,SMY],'Kilang',()=>toast('Kilang kayu siap! Berjalan ke kilang untuk ambil kayu.'));
 const buildVl=mkBuild('vl',VLST,()=>S.house>=4&&S.ks>=3,[VX,VY],'Kampung',()=>{S.stock+=100;S.stone+=50;toast('Kampung siap! +100 kayu, +50 batu')});
-const buildPw=mkBuild('pw',PWST,()=>S.house>=4,[CX,CY],'Pos',()=>toast('Semua pos kawalan siap!'));
+const _bp=mkBuild('pw',PWST,()=>S.house>=4,[CX,CY],'Pos',()=>toast('Semua pos kawalan siap!'));
+const buildPw=()=>{const r=_bp();if(r)S.ph[S.pw-1]=pwMax();return r};
 const helperMul=()=>(S.house>=3?2:1)*(1+(S.vl>=1?.5:0)+(S.vl>=4?.5:0));
 function gainXp(n){
   if(!S||S.lv>=60)return;
@@ -817,7 +828,7 @@ function kidAI(k,dt){
     if(k.ct<=0){
       t.hp--;t.shake=.25;t.kc=null;puff(t.x,t.y-16,'#a98258',3,40);
       if(t.hp<=0){if(Math.random()<.1)t.dead=true;else t.regrow=130}
-      k.carry=Math.max(1,Math.round((1+Math.floor(S.up.latih/2))*helperMul()));k.tree=null;k.job='back';
+      k.carry=Math.max(1,Math.round((1+Math.floor(S.up.latih/2))*helperMul()*.5));k.tree=null;k.job='back';
     }
     return;
   }
@@ -1009,18 +1020,18 @@ function update(dt){
   if(S.vl>=2&&Math.abs(pl.x-WLX)<60&&Math.abs(pl.y-WLY)<50&&pl.hp<MAXHP())pl.hp=Math.min(MAXHP(),pl.hp+5*dt);
   if(S.vl>=3){
     twT-=dt;
-    if(twT<=0&&mons.length){
+    if(twT<=0&&mons.length&&S.stock>=1){
       let b=null,bd=310;
       for(const m of mons){const d=dist(TWX,TWY-34,m.x,m.y);if(d<bd){bd=d;b=m}}
-      if(b){twT=1.1;const dm=14+.45*N;b.hp-=dm;b.hit=.15;fx.push({k:'l',x:TWX,y:TWY-36,x2:b.x,y2:b.y-b.r,life:.14});floatText(b.x,b.y-b.r*2-6,'-'+Math.round(dm),'#ffe08a');sfx('tower')}else twT=.4
+      if(b){twT=1.1;const dm=14+.45*N;S.pwA+=1+N/60;if(S.pwA>=1){S.pwA-=1;S.stock--}b.hp-=dm;b.hit=.15;fx.push({k:'l',x:TWX,y:TWY-36,x2:b.x,y2:b.y-b.r,life:.14});floatText(b.x,b.y-b.r*2-6,'-'+Math.round(dm),'#ffe08a');sfx('tower')}else twT=.4
     }
   }
   for(let i=0;i<S.pw;i++){
     pwT[i]-=dt;
-    if(pwT[i]<=0&&mons.length){
+    if(S.ph[i]>0&&S.stock>=1&&pwT[i]<=0&&mons.length){
       const P=TWS[i];let b=null,bd=290;
       for(const m of mons){const d=dist(P[0],P[1]-34,m.x,m.y);if(d<bd){bd=d;b=m}}
-      if(b){pwT[i]=1;const dm=18+.5*N+2*S.pw;b.hp-=dm;b.hit=.15;fx.push({k:'l',x:P[0],y:P[1]-36,x2:b.x,y2:b.y-b.r,life:.14});floatText(b.x,b.y-b.r*2-6,'-'+Math.round(dm),'#ffe08a');sfx('tower')}else pwT[i]=.4
+      if(b){pwT[i]=1;const dm=(18+.5*N+2*S.pw)*(1+.12*S.up.poskuat);S.pwA+=1+N/60;if(S.pwA>=1){S.pwA-=1;S.stock--}tip('amm','Menara menggunakan kayu simpanan sebagai peluru. Pastikan kayu mencukupi.');b.hp-=dm;b.hit=.15;fx.push({k:'l',x:P[0],y:P[1]-36,x2:b.x,y2:b.y-b.r,life:.14});floatText(b.x,b.y-b.r*2-6,'-'+Math.round(dm),'#ffe08a');sfx('tower')}else pwT[i]=.4
     }
   }
   /* kids */
@@ -1055,10 +1066,15 @@ function update(dt){
   for(const m of mons){
     m.cd-=dt;m.hit=Math.max(0,m.hit-dt);
     const d=dist(m.x,m.y,pl.x,pl.y);
+    let ti=-1;if(m.type!=='spitter'&&S.pw>0)for(let i=0;i<S.pw;i++){if(S.ph[i]<=0)continue;const P=TWS[i],dd=dist(m.x,m.y,P[0],P[1]);if(dd<150&&dd<d+60){ti=i;break}}
     if(m.type==='spitter'){
       const dir=d>190?1:d<140?-1:0;
       if(dir&&d>0){m.x+=(pl.x-m.x)/d*m.sp*dt*dir;m.y+=(pl.y-m.y)/d*m.sp*dt*dir}
       if(d<270&&m.cd<=0){m.cd=2.4;const a=Math.atan2(pl.y-m.y,pl.x-m.x);orbs.push({x:m.x,y:m.y-m.r,vx:Math.cos(a)*150,vy:Math.sin(a)*150,life:3,dmg:m.dmg});sfx('spit')}
+    }else if(ti>=0){
+      const P=TWS[ti],dt2=dist(m.x,m.y,P[0],P[1]);
+      if(dt2>m.r+16){m.x+=(P[0]-m.x)/dt2*m.sp*dt;m.y+=(P[1]-m.y)/dt2*m.sp*dt}
+      else if(m.cd<=0){m.cd=1;S.ph[ti]-=m.dmg*.8;puff(P[0],P[1]-20,'#c9a46a',3,40);if(S.ph[ti]<=0){S.ph[ti]=0;puff(P[0],P[1]-30,'#6a5a48',14,70);qToast(PWST[ti].n+' rosak! Baiki di tab Misi.');sfx('hurt')}}
     }else if(d>m.r+8){m.x+=(pl.x-m.x)/d*m.sp*dt;m.y+=(pl.y-m.y)/d*m.sp*dt}
     if(pl.x!==m.x)m.face=pl.x>m.x?1:-1;
     if(S.fuel>0){
@@ -1397,6 +1413,11 @@ function drawTowerAt(x,y){
   ctx.fillStyle='#3d2a18';ctx.fillRect(x-4,y-46,8,6);
   ctx.fillStyle='#6e2f2a';ctx.beginPath();ctx.moveTo(x-14,y-50);ctx.lineTo(x,y-64);ctx.lineTo(x+14,y-50);ctx.fill();
 }
+function drawPos(P){
+  const i=TWS.indexOf(P),hp=S.ph[i],mxh=pwMax();
+  ctx.globalAlpha=hp>0?1:.4;drawTowerAt(P[0],P[1]);ctx.globalAlpha=1;
+  if(hp<mxh){ctx.fillStyle='rgba(0,0,0,.6)';ctx.fillRect(P[0]-16,P[1]+8,32,4);ctx.fillStyle=hp>mxh*.35?'#7fbf5a':'#d2402f';ctx.fillRect(P[0]-16,P[1]+8,32*Math.max(0,hp/mxh),4)}
+}
 function drawPosGround(){
   if(S.house<4||S.pw>=4)return;
   const P=TWS[S.pw];
@@ -1549,7 +1570,7 @@ function render(){
   for(const c of chests)if(c.x>camx-30&&c.x<camx+vw+30&&c.y>camy-20&&c.y<camy+vh+40)ents.push([c.y,7,c]);
   ents.sort((a,b)=>a[0]-b[0]);
   for(const e of ents){
-    if(e[1]===0)drawTree(e[2]);else if(e[1]===1)drawBush(e[2]);else if(e[1]===2)drawMon(e[2]);else if(e[1]===3)drawKid(e[2]);else if(e[1]===5)drawHouseUpper();else if(e[1]===6)drawTorch(e[2]);else if(e[1]===7)drawChest(e[2]);else if(e[1]===8)drawWorkshopUpper();else if(e[1]===9)drawSawUpper();else if(e[1]===10)drawVillageUpper();else if(e[1]===11)drawSapling(e[2]);else if(e[1]===12)drawTowerAt(e[2][0],e[2][1]);else drawPlayer();
+    if(e[1]===0)drawTree(e[2]);else if(e[1]===1)drawBush(e[2]);else if(e[1]===2)drawMon(e[2]);else if(e[1]===3)drawKid(e[2]);else if(e[1]===5)drawHouseUpper();else if(e[1]===6)drawTorch(e[2]);else if(e[1]===7)drawChest(e[2]);else if(e[1]===8)drawWorkshopUpper();else if(e[1]===9)drawSawUpper();else if(e[1]===10)drawVillageUpper();else if(e[1]===11)drawSapling(e[2]);else if(e[1]===12)drawPos(e[2]);else drawPlayer();
   }
 
   /* darkness */
@@ -1684,6 +1705,14 @@ function renderMis(){
   stageBlock(L,'Bina ladang buah',S.house>=1?'Tapak ladang di selatan unggun. Buah masak memulihkan lapar dan nyawa.':'Siapkan rumah tahap 1 dahulu.',OGST,S.og,S.house>=1,buildOg);
   stageBlock(L,'Bina kilang kayu',S.ws>=1?'Tapak kilang di timur bengkel. Perlu sekurang-kurangnya 2 anak. Berjalan ke kilang untuk ambil kayu.':'Siapkan bengkel tahap 1 dahulu.',SMST,S.sm,S.ws>=1,buildSm);
   stageBlock(L,'Bina pos kawalan',S.house>=4?'Empat menara pengawal di sekeliling unggun. Setiap pos menembak makhluk secara automatik.':'Siapkan rumah dahulu.',PWST,S.pw,S.house>=4,buildPw);
+  for(let i=0;i<S.pw;i++){
+    const m2=pwMax();if(S.ph[i]>=m2)continue;
+    const c=Math.ceil(PWST[i].w*.3*(1-S.ph[i]/m2)),row=document.createElement('div');row.className='up';
+    row.innerHTML='<h3>Baiki '+PWST[i].n+'<span>'+Math.round(S.ph[i]/m2*100)+'%</span></h3><p>'+(S.ph[i]<=0?'Rosak. Tidak menembak.':'Rosak sebahagian.')+'</p>';
+    const b=document.createElement('button');b.textContent=c+' kayu';b.disabled=S.stock<c;
+    b.onclick=()=>{if(S.stock>=c){S.stock-=c;S.ph[i]=m2;sfx('build');renderMis()}};
+    row.appendChild(b);L.appendChild(row);
+  }
   stageBlock(L,'Bina kampung',(S.house>=4&&S.ks>=3)?'Tapak kampung di barat unggun.':'Siapkan rumah dan selamatkan 3 kanak-kanak.',VLST,S.vl,S.house>=4&&S.ks>=3,buildVl);
   const h=document.createElement('div');h.className='mis';
   h.innerHTML='<h3>Misi sampingan<span>'+MIS.filter(m=>S.md[m.id]).length+'/'+MIS.length+'</span></h3>';
