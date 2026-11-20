@@ -310,9 +310,14 @@ const UPG=[
   {id:'bekal',n:'Bekal makanan',d:'Anda menjadi lapar 10% lebih perlahan setiap tahap.',max:4,cost:l=>12+l*12},
   {id:'latih',n:'Latihan anak',d:'Anak-anak yang selamat menebang lebih laju dan membawa lebih banyak kayu.',max:4,cost:l=>16+l*16},
   {id:'senjata',n:'Senjata anak',d:'Anak-anak yang selamat melawan makhluk dengan lebih kuat.',max:6,cost:l=>16+l*16},
-  {id:'poskuat',n:'Pos diperkuat',d:'Pos kawalan lebih tahan dan menembak lebih kuat (12% setiap tahap).',max:10,cost:l=>120+l*90}
+  {id:'poskuat',n:'Pos diperkuat',d:'Pos kawalan lebih tahan dan menembak lebih kuat (12% setiap tahap).',max:10,cost:l=>120+l*90},
+  {id:'kulit',n:'Kulit batu',d:'Kurangkan kerosakan diterima (4% setiap tahap). Guna batu.',max:10,stone:1,cost:l=>60+l*50},
+  {id:'bara',n:'Unggun batu',d:'Api membakar makhluk lebih pedih (20% setiap tahap). Guna batu.',max:8,stone:1,cost:l=>70+l*55},
+  {id:'lontar',n:'Mata kapak batu',d:'+6 kerosakan serangan setiap tahap. Guna batu.',max:10,stone:1,cost:l=>90+l*60},
+  {id:'tuah',n:'Peti bertuah',d:'Ganjaran peti harta +15% setiap tahap. Guna batu.',max:6,stone:1,cost:l=>80+l*70},
+  {id:'apib',n:'Cincin batu api',d:'Lingkaran cahaya unggun lebih luas (+12 setiap tahap). Guna batu.',max:6,stone:1,cost:l=>100+l*65}
 ];
-const UMAX={axe:12,bag:10,fire:10,spear:16,boots:8,lamp:7,shield:10,pick:9,obor:7,forage:7,bekal:7,latih:8,senjata:12};
+const UMAX={kulit:12,bara:10,lontar:12,tuah:8,apib:8,axe:12,bag:10,fire:10,spear:16,boots:8,lamp:7,shield:10,pick:9,obor:7,forage:7,bekal:7,latih:8,senjata:12};
 UPG.forEach(u=>{u.max=UMAX[u.id]||u.max;const c0=u.cost;u.cost=l=>Math.round(c0(l)*(1+l*l*.02))});
 const WSTAGES=[
   {n:'Lantai dan meja kerja',w:40,s:20,d:'Naik taraf 10% lebih murah.'},
@@ -471,9 +476,10 @@ const pl={x:CX,y:CY+60,hp:100,hunger:100,bag:0,stone:0,mine:0,inv:0,atk:0,chop:0
 const maxFuel=()=>100+40*S.up.fire;
 const bagCap=()=>20+12*S.up.bag+(S.house>=1?8:0);
 const stoneCap=()=>10+6*S.up.bag;
-const safeR=()=>S.fuel>0?60+(S.fuel/maxFuel())*60+14*S.up.fire:0;
+const safeR=()=>S.fuel>0?60+(S.fuel/maxFuel())*60+14*S.up.fire+12*S.up.apib:0;
+const shF=()=>Math.max(.15,1-.07*S.up.shield-.04*S.up.kulit);
 
-function freshUp(){return{axe:0,bag:0,fire:0,spear:0,boots:0,lamp:0,shield:0,pick:0,obor:0,forage:0,bekal:0,latih:0,senjata:0,poskuat:0}}
+function freshUp(){return{axe:0,bag:0,fire:0,spear:0,boots:0,lamp:0,shield:0,pick:0,obor:0,forage:0,bekal:0,latih:0,senjata:0,poskuat:0,kulit:0,bara:0,lontar:0,tuah:0,apib:0}}
 function newGame(){
   S={n:0,t:0,up:freshUp(),stock:14,ks:0,kl:2,fuel:100,speed:1,paused:false,over:false,nightStarted:false,helperT:0,refT:0,msgT:0,warnT:0,bagWarn:0,running:true,...EXTRA()};
   S.stock+=15*pk('bekal');S.up.axe=pk('kapak');S.up.senjata=pk('anak');
@@ -992,8 +998,8 @@ function update(dt){
     if(c.open||Math.abs(c.x-pl.x)>26||Math.abs(c.y-pl.y)>26)continue;
     c.open=true;S.st.chest++;sfx('chest');puff(c.x,c.y-8,'#ffd27a',14,80);
     const rr=Math.random();
-    if(rr<.55){const a=Math.floor(rnd(10,21));S.stock+=a;toast('Peti harta: +'+a+' kayu');floatText(c.x,c.y-26,'+'+a+' kayu','#ffd27a')}
-    else if(rr<.85){const a=Math.floor(rnd(6,12));S.stone+=a;toast('Peti harta: +'+a+' batu');floatText(c.x,c.y-26,'+'+a+' batu','#aab4c0')}
+    if(rr<.55){const a=Math.floor(rnd(10,21)*(1+.15*S.up.tuah));S.stock+=a;toast('Peti harta: +'+a+' kayu');floatText(c.x,c.y-26,'+'+a+' kayu','#ffd27a')}
+    else if(rr<.85){const a=Math.floor(rnd(6,12)*(1+.15*S.up.tuah));S.stone+=a;toast('Peti harta: +'+a+' batu');floatText(c.x,c.y-26,'+'+a+' batu','#aab4c0')}
     else{pl.hunger=100;pl.hp=Math.min(MAXHP(),pl.hp+40);toast('Peti harta: bekalan. Nyawa dan lapar pulih')}
     tip('chest','Peti harta muncul semula setiap 3 malam.');
   }
@@ -1008,18 +1014,18 @@ function update(dt){
   if(S.vl>=2&&Math.abs(pl.x-WLX)<60&&Math.abs(pl.y-WLY)<50&&pl.hp<MAXHP())pl.hp=Math.min(MAXHP(),pl.hp+5*dt);
   if(S.vl>=3){
     twT-=dt;
-    if(twT<=0&&mons.length&&S.stock>=1){
+    if(twT<=0&&mons.length&&(S.stone>=1||S.stock>=1)){
       let b=null,bd=310;
       for(const m of mons){const d=dist(TWX,TWY-34,m.x,m.y);if(d<bd){bd=d;b=m}}
-      if(b){twT=1.1;const dm=14+.45*N;S.pwA+=1+N/60;if(S.pwA>=1){S.pwA-=1;S.stock--}b.hp-=dm;b.hit=.15;fx.push({k:'l',x:TWX,y:TWY-36,x2:b.x,y2:b.y-b.r,life:.14});floatText(b.x,b.y-b.r*2-6,'-'+Math.round(dm),'#ffe08a');sfx('tower')}else twT=.4
+      if(b){twT=1.1;const dm=14+.45*N;S.pwA+=1+N/60;if(S.pwA>=1){S.pwA-=1;if(S.stone>=1)S.stone--;else S.stock--}b.hp-=dm;b.hit=.15;fx.push({k:'l',x:TWX,y:TWY-36,x2:b.x,y2:b.y-b.r,life:.14});floatText(b.x,b.y-b.r*2-6,'-'+Math.round(dm),'#ffe08a');sfx('tower')}else twT=.4
     }
   }
   for(let i=0;i<S.pw;i++){
     pwT[i]-=dt;
-    if(S.ph[i]>0&&S.stock>=1&&pwT[i]<=0&&mons.length){
+    if(S.ph[i]>0&&(S.stone>=1||S.stock>=1)&&pwT[i]<=0&&mons.length){
       const P=TWS[i];let b=null,bd=290;
       for(const m of mons){const d=dist(P[0],P[1]-34,m.x,m.y);if(d<bd){bd=d;b=m}}
-      if(b){pwT[i]=1;const dm=(18+.5*N+2*S.pw)*(1+.12*S.up.poskuat);S.pwA+=1+N/60;if(S.pwA>=1){S.pwA-=1;S.stock--}tip('amm','Menara menggunakan kayu simpanan sebagai peluru. Pastikan kayu mencukupi.');b.hp-=dm;b.hit=.15;fx.push({k:'l',x:P[0],y:P[1]-36,x2:b.x,y2:b.y-b.r,life:.14});floatText(b.x,b.y-b.r*2-6,'-'+Math.round(dm),'#ffe08a');sfx('tower')}else pwT[i]=.4
+      if(b){pwT[i]=1;const dm=(18+.5*N+2*S.pw)*(1+.12*S.up.poskuat);S.pwA+=1+N/60;if(S.pwA>=1){S.pwA-=1;if(S.stone>=1)S.stone--;else S.stock--}tip('amm','Menara menggunakan batu sebagai peluru (kayu jika batu habis).');b.hp-=dm;b.hit=.15;fx.push({k:'l',x:P[0],y:P[1]-36,x2:b.x,y2:b.y-b.r,life:.14});floatText(b.x,b.y-b.r*2-6,'-'+Math.round(dm),'#ffe08a');sfx('tower')}else pwT[i]=.4
     }
   }
   /* kids */
@@ -1050,7 +1056,7 @@ function update(dt){
   }
 
   /* monsters */
-  const range=46+3*S.up.spear,dmgP=10+8*S.up.spear+2*(S.lv-1)+5*S.axt;
+  const range=46+3*S.up.spear,dmgP=10+8*S.up.spear+2*(S.lv-1)+5*S.axt+6*S.up.lontar;
   for(const m of mons){
     m.cd-=dt;m.hit=Math.max(0,m.hit-dt);
     const d=dist(m.x,m.y,pl.x,pl.y);
@@ -1068,19 +1074,19 @@ function update(dt){
     if(S.fuel>0){
       const lim=Rs*(1-m.brave),df=dist(m.x,m.y,CX,CY);
       if(df<lim&&df>0){m.x=CX+(m.x-CX)/df*lim;m.y=CY+(m.y-CY)/df*lim}
-      if(df<Rs+8){m.hp-=3.5*(1+.15*S.up.fire)*dt;burning++;if(Math.random()<dt*8)puff(m.x,m.y-6,'#ff8a2a',1,30)}
+      if(df<Rs+8){m.hp-=3.5*(1+.15*S.up.fire+.2*S.up.bara)*dt;burning++;if(Math.random()<dt*8)puff(m.x,m.y-6,'#ff8a2a',1,30)}
     }
     for(const tq of S.torches){const lim=55*(1-m.brave),dd=dist(m.x,m.y,tq.x,tq.y);if(dd<lim&&dd>0){m.x=tq.x+(m.x-tq.x)/dd*lim;m.y=tq.y+(m.y-tq.y)/dd*lim}}
     if(S.house>=2&&m.type!=='boss')pushOutRect(m);
     if(m.type!=='spitter'&&dist(m.x,m.y,pl.x,pl.y)<m.r+11&&m.cd<=0){
       m.cd=1;
-      if(pl.inv<=0){pl.hp-=m.dmg*(1-.07*S.up.shield);pl.inv=.45;pl.hurt=.35;sfx('hurt');puff(pl.x,pl.y,'#d2402f',6,60)}
+      if(pl.inv<=0){pl.hp-=m.dmg*shF();pl.inv=.45;pl.hurt=.35;sfx('hurt');puff(pl.x,pl.y,'#d2402f',6,60)}
     }
   }
   for(let i=orbs.length-1;i>=0;i--){
     const o=orbs[i];o.x+=o.vx*dt;o.y+=o.vy*dt;o.life-=dt;
     let gone=o.life<=0||inHouse(o);
-    if(!gone&&dist(o.x,o.y,pl.x,pl.y)<13){gone=true;if(pl.inv<=0){pl.hp-=o.dmg*(1-.07*S.up.shield);pl.inv=.45;pl.hurt=.35;sfx('hurt');puff(pl.x,pl.y,'#6fd36a',6,60)}}
+    if(!gone&&dist(o.x,o.y,pl.x,pl.y)<13){gone=true;if(pl.inv<=0){pl.hp-=o.dmg*shF();pl.inv=.45;pl.hurt=.35;sfx('hurt');puff(pl.x,pl.y,'#6fd36a',6,60)}}
     if(gone){puff(o.x,o.y,'#6fd36a',3,40);orbs.splice(i,1)}
   }
   /* player attack */
@@ -1633,12 +1639,12 @@ function renderUp(){
   }
   if(S.ws>0){const nt=document.createElement('p');nt.style.cssText='margin:0;font-size:16px;color:#ff9a3c';nt.textContent='Diskaun bengkel: '+S.ws*10+'% untuk semua naik taraf';L.appendChild(nt)}
   for(const u of UPG){
-    const lv=S.up[u.id],maxed=lv>=u.max,c=Math.ceil(u.cost(lv)*(1-.1*S.ws));
+    const lv=S.up[u.id],maxed=lv>=u.max,c=Math.ceil(u.cost(lv)*(1-.1*S.ws)),pool=u.stone?S.stone:S.stock;
     const row=document.createElement('div');row.className='up';
     row.innerHTML='<h3>'+u.n+'<span>Tahap '+lv+'/'+u.max+'</span></h3><p>'+u.d+'</p>';
     const b=document.createElement('button');
-    b.textContent=maxed?'Penuh':c+' kayu';b.disabled=maxed||S.stock<c;
-    b.onclick=()=>{if(S.stock>=c&&!maxed){S.stock-=c;S.up[u.id]++;sfx('buy');if(u.id==='fire')S.fuel=Math.min(maxFuel(),S.fuel+40);renderUp()}};
+    b.textContent=maxed?'Penuh':c+(u.stone?' batu':' kayu');b.disabled=maxed||pool<c;
+    b.onclick=()=>{if(pool>=c&&!maxed){if(u.stone)S.stone-=c;else S.stock-=c;S.up[u.id]++;sfx('buy');if(u.id==='fire')S.fuel=Math.min(maxFuel(),S.fuel+40);renderUp()}};
     row.appendChild(b);row.dataset.done=maxed?'1':'';T.appendChild(row);
   }
   const kids=[...T.children];
@@ -1672,10 +1678,10 @@ function renderMis(){
   stageBlock(T,'Bina pos kawalan',S.house>=4?'Empat menara pengawal di sekeliling unggun. Setiap pos menembak makhluk secara automatik.':'Siapkan rumah dahulu.',PWST,S.pw,S.house>=4,buildPw);
   for(let i=0;i<S.pw;i++){
     const m2=pwMax();if(S.ph[i]>=m2)continue;
-    const c=Math.ceil(PWST[i].w*.3*(1-S.ph[i]/m2)),row=document.createElement('div');row.className='up';
+    const c=Math.ceil(PWST[i].w*.3*(1-S.ph[i]/m2)*1.3),row=document.createElement('div');row.className='up';
     row.innerHTML='<h3>Baiki '+PWST[i].n+'<span>'+Math.round(S.ph[i]/m2*100)+'%</span></h3><p>'+(S.ph[i]<=0?'Rosak. Tidak menembak.':'Rosak sebahagian.')+'</p>';
-    const b=document.createElement('button');b.textContent=c+' kayu';b.disabled=S.stock<c;
-    b.onclick=()=>{if(S.stock>=c){S.stock-=c;S.ph[i]=m2;sfx('build');renderMis()}};
+    const b=document.createElement('button');b.textContent=c+' batu';b.disabled=S.stone<c;
+    b.onclick=()=>{if(S.stone>=c){S.stone-=c;S.ph[i]=m2;sfx('build');renderMis()}};
     row.appendChild(b);T.appendChild(row);
   }
   stageBlock(T,'Bina kampung',(S.house>=4&&S.ks>=3)?'Tapak kampung di barat unggun.':'Siapkan rumah dan selamatkan 3 kanak-kanak.',VLST,S.vl,S.house>=4&&S.ks>=3,buildVl);
