@@ -884,8 +884,17 @@ function endScreen(kind){
     b.insertBefore(ct,b.firstChild);
   }else{
     t.textContent='Anda tumbang';
-    p.textContent='Anda gugur pada malam ke-'+(S.n+1)+'. Anda boleh sambung dari titik simpan malam '+ckpt.n+'.';
-    const a=document.createElement('button');a.className='primary';a.textContent='Sambung dari malam '+ckpt.n;
+    p.textContent='Anda gugur pada malam ke-'+(S.n+1)+'. Hidup semula di malam ini dengan semua kemajuan anda, atau sambung dari titik simpan malam '+ckpt.n+'.';
+    const rv=document.createElement('button');rv.className='primary';rv.textContent='Hidup semula (malam '+(S.n+1)+')';
+    rv.onclick=()=>{
+      hide('endSheet');
+      S.stock=Math.floor(S.stock*.85);S.stone=Math.floor(S.stone*.85);
+      pl.hp=MAXHP();pl.hunger=Math.max(pl.hunger,70);pl.hurt=0;pl.inv=4;pl.x=CX;pl.y=CY+60;pl.bag=0;
+      mons.length=0;orbs.length=0;S.fuel=maxFuel();S.over=false;S.paused=false;
+      toast('Anda bangkit semula. 15% kayu dan batu hilang.');sfx('rescue');
+    };
+    b.appendChild(rv);
+    const a=document.createElement('button');a.textContent='Sambung dari malam '+ckpt.n;
     a.onclick=()=>{hide('endSheet');loadFrom(ckpt)};b.appendChild(a);
     const c=document.createElement('button');c.textContent='Mula semula';
     c.onclick=()=>{hide('endSheet');newGame()};b.appendChild(c);
