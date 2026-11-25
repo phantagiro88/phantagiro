@@ -1,6 +1,6 @@
 'use strict';
 (() => {
-  const VERSION = '1.0.0';
+  const VERSION = '1.0.1';
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 
@@ -12,7 +12,7 @@
     textColor: '#ffffff', bgColor: '#000000',
     mirror: false, marker: true, countdown: true,
     camera: false, facing: 'user', res: '720',
-    overlay: 0.35, textOp: 0.9
+    overlay: 0.35, textOp: 0.9, fit: 'contain'
   };
   const loadJSON = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } };
   const saveJSON = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { toast('Gagal simpan. Storan telefon penuh?'); } };
@@ -261,6 +261,7 @@
     sw('camera', 'Guna kamera sebagai latar');
     seg('facing', 'Kamera', [['user', 'Depan'], ['environment', 'Belakang']]);
     seg('res', 'Resolusi rakaman', [['720', '720p'], ['1080', '1080p']]);
+    seg('fit', 'Paparan kamera', [['contain', 'Muat (tiada potong)'], ['cover', 'Penuh skrin']]);
     const reset = el('button', 'btn', 'Set semula tetapan'); reset.type = 'button';
     reset.addEventListener('click', () => {
       if (!confirm('Set semula semua tetapan kepada asal?')) return;
@@ -285,6 +286,7 @@
     stage.style.setProperty('--ta', S.align);
     vp.classList.toggle('cam-on', !!S.camera);
     $('#cam').classList.toggle('front', S.facing === 'user');
+    $('#cam').style.objectFit = S.fit === 'cover' ? 'cover' : 'contain';
     $('#pmirror').classList.toggle('mirror', !!S.mirror);
     $('#marker').hidden = !S.marker;
     $('#backdrop').style.background = S.camera ? 'rgba(0,0,0,' + S.overlay + ')' : 'transparent';
@@ -594,7 +596,8 @@
     if (!md || !md.getUserMedia) {
       toast('Kamera tidak disokong. Buka app melalui HTTPS.'); S.camera = false; saveSettings(); applySettings('none'); return false;
     }
-    const [w, h] = S.res === '1080' ? [1080, 1920] : [720, 1280];
+    // Sensor kamera landscape: minta dimensi landscape supaya iPhone/Android beri bidang pandang penuh (tiada potong/zum)
+    const [w, h] = S.res === '1080' ? [1920, 1080] : [1280, 720];
     const audio = { echoCancellation: true, noiseSuppression: true, autoGainControl: true };
     const attempts = [
       { video: { facingMode: { ideal: S.facing }, width: { ideal: w }, height: { ideal: h }, frameRate: { ideal: 30 } }, audio },
