@@ -32,3 +32,10 @@
   Cache-Control: no-cache
 /belanjawan/manifest.webmanifest
   Cache-Control: no-cache
+
+/teleprompter/sw.js
+  Cache-Control: no-cache
+/teleprompter/index.html
+  Cache-Control: no-cache
+/teleprompter/manifest.json
+  Cache-Control: no-cache

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Teleprompter">
+<meta name="description" content="Teleprompter untuk rakam video content">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<title>Teleprompter</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Sprite ikon -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+    <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h9M19 7h1M4 17h1M11 17h9"/><circle cx="16" cy="7" r="2.5"/><circle cx="8" cy="17" r="2.5"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15l12.5-7.5z"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><path d="M6.5 4.5h4v15h-4zM13.5 4.5h4v15h-4z"/></symbol>
+    <symbol id="i-rewind" viewBox="0 0 24 24"><path d="M5 5v14M19.5 5.5L9 12l10.5 6.5z"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+    <symbol id="i-rec" viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/></symbol>
+    <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/></symbol>
+    <symbol id="i-flip" viewBox="0 0 24 24"><path d="M4 12a8 8 0 0 1 14-5.3L20 9M20 4v5h-5M20 12a8 8 0 0 1-14 5.3L4 15M4 20v-5h5"/></symbol>
+    <symbol id="i-eyeoff" viewBox="0 0 24 24"><path d="M3 3l18 18M10.6 6.1A10 10 0 0 1 12 6c5 0 8.5 4 9.5 6a14 14 0 0 1-3 3.8M6.5 7.5C4.6 8.9 3.3 10.8 2.5 12c1 2 4.5 6 9.5 6 1.5 0 2.8-.4 4-1"/></symbol>
+    <symbol id="i-cam" viewBox="0 0 24 24"><path d="M3 7h12v10H3zM15 11l6-3v8l-6-3"/></symbol>
+    <symbol id="i-clip" viewBox="0 0 24 24"><path d="M9 4h6v3H9zM7 5.5H5V21h14V5.5h-2"/></symbol>
+    <symbol id="i-text" viewBox="0 0 24 24"><path d="M5 7V5h14v2M12 5v14M9 19h6"/></symbol>
+  </defs>
+</svg>
+
+<!-- ============ SKRIN UTAMA: SENARAI SKRIP ============ -->
+<section id="v-home" class="view active">
+  <header class="bar">
+    <div class="grow">
+      <h1>Teleprompter</h1>
+      <p class="sub">Skrip untuk rakam content</p>
+    </div>
+    <button id="btn-open-settings" class="icon-btn" aria-label="Tetapan"><svg class="i"><use href="#i-sliders"/></svg></button>
+  </header>
+  <div class="scroll">
+    <div id="empty" class="empty" hidden>
+      <p class="big">Belum ada skrip</p>
+      <p>Salin skrip anda, kemudian tekan <b>Tampal daripada clipboard</b> di bawah.</p>
+    </div>
+    <div id="list"></div>
+  </div>
+  <div class="dock">
+    <button id="btn-paste-new" class="btn gold tall"><svg class="i"><use href="#i-clip"/></svg><span>Tampal daripada clipboard</span></button>
+    <button id="btn-new" class="btn tall" aria-label="Skrip baharu"><svg class="i"><use href="#i-plus"/></svg><span>Baharu</span></button>
+  </div>
+</section>
+
+<!-- ============ EDIT SKRIP ============ -->
+<section id="v-edit" class="view">
+  <header class="bar">
+    <button class="icon-btn" data-back aria-label="Kembali"><svg class="i"><use href="#i-back"/></svg></button>
+    <input id="e-title" class="title-input grow" type="text" placeholder="Tajuk skrip" maxlength="80" autocomplete="off">
+  </header>
+  <div class="edit-body">
+    <textarea id="e-text" placeholder="Taip atau tampal skrip anda di sini. Setiap baris baharu akan jadi baris baharu dalam teleprompter." spellcheck="false"></textarea>
+    <p id="e-stats" class="stats"></p>
+  </div>
+  <div class="dock">
+    <button id="e-paste" class="btn tall"><svg class="i"><use href="#i-clip"/></svg><span>Tampal</span></button>
+    <button id="e-go" class="btn gold tall"><svg class="i f"><use href="#i-play"/></svg><span>Mula teleprompter</span></button>
+  </div>
+</section>
+
+<!-- ============ TETAPAN ============ -->
+<section id="v-settings" class="view">
+  <header class="bar">
+    <button class="icon-btn" data-back aria-label="Kembali"><svg class="i"><use href="#i-back"/></svg></button>
+    <h2 class="grow">Tetapan</h2>
+  </header>
+  <div class="scroll">
+    <div id="settings-box" class="settings"></div>
+    <div class="install">
+      <h3>Pasang di skrin utama</h3>
+      <button id="btn-install" class="btn gold" hidden>Pasang app</button>
+      <p><b>iPhone (Safari):</b> tekan butang Kongsi, kemudian <b>Tambah ke Skrin Utama</b>.</p>
+      <p><b>Android (Chrome):</b> tekan menu ⋮, kemudian <b>Pasang app</b> atau <b>Tambah ke skrin utama</b>.</p>
+      <p class="muted">Versi <span id="ver"></span> · Semua skrip disimpan dalam telefon ini sahaja dan app boleh digunakan tanpa internet.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TELEPROMPTER ============ -->
+<section id="v-prompter" class="view">
+  <div id="stage">
+    <video id="cam" playsinline muted autoplay></video>
+    <div id="backdrop"></div>
+    <div id="pmirror"><div id="pcontent"></div></div>
+    <div id="marker"><i class="tri l"></i><i class="band"></i><i class="tri r"></i></div>
+    <div id="progress"><i></i></div>
+  </div>
+
+  <div id="countdown" hidden><span>3</span><small>Tap untuk batal</small></div>
+
+  <div id="topbar" class="ui">
+    <button class="icon-btn" data-back aria-label="Kembali"><svg class="i"><use href="#i-back"/></svg></button>
+    <div class="grow tb-info">
+      <div id="p-title" class="tb-title"></div>
+      <div id="p-time" class="tb-time">0:00 / 0:00</div>
+    </div>
+    <button id="p-flip" class="icon-btn" aria-label="Tukar kamera" hidden><svg class="i"><use href="#i-flip"/></svg></button>
+    <button id="p-hide" class="icon-btn" aria-label="Sembunyikan kawalan"><svg class="i"><use href="#i-eyeoff"/></svg></button>
+  </div>
+
+  <div id="bottombar" class="ui">
+    <div id="drawer" hidden>
+      <div class="drawer-head"><b>Tetapan teleprompter</b><button id="drawer-close" class="btn small">Tutup</button></div>
+      <div id="drawer-box" class="settings"></div>
+    </div>
+    <div class="speed-row">
+      <button id="sp-minus" class="icon-btn sq" aria-label="Perlahan"><svg class="i"><use href="#i-minus"/></svg></button>
+      <div class="sp-mid"><input id="sp-range" type="range" min="60" max="300" step="5" aria-label="Kelajuan"><span id="sp-label">140 ppm</span></div>
+      <button id="sp-plus" class="icon-btn sq" aria-label="Laju"><svg class="i"><use href="#i-plus"/></svg></button>
+    </div>
+    <div class="main-row">
+      <button id="p-rewind" class="btn tall"><svg class="i"><use href="#i-rewind"/></svg><span>Undur</span></button>
+      <button id="p-play" class="btn gold tall big"><svg class="i f"><use href="#i-play"/></svg><span>Main</span></button>
+      <button id="p-rec" class="btn tall rec"><svg class="i f"><use href="#i-rec"/></svg><span>Rakam</span></button>
+    </div>
+    <div class="sub-row">
+      <button id="f-minus" class="btn"><span class="aa">A−</span></button>
+      <button id="f-plus" class="btn"><span class="aa">A+</span></button>
+      <button id="p-cam" class="btn"><svg class="i"><use href="#i-cam"/></svg><span id="p-cam-l">Kamera</span></button>
+      <button id="p-set" class="btn"><svg class="i"><use href="#i-sliders"/></svg><span>Tetapan</span></button>
+    </div>
+  </div>
+
+  <button id="ui-show" class="ui-show" hidden aria-label="Tunjuk kawalan"><svg class="i"><use href="#i-sliders"/></svg></button>
+  <button id="rec-float" class="rec-float" hidden aria-label="Henti rakaman"><svg class="i f"><use href="#i-stop"/></svg></button>
+  <div id="recpill" class="recpill" hidden><i></i><span id="rec-time">0:00</span></div>
+</section>
+
+<!-- ============ PRATONTON RAKAMAN ============ -->
+<section id="v-preview" class="view">
+  <header class="bar">
+    <button class="icon-btn" data-back aria-label="Kembali"><svg class="i"><use href="#i-back"/></svg></button>
+    <h2 class="grow">Pratonton rakaman</h2>
+  </header>
+  <div class="pv-wrap"><video id="pv" controls playsinline></video></div>
+  <p id="pv-info" class="stats center"></p>
+  <div class="pv-actions">
+    <button id="pv-save" class="btn gold tall">Simpan ke telefon</button>
+    <button id="pv-dl" class="btn tall">Muat turun</button>
+    <button id="pv-again" class="btn tall">Rakam semula</button>
+    <button id="pv-discard" class="btn tall danger">Buang</button>
+  </div>
+</section>
+
+<!-- Kotak tampal manual -->
+<div id="modal" class="modal" hidden>
+  <div class="modal-card">
+    <h3>Tampal skrip</h3>
+    <p class="muted">Pelayar menyekat akses clipboard. Tekan lama dalam kotak di bawah, pilih <b>Tampal</b>, kemudian tekan <b>Guna teks ini</b>.</p>
+    <textarea id="m-text" placeholder="Tampal teks di sini"></textarea>
+    <div class="modal-actions">
+      <button id="m-cancel" class="btn">Batal</button>
+      <button id="m-ok" class="btn gold">Guna teks ini</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast" hidden></div>
+
+<script src="app.js"></script>
+</body>
+</html>
