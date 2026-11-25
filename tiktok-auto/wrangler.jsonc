@@ -24,7 +24,7 @@
     // URL Worker anda selepas deploy, tanpa garis condong di hujung
     "PUBLIC_BASE_URL": "https://tiktok-auto.qada-app-7k2m.workers.dev",
     // Emel untuk halaman Terma dan Privasi
-    "CONTACT_EMAIL": "GANTI_EMEL_ANDA",
+    "CONTACT_EMAIL": "safari_aepal@yahoo.com",
     "APP_NAME": "Dr Sakinah Content Scheduler",
     "TZ_OFFSET_HOURS": "8",
     // MEDIA_UPLOAD = draf (lalai, selamat). DIRECT_POST = terus post (selepas app diluluskan TikTok)
