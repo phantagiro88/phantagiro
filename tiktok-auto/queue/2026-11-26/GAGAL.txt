@@ -1,0 +1,3 @@
+Content 2026-11-26 gagal disediakan.
+Sebab: artikel #3, #4 dan #5 (mohdzulkifli.com) tidak boleh dibaca. WebFetch memulangkan PROVENANCE_REQUIRED (kebenaran URL tidak dijawab kerana tiada sesiapa dalam sesi). Maksimum 3 percubaan dicapai.
+progress.json tidak diubah. Run seterusnya akan mula semula dari #3.
