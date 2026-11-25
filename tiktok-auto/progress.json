@@ -1,7 +1,16 @@
 {
  "used": [
-  1
+  1,
+  2
  ],
- "last_run": null,
- "history": []
+ "last_run": "2026-11-25",
+ "history": [
+  {
+   "date": "2026-11-25",
+   "n": 2,
+   "title": "Simpan 1 Gram Sebulan: Lambat Macam Kura-kura, Tapi Menang",
+   "photo": "foto-01.jpg",
+   "style": "STYLE1"
+  }
+ ]
 }
