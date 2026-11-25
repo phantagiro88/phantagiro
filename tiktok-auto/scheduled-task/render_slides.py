@@ -205,6 +205,9 @@ def main():
     style = spec.get("style", "style1")
     title, photo, pts = spec["title"], spec["photo"], spec.get("points", [])
     if style == "style1":
+        # Style 1: SATU slide = foto Dr. Sakinah + tajuk hook sahaja (isi penuh ada dalam caption)
+        slides = [slide_cover(photo, title, 1, False)]
+    elif style == "style1_mata":
         slides = [slide_single(photo, title, pts[:5])]
     else:
         pts = pts[:8]

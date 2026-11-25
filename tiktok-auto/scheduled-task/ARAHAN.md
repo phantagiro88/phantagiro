@@ -12,7 +12,7 @@ Anda menyediakan content TikTok harian untuk Dr. Sakinah Azami (@drsakinahazami)
 
 ## Tetapan (ubah satu perkataan jika perlu)
 GAYA = STYLE1
-(STYLE1 = satu slide: foto + tajuk + mata ringkas dengan penerangan pendek. STYLE2 = beberapa slide bernombor "01 / NN" dengan "SWIPE →", tanpa caption pada slide.)
+(STYLE1 = SATU slide: foto Dr. Sakinah + tajuk hook sahaja; isi penuh ada dalam caption yang boleh disalin tampal. STYLE2 = beberapa slide bernombor "01 / NN" dengan "SWIPE →", tanpa caption pada slide.)
 
 ## Persediaan
 1. Sambung repo `phantagiro88/phantagiro` dengan akses push (add_repo, access push), clone, dan masuk folder `tiktok-auto/` di dalamnya. Semua laluan di bawah relatif kepada folder itu.
@@ -35,10 +35,9 @@ GAYA = STYLE1
 ## Langkah 4: sediakan slide
 Tulis `spec.json` sementara (di luar repo, contoh `/tmp/spec.json`):
 ```
-{"style":"style1","photo":"photos/NAMA.jpg","title":"<tajuk photomode>",
- "points":[{"head":"<mata 1, maks 6 patah perkataan>","body":"<penerangan 1 ayat pendek>"}, ...]}
+{"style":"style1","photo":"photos/NAMA.jpg","title":"<tajuk HOOK pendek, maks 8 patah perkataan, bentuk kesilapan atau soalan>"}
 ```
-- STYLE1: 3 hingga 4 mata. Setiap penerangan satu ayat pendek (maks kira-kira 70 aksara) supaya muat pada slide.
+- STYLE1: tiada "points". Tajuk mestilah hook (contoh: "Tunggu Duit Banyak Baru Simpan Emas? Silap!"), bukan tajuk artikel penuh. Semua isi, mata dan penerangan masuk dalam caption.
 - STYLE2: tukar `"style":"style2"`, sehingga 7 mata, dan tambah `"closing":"Ikut @drsakinahazami dan daftar Public Gold percuma. Link di bio."`.
 - Mata mesti datang daripada isi artikel, bukan pendapat anda.
 
