@@ -24,6 +24,16 @@ export default {
             headers: { "content-type": "text/plain; charset=utf-8", "cache-control": "no-store" },
           });
         }
+        // Fail pengesahan tambahan (contoh: Sandbox) disimpan sebagai kunci "vf:<nama fail>"
+        if (/^\/tiktok[A-Za-z0-9]{16,80}\.txt$/.test(path)) {
+          const row = await env.DB.prepare("SELECT value FROM settings WHERE key = ?1")
+            .bind("vf:" + path.slice(1)).first().catch(() => null);
+          if (row?.value) {
+            return new Response(request.method === "HEAD" ? null : row.value, {
+              headers: { "content-type": "text/plain; charset=utf-8", "cache-control": "no-store" },
+            });
+          }
+        }
       }
 
       // Hidangkan slide kepada TikTok (PULL_FROM_URL). Cari dalam queue/ kemudian posted/.
