@@ -1,0 +1,15 @@
+{
+  "name": "tiktok-auto",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev --local",
+    "deploy": "wrangler deploy",
+    "db:init": "wrangler d1 execute tiktok-auto --remote --file=schema.sql",
+    "db:init:local": "wrangler d1 execute tiktok-auto --local --file=schema.sql",
+    "test": "node test/run.mjs"
+  },
+  "devDependencies": {
+    "wrangler": "^4"
+  }
+}

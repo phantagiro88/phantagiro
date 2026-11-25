@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#120e06">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icon-192.png">
+<title>TikTok Auto</title>
+<style>
+:root{--bg:#120e06;--card:#1d170a;--line:#33280f;--gold:#d4a73a;--txt:#f3ead6;--mut:#a89a78;--ok:#6cc070;--bad:#e5645a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--txt);font:16px/1.5 system-ui,sans-serif;padding:16px 16px 60px;max-width:640px;margin:auto}
+h1{font-size:1.25rem;margin:4px 0 14px;color:var(--gold)}h2{font-size:1rem;margin:0 0 10px;color:var(--gold)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+label{display:block;font-size:.85rem;color:var(--mut);margin:10px 0 4px}
+input,select{width:100%;padding:11px;border-radius:10px;border:1px solid var(--line);background:#120e06;color:var(--txt);font-size:1rem}
+button{padding:11px 14px;border-radius:10px;border:0;background:var(--gold);color:#201700;font-weight:700;font-size:.95rem;margin:8px 8px 0 0}
+button.sec{background:#2b2210;color:var(--txt);border:1px solid var(--line)}button.bad{background:#4a1d19;color:#ffd7d3}
+.row{display:flex;gap:8px;flex-wrap:wrap}.pill{display:inline-block;padding:2px 10px;border-radius:99px;font-size:.8rem;background:#2b2210}
+.ok{color:var(--ok)}.bad-t{color:var(--bad)}.mut{color:var(--mut);font-size:.85rem}
+.item{border-top:1px solid var(--line);padding:8px 0;font-size:.9rem}.item:first-child{border-top:0}
+code{background:#120e06;padding:1px 6px;border-radius:6px;word-break:break-all}
+#login{margin-top:30vh}
+</style>
+</head>
+<body>
+
+<div id="login" class="card">
+  <h1>TikTok Auto</h1>
+  <label>Kata laluan admin</label>
+  <input id="pw" type="password" autocomplete="current-password">
+  <button onclick="doLogin()">Masuk</button>
+  <div id="loginerr" class="bad-t mut"></div>
+</div>
+
+<div id="app" hidden>
+  <h1>TikTok Auto <span class="mut" id="who"></span></h1>
+
+  <div class="card">
+    <h2>Status</h2>
+    <div id="conn"></div>
+    <div class="row">
+      <button onclick="connect()">Sambung TikTok</button>
+      <button class="sec" onclick="testCreator()">Uji creator_info</button>
+      <button class="bad" onclick="disconnect()">Putuskan</button>
+    </div>
+    <div id="creator" class="mut"></div>
+  </div>
+
+  <div class="card">
+    <h2>Post hari ini</h2>
+    <div id="today" class="mut"></div>
+    <div class="row">
+      <button onclick="runNow(false)">Jalankan sekarang</button>
+      <button class="sec" onclick="runNow(true)">Post lagi (paksa)</button>
+      <button class="sec" onclick="load()">Muat semula</button>
+    </div>
+    <div id="runmsg" class="mut"></div>
+  </div>
+
+  <div class="card">
+    <h2>Tetapan</h2>
+    <label>Masa post (waktu Malaysia)</label><input id="post_time" type="time">
+    <label>Mod</label>
+    <select id="post_mode">
+      <option value="MEDIA_UPLOAD">Draf (inbox TikTok) — lalai, selamat</option>
+      <option value="DIRECT_POST">Direct post (selepas app diluluskan)</option>
+    </select>
+    <label>Privasi (direct post sahaja)</label>
+    <select id="privacy_level">
+      <option value="SELF_ONLY">Hanya saya (wajib sebelum audit)</option>
+      <option value="MUTUAL_FOLLOW_FRIENDS">Rakan (follow bersama)</option>
+      <option value="FOLLOWER_OF_CREATOR">Pengikut</option>
+      <option value="PUBLIC_TO_EVERYONE">Awam</option>
+    </select>
+    <label>Content dijana AI? (tanda AIGC)</label>
+    <select id="is_aigc"><option value="0">Tidak</option><option value="1">Ya</option></select>
+    <label>Jeda sistem</label>
+    <select id="paused"><option value="0">Aktif</option><option value="1">Dijeda</option></select>
+    <button onclick="saveSettings()">Simpan tetapan</button>
+    <div id="savemsg" class="mut"></div>
+  </div>
+
+  <div class="card">
+    <h2>Pengesahan URL TikTok</h2>
+    <div class="mut">Tampal nama fail dan isi daripada TikTok for Developers (URL properties). Worker akan hidangkannya di <code id="vurl"></code></div>
+    <label>Nama fail (contoh tiktokAbC123.txt)</label><input id="verify_filename">
+    <label>Isi fail</label><input id="verify_content">
+    <button onclick="saveVerify()">Simpan pengesahan</button>
+  </div>
+
+  <div class="card"><h2>Queue</h2><div id="queue" class="mut"></div><div id="progress" class="mut"></div></div>
+  <div class="card"><h2>Sejarah post</h2><div id="posts"></div></div>
+  <div class="card"><h2>Log</h2><div id="logs"></div></div>
+  <div class="card"><h2>Maklumat untuk TikTok</h2>
+    <div class="mut">Redirect URI: <code id="redir"></code></div>
+    <div class="mut">Terma: <code id="terms"></code></div>
+    <div class="mut">Privasi: <code id="priv"></code></div>
+    <div class="mut">Notifikasi: <span id="notif"></span></div>
+  </div>
+  <button class="sec" onclick="logout()">Log keluar</button>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+let PW = localStorage.getItem("ta_pw") || "";
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const fmt = (ts) => new Date(ts * 1000).toLocaleString("ms-MY", { timeZone: "Asia/Kuala_Lumpur", hour12: false });
+
+async function api(path, body) {
+  const res = await fetch("/api/" + path, {
+    method: body ? "POST" : "GET",
+    headers: { "x-admin-password": PW, "content-type": "application/json" },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (res.status === 401) { logout(true); throw new Error("Kata laluan salah"); }
+  return res.json();
+}
+function logout(keep) { localStorage.removeItem("ta_pw"); PW = ""; $("app").hidden = true; $("login").hidden = false; }
+async function doLogin() {
+  PW = $("pw").value;
+  try { await load(); localStorage.setItem("ta_pw", PW); $("login").hidden = true; $("app").hidden = false; }
+  catch (e) { $("loginerr").textContent = e.message; }
+}
+async function load() {
+  const d = await api("status");
+  $("login").hidden = true; $("app").hidden = false;
+  const s = d.settings;
+  $("who").textContent = s.creator_username ? "@" + s.creator_username : "";
+  $("conn").innerHTML = d.connected
+    ? `<span class="pill ok">Bersambung</span> <span class="mut">token tamat ${fmt(d.token.expires_at)} (disegar automatik)</span>`
+    : `<span class="pill bad-t">Belum bersambung</span>`;
+  for (const k of ["post_time", "post_mode", "privacy_level", "is_aigc", "paused", "verify_filename", "verify_content"]) $(k).value = s[k] ?? "";
+  $("vurl").textContent = d.public_base_url + "/" + (s.verify_filename || "<nama-fail>");
+  $("redir").textContent = d.redirect_uri;
+  $("terms").textContent = d.public_base_url + "/terms";
+  $("priv").textContent = d.public_base_url + "/privacy";
+  $("notif").textContent = d.has_notify ? "Aktif" : "Belum ditetapkan (emel/Telegram)";
+  $("queue").textContent = d.queue.length ? d.queue.join(", ") : "Kosong";
+  $("progress").textContent = d.progress ? `Tajuk digunakan: ${d.progress.used?.length ?? 0}/90` : "";
+  const today = d.posts[0];
+  $("today").textContent = today ? `${today.day}: ${today.status}${today.tiktok_status ? " (" + today.tiktok_status + ")" : ""}${today.error ? " — " + today.error : ""}` : "Belum ada rekod";
+  $("posts").innerHTML = d.posts.map((p) => `<div class="item"><b>${esc(p.day)}</b> <span class="pill ${p.status === "ok" ? "ok" : p.status === "failed" ? "bad-t" : ""}">${esc(p.status)}</span> <span class="mut">${esc(p.mode)} · ${esc(p.set_name)} · cuba ${p.attempts}</span>${p.error ? `<div class="bad-t mut">${esc(p.error)}</div>` : ""}</div>`).join("") || '<div class="mut">Tiada</div>';
+  $("logs").innerHTML = d.logs.map((l) => `<div class="item"><span class="mut">${fmt(l.ts)}</span> <span class="${l.level === "error" ? "bad-t" : ""}">${esc(l.msg)}</span></div>`).join("") || '<div class="mut">Tiada</div>';
+  if (new URLSearchParams(location.search).get("connected")) history.replaceState({}, "", "/");
+}
+async function connect() { const d = await api("connect-url", {}); location.href = d.url; }
+async function disconnect() { if (confirm("Putuskan sambungan TikTok?")) { await api("disconnect", {}); load(); } }
+async function testCreator() {
+  const d = await api("test-creator", {});
+  $("creator").textContent = d.ok ? `OK: @${d.creator.username} (${d.creator.nickname}); privasi dibenarkan: ${(d.creator.privacy_level_options || []).join(", ")}` : "Ralat: " + d.error;
+  load();
+}
+async function runNow(again) { const d = await api("run-now", { again }); $("runmsg").textContent = d.message; setTimeout(load, 8000); }
+async function saveSettings() {
+  const body = {}; for (const k of ["post_time", "post_mode", "privacy_level", "is_aigc", "paused"]) body[k] = $(k).value;
+  const d = await api("settings", body); $("savemsg").textContent = d.ok ? "Disimpan" : d.error; load();
+}
+async function saveVerify() {
+  const d = await api("settings", { verify_filename: $("verify_filename").value, verify_content: $("verify_content").value });
+  alert(d.ok ? "Disimpan. Sekarang tekan Verify di TikTok for Developers." : d.error); load();
+}
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js").catch(() => {});
+if (PW) load().catch(() => {});
+</script>
+</body>
+</html>

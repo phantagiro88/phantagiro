@@ -1,0 +1,455 @@
+{
+ "base": "https://www.mohdzulkifli.com",
+ "titles": [
+  {
+   "n": 1,
+   "title": "7 Perkara Wajib Tahu Sebelum Beli Emas Pertama",
+   "url": "https://www.mohdzulkifli.com/2024/11/fahami-7-perkara-asas-ini-sebelum-memulakan-tabungan-emas.html"
+  },
+  {
+   "n": 2,
+   "title": "Simpan 1 Gram Sebulan: Lambat Macam Kura-kura, Tapi Menang",
+   "url": "https://www.mohdzulkifli.com/2016/10/kelebihan-simpan-emas-1-gram-1-bulan.html"
+  },
+  {
+   "n": 3,
+   "title": "Takut Simpan Emas Sendiri? Ini Cara Paling Mudah",
+   "url": "https://www.mohdzulkifli.com/2014/09/mudahnya-simpan-emas-dengan-gap-public-gold.html"
+  },
+  {
+   "n": 4,
+   "title": "Auto-Debit, Auto-Menabung, Auto-Kaya",
+   "url": "https://www.mohdzulkifli.com/2024/07/gap-auto-debit-kaedah-terbaik-menabung-secara-konsisten.html"
+  },
+  {
+   "n": 5,
+   "title": "Beli Ikut Bajet atau Ikut Gram? Ini Yang Lebih Konsisten",
+   "url": "https://www.mohdzulkifli.com/2024/11/belian-emas-secara-epp-dan-akaun-gap-mana-lebih-baik.html"
+  },
+  {
+   "n": 6,
+   "title": "Akaun Emas atau Emas Fizikal, Mana Lebih Selamat?",
+   "url": "https://www.mohdzulkifli.com/2014/04/akaun-pelaburan-emas-atau-emas-fizikal.html"
+  },
+  {
+   "n": 7,
+   "title": "6 Tip Simpan Emas Dengan Selamat",
+   "url": "https://www.mohdzulkifli.com/2011/10/cara-simpan-emas-dengan-selamat.html"
+  },
+  {
+   "n": 8,
+   "title": "Jangan Simpan Emas Dalam Almari Baju!",
+   "url": "https://www.mohdzulkifli.com/2023/09/tip-simpan-emas-di-rumah-dengan-selamat.html"
+  },
+  {
+   "n": 9,
+   "title": "20 Soalan Yang Selalu Ditanya Bila Nak Mula Simpan Emas",
+   "url": "https://www.mohdzulkifli.com/2010/11/20-persoalan-asas-pelaburan-emas.html"
+  },
+  {
+   "n": 10,
+   "title": "Soalan Lazim Emas: Zakat, Harga dan Barang Kemas",
+   "url": "https://www.mohdzulkifli.com/faq-emas"
+  },
+  {
+   "n": 11,
+   "title": "Azam Tahun Baru: Hujung Tahun Dah Ada 12 Gram",
+   "url": "https://www.mohdzulkifli.com/2024/01/tahun-baru-azam-baru-menabung-emas.html"
+  },
+  {
+   "n": 12,
+   "title": "Teknik Menabung Sampai Cecah RM100,000",
+   "url": "https://www.mohdzulkifli.com/2024/03/teknik-berkesan-menabung-hingga-mencapai-rm100000.html"
+  },
+  {
+   "n": 13,
+   "title": "Emas Untuk Pelaburan atau Simpanan?",
+   "url": "https://www.mohdzulkifli.com/2026/10/beli-emas-sebagai-pelaburan-atau-simpanan.html"
+  },
+  {
+   "n": 14,
+   "title": "7 Keistimewaan Emas Yang Duit Bank Tak Ada",
+   "url": "https://www.mohdzulkifli.com/2015/01/keistimewaan-emas-sebagai-simpanan.html"
+  },
+  {
+   "n": 15,
+   "title": "Dana Kecemasan Asyik Bocor? Cuba Simpan Dalam Emas",
+   "url": "https://www.mohdzulkifli.com/2016/06/emas-sebagai-simpanan-kecemasan.html"
+  },
+  {
+   "n": 16,
+   "title": "Kenapa Penyimpan Emas Rasa Sayang Nak Belanja",
+   "url": "https://www.mohdzulkifli.com/2016/05/emas-menutup-kebocoran-wang.html"
+  },
+  {
+   "n": 17,
+   "title": "Emas Magnet Kekayaan: 400 Gram Dalam 3 Tahun",
+   "url": "https://www.mohdzulkifli.com/2023/11/emas-magnet-kekayaan.html"
+  },
+  {
+   "n": 18,
+   "title": "Tengok Emas Hari-hari, Makin Ketagih Menabung",
+   "url": "https://www.mohdzulkifli.com/2018/09/inilah-rahsia-penyimpan-emas-bertambah-kaya.html"
+  },
+  {
+   "n": 19,
+   "title": "3 Sebab Penyimpan Emas Tak Akan Rugi",
+   "url": "https://www.mohdzulkifli.com/2023/09/penyimpan-emas-tak-akan-rugi-ini-sebabnya.html"
+  },
+  {
+   "n": 20,
+   "title": "3 Punca Kekayaan Anda Bocor Tanpa Sedar",
+   "url": "https://www.mohdzulkifli.com/2023/04/kekayaan-bocor-inilah-punca-dan-solusinya.html"
+  },
+  {
+   "n": 21,
+   "title": "Asal Duit Sebenarnya Adalah Emas",
+   "url": "https://www.mohdzulkifli.com/2017/05/asal-duit-adalah-emas.html"
+  },
+  {
+   "n": 22,
+   "title": "RM50 Dulu vs RM50 Sekarang: Nombor Sama, Nilai Hilang",
+   "url": "https://www.mohdzulkifli.com/2024/03/nilai-duit-merosot-nombor-masih-sama-tapi-kita-makin-miskin.html"
+  },
+  {
+   "n": 23,
+   "title": "Iktibar 1997: Ringgit Jatuh, Emas Selamatkan Nilai",
+   "url": "https://www.mohdzulkifli.com/2014/01/emas-penyelamat-bencana-kewangan-iktibar-kejatuhan-ringgit-1997.html"
+  },
+  {
+   "n": 24,
+   "title": "5 Rahsia Penyimpan Emas Yang Sentiasa Senyum",
+   "url": "https://www.mohdzulkifli.com/2013/05/5-rahsia-pelabur-emas-yang-sentiasa-senyum.html"
+  },
+  {
+   "n": 25,
+   "title": "ASB, Tabung Haji, Emas atau Rumah? Ini Susunan Yang Betul",
+   "url": "https://www.mohdzulkifli.com/2025/09/asb-tabung-haji-emas-atau-hartanah-ini-cara-saya-simpan-duit.html"
+  },
+  {
+   "n": 26,
+   "title": "Harga Emas Esok Naik atau Turun? Tak Perlu Teka",
+   "url": "https://www.mohdzulkifli.com/2024/12/macam-mana-nak-tahu-harga-emas-naik-atau-turun.html"
+  },
+  {
+   "n": 27,
+   "title": "Jangan Biar Emosi Naik Turun Macam Harga Emas",
+   "url": "https://www.mohdzulkifli.com/2023/05/jangan-bazirkan-emosi-dengan-harga-emas.html"
+  },
+  {
+   "n": 28,
+   "title": "Harga Emas Rekod Tertinggi: Investor Panik, Gold Saver Tenang",
+   "url": "https://www.mohdzulkifli.com/2026/01/harga-emas-all-time-high-investor-panik-gold-saver-kekal-tenang.html"
+  },
+  {
+   "n": 29,
+   "title": "Harga Emas Paling Tinggi Dalam Sejarah, Patut Beli Lagi?",
+   "url": "https://www.mohdzulkifli.com/2023/09/harga-emas-tertinggi-dalam-sejarah-apa-patut-kita-buat.html"
+  },
+  {
+   "n": 30,
+   "title": "\"Emas Dah Mahal, Tunggu Turun Dulu\": Silap Ramai Orang",
+   "url": "https://www.mohdzulkifli.com/2024/11/harga-emas-sekarang-mahal-berbaloi-tak-beli-emas-sekarang.html"
+  },
+  {
+   "n": 31,
+   "title": "Abaikan Ramalan Harga, Fokus Gram Bertambah",
+   "url": "https://www.mohdzulkifli.com/2025/08/harga-emas-dijangka-akan-naik-abaikan-prediction-fokus-konsisten-menabung.html"
+  },
+  {
+   "n": 32,
+   "title": "Apa Graf 30 Tahun Harga Emas Ajar Kita",
+   "url": "https://www.mohdzulkifli.com/2025/08/graf-harga-emas-30-tahun-ini-point-terpenting-perlu-difahami.html"
+  },
+  {
+   "n": 33,
+   "title": "Harga Jatuh Pun Masih Untung? Ini Teknik Purata Kos",
+   "url": "https://www.mohdzulkifli.com/2026/03/dollar-cost-averaging-dsa-teknik-kumpul-emas-sampai-1-kilogram-tanpa-stress.html"
+  },
+  {
+   "n": 34,
+   "title": "Target 1 Kilo 1 Keluarga: Harga Naik Senyum, Turun Lagi Senyum",
+   "url": "https://www.mohdzulkifli.com/2026/03/fokus-capai-1-kilogram-1-keluarga-harga-naik-senyum-harga-turun-lagi-senyum.html"
+  },
+  {
+   "n": 35,
+   "title": "Betul Ke Teknik Ar-Rahnu Boleh Gandakan Emas?",
+   "url": "https://www.mohdzulkifli.com/2023/08/benarkah-teknik-ar-rahnu-dapat-gandakan-simpanan-emas.html"
+  },
+  {
+   "n": 36,
+   "title": "Perlu Duit Segera? Pajak Dulu, Jangan Jual",
+   "url": "https://www.mohdzulkifli.com/2013/02/cara-pajak-emas-di-ar-rahnu.html"
+  },
+  {
+   "n": 37,
+   "title": "Dinar Sebagai Mas Kahwin: Tip Penting Sebelum Akad",
+   "url": "https://www.mohdzulkifli.com/2016/08/cara-menetapkan-dinar-emas-sebagai-maskahwin.html"
+  },
+  {
+   "n": 38,
+   "title": "Duit Raya Anak, Tukar Jadi Emas Cepat-cepat",
+   "url": "https://www.mohdzulkifli.com/2023/04/selamatkan-duit-raya-anak-kepada-emas.html"
+  },
+  {
+   "n": 39,
+   "title": "8 Tip Beli Barang Kemas Yang Masih Bernilai Tinggi",
+   "url": "https://www.mohdzulkifli.com/2011/10/8-tips-membeli-barang-kemas-bernilai-tinggi.html"
+  },
+  {
+   "n": 40,
+   "title": "Barang Kemas Yang Dipakai Pun Kena Zakat?",
+   "url": "https://www.mohdzulkifli.com/2023/11/kiraan-zakat-barang-kemas-berbeza-uruf-mengikut-negeri.html"
+  },
+  {
+   "n": 41,
+   "title": "Izinkan Isteri Beli Barang Kemas, Tanpa Rasa Ralat",
+   "url": "https://www.mohdzulkifli.com/2026/09/pg-jewel-akhirnya-saya-tak-rasa-ralat-izinkan-isteri-beli-barang-kemas.html"
+  },
+  {
+   "n": 42,
+   "title": "Tanda Sebenar Kaya: Mampu Tunai Haji Di Usia Muda",
+   "url": "https://www.mohdzulkifli.com/2026/06/tanda-sebenar-kaya-mampu-tunai-haji-di-usia-muda.html"
+  },
+  {
+   "n": 43,
+   "title": "Tabungan Emas Langsaikan Loan Rumah: Kisah En Azlan",
+   "url": "https://www.mohdzulkifli.com/2023/04/settle-loan-rumah-hasil-tabungan-emas-ini-kisah-en-azlan.html"
+  },
+  {
+   "n": 44,
+   "title": "Dari Tiada Tabungan ke Rumah Sewa Tunai: Kisah En Bashir",
+   "url": "https://www.mohdzulkifli.com/2023/03/berjaya-bina-rumah-sewa-secara-tunai-ini-kisah-en-bashir.html"
+  },
+  {
+   "n": 45,
+   "title": "Hutang Keliling Pinggang, Kini Beli Rumah Tunai Dengan Emas",
+   "url": "https://www.mohdzulkifli.com/2026/08/daripada-hutang-keliling-pinggang-kini-en-bashir-mampu-beli-rumah-secara-tunai-dengan-emas.html"
+  },
+  {
+   "n": 46,
+   "title": "Dulu Stress Dengan Hutang, Sekarang Jutawan",
+   "url": "https://www.mohdzulkifli.com/2026/03/maksud-kaya-dengan-emas-dulu-stress-dengan-hutang-sekarang-jutawan.html"
+  },
+  {
+   "n": 47,
+   "title": "3 Petanda Anda Makin Kaya Dengan Emas",
+   "url": "https://www.mohdzulkifli.com/2026/06/3-petanda-penting-makin-lama-makin-kaya-dengan-emas.html"
+  },
+  {
+   "n": 48,
+   "title": "Kumpul Emas Dulu, Kemudian Miliki Hartanah",
+   "url": "https://www.mohdzulkifli.com/2010/11/kumpul-emas-miliki-hartanah.html"
+  },
+  {
+   "n": 49,
+   "title": "7 Checklist Kaya Dengan Emas",
+   "url": "https://www.mohdzulkifli.com/2024/07/7-checklist-penting-kaya-dengan-emas-tahun-2025.html"
+  },
+  {
+   "n": 50,
+   "title": "Gaji Tolak Simpanan = Belanja, Bukan Sebaliknya",
+   "url": "https://www.mohdzulkifli.com/2025/10/rahsia-orang-kaya-gaji-simpan-belanja-bukan-sebaliknya.html"
+  },
+  {
+   "n": 51,
+   "title": "Menabung Bukan Soal Jumlah, Tapi Paksa Sampai Jadi Tabiat",
+   "url": "https://www.mohdzulkifli.com/2023/08/nak-berjaya-menabung-kena-paksa-sampai-terbiasa.html"
+  },
+  {
+   "n": 52,
+   "title": "Gaji RM3,000? Ini Cara Kumpul RM9,000 Dana Kecemasan",
+   "url": "https://www.mohdzulkifli.com/2026/06/teknik-berkesan-menabung-3-bulan-gaji-sebagai-dana-kecemasan.html"
+  },
+  {
+   "n": 53,
+   "title": "Bila Mula Menabung, Nafsu Berbelanja Makin Kurang",
+   "url": "https://www.mohdzulkifli.com/2024/10/bila-menabung-kita-lebih-hargai-duit-hasil-titik-peluh-kita.html"
+  },
+  {
+   "n": 54,
+   "title": "Tip Hari Gaji: Gembira Sebulan, Bukan Sehari",
+   "url": "https://www.mohdzulkifli.com/2023/09/tip-happy-sebulan-setiap-kali-hari-gaji.html"
+  },
+  {
+   "n": 55,
+   "title": "Nak Cepat Kaya? Tahan Kos Gaya Hidup, Bukan Sara Hidup",
+   "url": "https://www.mohdzulkifli.com/2025/09/nak-cepat-kaya-tahan-kos-gaya-hidup-bukan-sara-hidup.html"
+  },
+  {
+   "n": 56,
+   "title": "Satu-satunya Jaminan Pekerja: Berhenti atau Diberhentikan",
+   "url": "https://www.mohdzulkifli.com/2024/07/jaminan-bagi-seorang-pekerja-ialah-berhenti-atau-diberhentikan.html"
+  },
+  {
+   "n": 57,
+   "title": "Langkah Pertama Ke Arah RM1 Juta",
+   "url": "https://www.mohdzulkifli.com/2011/07/langkah-pertama-menyimpan-rm1-juta.html"
+  },
+  {
+   "n": 58,
+   "title": "7 Strategi Tutup Kebocoran Wang",
+   "url": "https://www.mohdzulkifli.com/2013/12/7-strategi-elak-kebocoran-wang.html"
+  },
+  {
+   "n": 59,
+   "title": "Kaya = Tabungan + Harta – Hutang",
+   "url": "https://www.mohdzulkifli.com/2025/08/formula-jadi-kaya-simple-tapi-ramai-orang-tak-tahu.html"
+  },
+  {
+   "n": 60,
+   "title": "Kereta Sama, Nasib Berbeza: Kaya Lain, Mewah Lain",
+   "url": "https://www.mohdzulkifli.com/2026/02/kaya-lain-mewah-lain-ramai-nampak-mewah-tapi-tak-kaya.html"
+  },
+  {
+   "n": 61,
+   "title": "Biar Tak Nampak Bergaya, Asalkan Poket Kaya",
+   "url": "https://www.mohdzulkifli.com/2022/09/biar-tak-nampak-bergaya-asalkan-poket-kita-kaya.html"
+  },
+  {
+   "n": 62,
+   "title": "Jutawan Yang Pakai Kereta Biasa",
+   "url": "https://www.mohdzulkifli.com/2010/12/berkereta-biasa-tapi-dia-seorang-jutawan.html"
+  },
+  {
+   "n": 63,
+   "title": "Nak Kaya Untuk Apa? Jawab Dulu Soalan Ni",
+   "url": "https://www.mohdzulkifli.com/2023/10/kenalpasti-makna-kekayaan-nak-kaya-untuk-apa.html"
+  },
+  {
+   "n": 64,
+   "title": "Kaya Sebenar: Bebas Masa, Bukan Sekadar Ada Duit",
+   "url": "https://www.mohdzulkifli.com/2026/10/kaya-bukan-sekadar-ada-duit-tapi-ada-kebebasan-masa.html"
+  },
+  {
+   "n": 65,
+   "title": "Kenapa RM3,000 Sehari Rasa Mustahil?",
+   "url": "https://www.mohdzulkifli.com/2025/12/financial-thermostat-rahsia-naikkan-income-rm3k-sehari-dan-jadi-jutawan.html"
+  },
+  {
+   "n": 66,
+   "title": "Pencen Umur 33: Prinsip Yang Mentor Saya Amalkan",
+   "url": "https://www.mohdzulkifli.com/2025/07/berjaya-pencen-pada-usia-33-tahun-ini-prinsip-saya-amalkan.html"
+  },
+  {
+   "n": 67,
+   "title": "Nak Bebas Masa? Bebaskan Diri Dari Hutang Dulu",
+   "url": "https://www.mohdzulkifli.com/2026/10/mengopi-di-luar-negara-nak-bebas-masa-bebaskan-diri-dari-hutang.html"
+  },
+  {
+   "n": 68,
+   "title": "Hutang Berkat vs Hutang Mudarat: Mana Satu Anda?",
+   "url": "https://www.mohdzulkifli.com/2008/07/hutang-berkat-hutang-mudarat.html"
+  },
+  {
+   "n": 69,
+   "title": "7 Strategi Keluar Dari Hutang",
+   "url": "https://www.mohdzulkifli.com/2011/08/7-strategi-saya-bebas-dari-hutang.html"
+  },
+  {
+   "n": 70,
+   "title": "Nak Selesai Hutang, Jangan Fokus Pada Hutang",
+   "url": "https://www.mohdzulkifli.com/2026/09/nak-selesai-hutang-jangan-fokus-pada-hutang-tapi-fokus-punca-sebenarnya.html"
+  },
+  {
+   "n": 71,
+   "title": "Jangan Lari Dari Hutang: Satu Masalah Boleh Jadi Empat",
+   "url": "https://www.mohdzulkifli.com/2025/04/siapa-serius-nak-bebas-hutang-tuhan-akan-memudahkannya.html"
+  },
+  {
+   "n": 72,
+   "title": "Tiada Jalan Pintas Langsaikan Hutang",
+   "url": "https://www.mohdzulkifli.com/2014/04/tiada-formula-ajaib-langsaikan-hutang.html"
+  },
+  {
+   "n": 73,
+   "title": "Terjerat Hutang Along? Langkah Pertama Yang Patut Dibuat",
+   "url": "https://www.mohdzulkifli.com/2016/09/cara-selesaikan-masalah-hutang-along.html"
+  },
+  {
+   "n": 74,
+   "title": "Zero Hutang vs Bebas Hutang: Bezanya Besar",
+   "url": "https://www.mohdzulkifli.com/2011/11/cara-gandakan-kekayaan-dengan-hutang.html"
+  },
+  {
+   "n": 75,
+   "title": "Guna Kad Kredit 50 Hari Tanpa Caj, Tanpa Terjerat",
+   "url": "https://www.mohdzulkifli.com/2023/09/cara-guna-kad-kredit-tanpa-sebarang-caj-selama-50-hari.html"
+  },
+  {
+   "n": 76,
+   "title": "Beli Satu Kereta, Terlepas Harta RM200,000",
+   "url": "https://www.mohdzulkifli.com/2022/12/beli-satu-kereta-terlepas-harta-rm200000.html"
+  },
+  {
+   "n": 77,
+   "title": "Dulu Kerja Untuk Hidup, Sekarang Kerja Untuk Bayar Kereta",
+   "url": "https://www.mohdzulkifli.com/2023/08/beli-kereta-untuk-digunakan-bukan-untuk-dipamerkan.html"
+  },
+  {
+   "n": 78,
+   "title": "Beli Kereta: Nak Nampak Hebat atau Nak Hati Tenang?",
+   "url": "https://www.mohdzulkifli.com/2025/08/beli-kereta-nak-nampak-hebat-atau-nak-hati-tenang.html"
+  },
+  {
+   "n": 79,
+   "title": "Tip Beli Kereta Supaya Tak Terjerat Hutang",
+   "url": "https://www.mohdzulkifli.com/2016/10/hutang-membeli-kereta-yang-menjerat-kewangan.html"
+  },
+  {
+   "n": 80,
+   "title": "Bila Duit Dah Banyak, Nafsu Kereta Mewah Makin Hilang",
+   "url": "https://www.mohdzulkifli.com/2025/04/bila-duit-banyak-nafsu-nak-kereta-mewah-makin-berkurangan.html"
+  },
+  {
+   "n": 81,
+   "title": "Syarat Sebelum Beli Kereta Mewah: Tunai, Tak Lebih Sebulan Pendapatan",
+   "url": "https://www.mohdzulkifli.com/2026/03/saya-tak-beli-kereta-mewah-selagi-belum-lepasi-syarat-ini.html"
+  },
+  {
+   "n": 82,
+   "title": "Kereta Baharu atau Terpakai, Mana Lebih Jimat?",
+   "url": "https://www.mohdzulkifli.com/2022/11/beli-kereta-baharu-atau-kereta-terpakai.html"
+  },
+  {
+   "n": 83,
+   "title": "Anak Muda, Kereta Impian Boleh, Tapi Dengan Cara Ini",
+   "url": "https://www.mohdzulkifli.com/2024/07/anak-muda-milikilah-kereta-impian-dengan-cara-paling-bijak.html"
+  },
+  {
+   "n": 84,
+   "title": "Anak Muda, Jangan Kelam-kabut Beli Rumah Duduk Sendiri",
+   "url": "https://www.mohdzulkifli.com/2024/03/anak-muda-jangan-kelam-kabut-beli-rumah-duduk-sendiri.html"
+  },
+  {
+   "n": 85,
+   "title": "Graduan Baru Perlukan RM30,000 Dalam 3 Tahun Pertama",
+   "url": "https://www.mohdzulkifli.com/2013/06/3-nasihat-kewangan-graduan-baru.html"
+  },
+  {
+   "n": 86,
+   "title": "Nak Pencen Umur 30? Mula Dari Zaman Universiti",
+   "url": "https://www.mohdzulkifli.com/2017/02/untuk-pencen-umur-30-tahun-inilah-yang-pelajar-universiti-perlu-lakukan.html"
+  },
+  {
+   "n": 87,
+   "title": "Beli Rumah Secara Tunai: Bijak atau Tidak?",
+   "url": "https://www.mohdzulkifli.com/2024/03/beli-rumah-secara-tunai-adakah-ia-tindakan-bijak-dan-berbaloi.html"
+  },
+  {
+   "n": 88,
+   "title": "Duduk Rumah Sendiri Tanpa Guna Duit Gaji",
+   "url": "https://www.mohdzulkifli.com/2010/08/beli-rumah-tanpa-menanggung-hutang.html"
+  },
+  {
+   "n": 89,
+   "title": "6 Sebab Usahawan Jatuh, Jadikan Iktibar",
+   "url": "https://www.mohdzulkifli.com/2026/06/6-faktor-menyebabkan-usahawan-jatuh-sebagai-iktibar.html"
+  },
+  {
+   "n": 90,
+   "title": "Dari Cookies Buatan Rumah ke RM1 Billion",
+   "url": "https://www.mohdzulkifli.com/2026/09/cookies-bini-saya-buat-imbau-kenangan-bisnes-kecil-dari-rumah-sampai-cecah-rm1-billion.html"
+  }
+ ]
+}

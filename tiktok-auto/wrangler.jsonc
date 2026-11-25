@@ -1,0 +1,33 @@
+{
+  // Worker automasi TikTok Dr. Sakinah Azami (@drsakinahazami)
+  "name": "tiktok-auto",
+  "main": "src/index.js",
+  "compatibility_date": "2026-11-01",
+  "workers_dev": true,
+
+  // Cron jalan setiap 15 minit (UTC). Masa post sebenar dikawal dari halaman admin (waktu Malaysia).
+  "triggers": { "crons": ["*/15 * * * *"] },
+
+  // Fail PWA / ikon (percuma). Worker dijalankan dahulu untuk semua laluan.
+  "assets": { "directory": "./public", "binding": "ASSETS", "run_worker_first": true },
+
+  "d1_databases": [
+    { "binding": "DB", "database_name": "tiktok-auto", "database_id": "GANTI_DENGAN_DATABASE_ID_D1" }
+  ],
+
+  "vars": {
+    "GITHUB_OWNER": "phantagiro88",
+    "GITHUB_REPO": "phantagiro",
+    "GITHUB_BRANCH": "main",
+    // Folder dalam repo yang mengandungi queue/ dan posted/
+    "BASE_PATH": "tiktok-auto",
+    // URL Worker anda selepas deploy, tanpa garis condong di hujung
+    "PUBLIC_BASE_URL": "https://tiktok-auto.GANTI-SUBDOMAIN.workers.dev",
+    // Emel untuk halaman Terma dan Privasi
+    "CONTACT_EMAIL": "GANTI_EMEL_ANDA",
+    "APP_NAME": "Dr Sakinah Content Scheduler",
+    "TZ_OFFSET_HOURS": "8",
+    // MEDIA_UPLOAD = draf (lalai, selamat). DIRECT_POST = terus post (selepas app diluluskan TikTok)
+    "DEFAULT_POST_MODE": "MEDIA_UPLOAD"
+  }
+}
