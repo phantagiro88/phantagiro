@@ -1,6 +1,6 @@
 'use strict';
 (() => {
-  const VERSION = '1.0.2';
+  const VERSION = '1.0.3';
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 
@@ -450,9 +450,7 @@
     toast(recording() ? 'Skrip tamat. Tekan Henti untuk simpan rakaman.' : 'Skrip tamat');
   }
   function setPlayUI() {
-    const b = $('#p-play');
-    b.querySelector('use').setAttribute('href', P.playing ? '#i-pause' : '#i-play');
-    b.querySelector('span').textContent = P.playing ? 'Jeda' : 'Main';
+    // Satu butang sahaja (Rakam/Henti); tiada butang Main. Tap skrin masih jeda/sambung.
   }
   function rewind() {
     pause(); cancelInertia(); setPos(0); P.started = false;
@@ -467,12 +465,12 @@
   }
 
   /* ---- Kira detik ---- */
-  let cdActive = false, cdTimer = 0, cdResolve = null;
+  let cdActive = false, cdTimer = 0, cdResolve = null, cdShownAt = 0;
   function runCountdown() {
     return new Promise(res => {
       if (!S.countdown) { res(true); return; }
       const box = $('#countdown'), num = box.querySelector('span');
-      let n = 3; num.textContent = n; box.hidden = false; cdActive = true; cdResolve = res;
+      let n = 3; num.textContent = n; box.hidden = false; cdActive = true; cdResolve = res; cdShownAt = performance.now();
       cdTimer = setInterval(() => {
         n--;
         if (n <= 0) { clearInterval(cdTimer); box.hidden = true; cdActive = false; cdResolve = null; res(true); }
@@ -485,7 +483,8 @@
     clearInterval(cdTimer); $('#countdown').hidden = true; cdActive = false;
     const r = cdResolve; cdResolve = null; r && r(false);
   }
-  $('#countdown').addEventListener('click', cancelCountdown);
+  // Abaikan 'klik hantu' sebaik countdown muncul (tap yang memulakannya)
+  $('#countdown').addEventListener('click', () => { if (performance.now() - cdShownAt > 600) cancelCountdown(); });
 
   /* ---- Gerak isyarat: tap = jeda/sambung, seret = skrol manual ---- */
   const G = { id: null, y0: 0, pos0: 0, t0: 0, moved: false, samples: [] };
@@ -541,7 +540,6 @@
   });
 
   /* ---- Kawalan ---- */
-  $('#p-play').addEventListener('click', onPlayBtn);
   $('#p-rewind').addEventListener('click', rewind);
   $('#sp-minus').addEventListener('click', () => setSetting('wpm', Math.max(60, S.wpm - 10)));
   $('#sp-plus').addEventListener('click', () => setSetting('wpm', Math.min(300, S.wpm + 10)));

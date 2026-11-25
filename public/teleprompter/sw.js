@@ -1,5 +1,5 @@
 // Naikkan nombor versi ini setiap kali fail app dikemas kini
-const CACHE = 'teleprompter-v1.0.2';
+const CACHE = 'teleprompter-v1.0.3';
 const ASSETS = [
   './', 'style.css', 'app.js', 'manifest.json',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png', 'icons/apple-touch-icon.png'
