@@ -1,6 +1,6 @@
 'use strict';
 (() => {
-  const VERSION = '1.0.1';
+  const VERSION = '1.0.2';
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
 
@@ -56,8 +56,8 @@
   function show(v, push = true) {
     const prev = view;
     if (prev === 'edit' && v !== 'edit') { flushEdit(); if (v !== 'prompter') cur = null; }
-    if (prev === 'prompter' && v !== 'prompter') leavePrompter();
-    if (prev === 'preview' && v !== 'preview') { try { $('#pv').pause(); } catch (e) {} }
+    if (prev === 'prompter' && v !== 'prompter') leavePrompter(v);
+    if (prev === 'preview' && v !== 'preview') { try { $('#pv').pause(); } catch (e) {} if (v !== 'prompter') stopCamera(); }
     view = v;
     $$('.view').forEach(x => x.classList.toggle('active', x.id === 'v-' + v));
     if (push && v !== 'home') history.pushState({ v }, '');
@@ -286,7 +286,6 @@
     stage.style.setProperty('--ta', S.align);
     vp.classList.toggle('cam-on', !!S.camera);
     $('#cam').classList.toggle('front', S.facing === 'user');
-    $('#cam').style.objectFit = S.fit === 'cover' ? 'cover' : 'contain';
     $('#pmirror').classList.toggle('mirror', !!S.mirror);
     $('#marker').hidden = !S.marker;
     $('#backdrop').style.background = S.camera ? 'rgba(0,0,0,' + S.overlay + ')' : 'transparent';
@@ -296,13 +295,14 @@
     $('#p-cam-l').textContent = 'Kamera';
     $('#p-flip').hidden = !S.camera;
     refreshers.forEach(f => f());
+    fitCam();
     if (view === 'edit') updateEditStats();
     if (['font', 'lineH', 'margin', 'align', 'all'].includes(changed) && view === 'prompter') {
       clearTimeout(rebuildTimer); rebuildTimer = setTimeout(rebuild, 60);
     }
     if (changed === 'wpm') updateTimeUI(true);
     if (view === 'prompter') {
-      if (changed === 'camera') { S.camera ? startCamera() : stopCamera(); }
+      if (changed === 'camera') { S.camera ? (camStream || startCamera()) : stopCamera(); }
       if ((changed === 'facing' || changed === 'res') && S.camera) startCamera();
     }
   }
@@ -325,11 +325,11 @@
     applySettings('none');
     setPlayUI();
     lockScreen();
-    if (S.camera) startCamera();
+    if (S.camera && !camStream) startCamera();
     requestAnimationFrame(() => requestAnimationFrame(rebuild));
   }
-  function leavePrompter() {
-    pause(); cancelCountdown(); stopCamera(); unlockScreen();
+  function leavePrompter(next) {
+    pause(); cancelCountdown(); stopMic(); if (next !== 'preview') stopCamera(); unlockScreen();
     $('#drawer').hidden = true;
   }
 
@@ -589,6 +589,7 @@
     if (n === 'NotReadableError') return 'Kamera sedang digunakan oleh app lain.';
     return 'Kamera gagal dibuka.';
   }
+  let permWarm = false, micStream = null;
   async function startCamera() {
     stopCamera();
     const tok = ++camTok;
@@ -598,30 +599,55 @@
     }
     // Sensor kamera landscape: minta dimensi landscape supaya iPhone/Android beri bidang pandang penuh (tiada potong/zum)
     const [w, h] = S.res === '1080' ? [1920, 1080] : [1280, 720];
+    const vid = { facingMode: { ideal: S.facing }, width: { ideal: w }, height: { ideal: h }, frameRate: { ideal: 30 } };
     const audio = { echoCancellation: true, noiseSuppression: true, autoGainControl: true };
-    const attempts = [
-      { video: { facingMode: { ideal: S.facing }, width: { ideal: w }, height: { ideal: h }, frameRate: { ideal: 30 } }, audio },
-      { video: { facingMode: { ideal: S.facing } }, audio: true },
-      { video: true, audio: true },
-      { video: true }
-    ];
+    // Kali pertama sahaja: minta kamera + mikrofon serentak supaya kebenaran ditanya sekali.
+    // Mikrofon terus dimatikan; ia hanya dihidupkan semasa merakam (elak penanda oren iOS).
+    const attempts = !permWarm
+      ? [{ video: vid, audio }, { video: { facingMode: { ideal: S.facing } }, audio: true }, { video: vid }, { video: true }]
+      : [{ video: vid }, { video: { facingMode: { ideal: S.facing } } }, { video: true }];
     let s = null, err = null;
     for (const c of attempts) {
       try { s = await md.getUserMedia(c); break; } catch (e) { err = e; if (tok !== camTok) return false; }
     }
     if (tok !== camTok) { if (s) s.getTracks().forEach(t => t.stop()); return false; }
     if (!s) { toast(camErr(err), 4000); S.camera = false; saveSettings(); applySettings('none'); return false; }
+    s.getAudioTracks().forEach(t => { t.stop(); s.removeTrack(t); });
+    permWarm = true;
     camStream = s;
     const v = $('#cam'); v.srcObject = s;
     try { await v.play(); } catch (e) {}
-    if (!s.getAudioTracks().length) toast('Tiada akses mikrofon. Rakaman akan tanpa suara.', 3500);
+    fitCam();
     return true;
   }
   function stopCamera() {
     camTok++;
+    stopMic();
     if (camStream) { camStream.getTracks().forEach(t => t.stop()); camStream = null; }
     const v = $('#cam'); try { v.srcObject = null; } catch (e) {}
   }
+  async function getMic() {
+    stopMic();
+    try {
+      micStream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true } });
+      return true;
+    } catch (e) {
+      micStream = null; toast('Mikrofon tidak dibenarkan. Rakaman akan tanpa suara.', 4000); return false;
+    }
+  }
+  function stopMic() { if (micStream) { micStream.getTracks().forEach(t => t.stop()); micStream = null; } }
+  // Saiz video dikira sendiri (piksel) supaya sama di semua pelayar: Muat = tiada potong, Penuh = isi skrin
+  function fitCam() {
+    const v = $('#cam'), st = $('#stage');
+    const vw = v.videoWidth, vh = v.videoHeight, W = st.clientWidth, H = st.clientHeight;
+    if (!vw || !vh || !W || !H) return;
+    const k = S.fit === 'cover' ? Math.max(W / vw, H / vh) : Math.min(W / vw, H / vh);
+    const w = vw * k, h = vh * k;
+    Object.assign(v.style, { width: w + 'px', height: h + 'px', left: (W - w) / 2 + 'px', top: (H - h) / 2 + 'px', objectFit: 'fill' });
+  }
+  $('#cam').addEventListener('loadedmetadata', fitCam);
+  $('#cam').addEventListener('resize', fitCam);
+  window.addEventListener('resize', fitCam);
 
   let rec = null, chunks = [], recT0 = 0, recTimer = 0, recMime = '';
   let recBlob = null, recUrl = null;
@@ -640,15 +666,17 @@
       S.camera = true; saveSettings(); applySettings('none');
       const ok = await startCamera(); if (!ok) return;
     }
+    await getMic();
     rewind();
     if (!$('#v-prompter').classList.contains('ui-hidden')) hideUI();
     const ok = await runCountdown();
-    if (!ok) { showUI(); return; }
+    if (!ok) { stopMic(); showUI(); return; }
     recMime = pickMime();
     const opts = { videoBitsPerSecond: S.res === '1080' ? 8e6 : 5e6 };
     if (recMime) opts.mimeType = recMime;
-    try { rec = new MediaRecorder(camStream, opts); }
-    catch (e) { try { rec = new MediaRecorder(camStream); } catch (e2) { toast('Rakaman gagal dimulakan.'); showUI(); return; } }
+    const rs = new MediaStream([...camStream.getVideoTracks(), ...(micStream ? micStream.getAudioTracks() : [])]);
+    try { rec = new MediaRecorder(rs, opts); }
+    catch (e) { try { rec = new MediaRecorder(rs); } catch (e2) { stopMic(); toast('Rakaman gagal dimulakan.'); showUI(); return; } }
     chunks = [];
     rec.ondataavailable = ev => { if (ev.data && ev.data.size) chunks.push(ev.data); };
     rec.onstop = onRecStop;
@@ -661,7 +689,7 @@
     play();
   }
   function onRecStop() {
-    clearInterval(recTimer);
+    clearInterval(recTimer); stopMic();
     const type = (rec && rec.mimeType) || recMime || 'video/webm';
     const blob = new Blob(chunks, { type });
     chunks = []; setRecUI(false); pause(); showUI();

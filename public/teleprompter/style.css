@@ -94,7 +94,7 @@ input[type=range]{width:100%;height:36px;accent-color:var(--gold);margin:0;touch
 /* ---------- Teleprompter ---------- */
 #v-prompter{background:#000}
 #stage{position:absolute;inset:0;overflow:hidden;touch-action:none;background:var(--bg,#000);cursor:pointer}
-#cam{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;background:#000}
+#cam{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:fill;display:none;background:#000}
 #cam.front{transform:scaleX(-1)}
 .cam-on #cam{display:block}
 .cam-on #stage{background:#000}
