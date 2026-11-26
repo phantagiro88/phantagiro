@@ -13,7 +13,7 @@ self.addEventListener('install', e => {
 });
 self.addEventListener('activate', e => {
   e.waitUntil(
-    caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k))))
+    caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE && k.indexOf('belanjawan') === 0).map(k => caches.delete(k))))
       .then(() => self.clients.claim())
   );
 });

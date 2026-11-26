@@ -125,6 +125,7 @@ h2{margin:10px 0 6px;font-size:13px;letter-spacing:.06em;text-transform:uppercas
       <button class="big" id="go"></button>
       <div class="small" id="m_disc"></div>
       <div class="small" id="m_best"></div>
+      <div class="small" id="m_off"></div>
     </div>
   </div>
 
@@ -162,6 +163,7 @@ const D={
  how:['Ketik katil yang ada gelembung tugasan sebelum pesakit hilang sabar. Jawab telefon bila berdering. Jaga bar TEKANAN – kalau penuh, anda burnout! ☕ Teh tarik kurangkan tekanan (2 kali). Bertahan sehingga 17:00.','Tap a bed with a task bubble before the patient loses patience. Answer the phone when it rings. Watch the STRESS bar – if it fills, you burn out! ☕ Tea lowers stress (2 uses). Survive until 17:00.'],
  start:['MULA SYIF','START SHIFT'],
  disc:['Hospital, pesakit & kes adalah rekaan. Permainan ini bukan nasihat atau latihan perubatan.','Hospital, patients and cases are fictional. This game is not medical advice or training.'],
+ off:['✅ Sedia dimain tanpa internet','✅ Ready to play offline'],
  best:['Skor terbaik','Best score'],
  stress:['TEKANAN','STRESS'],
  call:['📞 Telefon berdering! Ketik untuk jawab','📞 Phone ringing! Tap to answer'],
@@ -285,6 +287,7 @@ function buildMenu(){
   $('#m_how').textContent=t('how');$('#go').textContent=t('start');$('#m_disc').textContent=t('disc');
   $('#stlbl').textContent=t('stress');$('#resume').textContent=t('resume');$('#quit').textContent=t('quit');
   $('#m_best').textContent=`${t('best')}: ${SAVE.best} · 🪙 ${SAVE.elaun}`;
+  $('#m_off').textContent=window.__offlineReady?t('off'):'';
   const r=$('#roles');r.innerHTML='';
   for(const k of Object.keys(ROLES)){
     const b=document.createElement('button');b.className='opt'+(SAVE.role===k?' sel':'');
@@ -691,7 +694,7 @@ function mgEcg(body,done){
 
 /* ---------- mula ---------- */
 initBeds();buildMenu();
-if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){navigator.serviceWorker.register('sw.js').catch(function(){});}
+if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){navigator.serviceWorker.register('sw.js').catch(function(){});navigator.serviceWorker.ready.then(function(){window.__offlineReady=true;buildMenu();}).catch(function(){});}
 })();
 </script>
 </body>
