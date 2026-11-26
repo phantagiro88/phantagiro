@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Keep Calm, and Keep On Parenting</title>
+<meta name="theme-color" content="#4E9A83">
+<meta name="description" content="Panduan santai untuk ibu bapa: kenal pencetus, kekal tenang, dan pulihkan hubungan dengan anak.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Keep Calm">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+@font-face{font-family:Nunito;font-style:normal;font-weight:400;font-display:swap;src:url(fonts/nunito-latin-400-normal.woff2) format('woff2')}
+@font-face{font-family:Nunito;font-style:normal;font-weight:600;font-display:swap;src:url(fonts/nunito-latin-600-normal.woff2) format('woff2')}
+@font-face{font-family:Nunito;font-style:normal;font-weight:700;font-display:swap;src:url(fonts/nunito-latin-700-normal.woff2) format('woff2')}
+@font-face{font-family:Nunito;font-style:normal;font-weight:800;font-display:swap;src:url(fonts/nunito-latin-800-normal.woff2) format('woff2')}
+@font-face{font-family:Lora;font-style:normal;font-weight:600;font-display:swap;src:url(fonts/lora-latin-600-normal.woff2) format('woff2')}
+@font-face{font-family:Lora;font-style:italic;font-weight:600;font-display:swap;src:url(fonts/lora-latin-600-italic.woff2) format('woff2')}
+@font-face{font-family:Lora;font-style:normal;font-weight:700;font-display:swap;src:url(fonts/lora-latin-700-normal.woff2) format('woff2')}
+@font-face{font-family:Lora;font-style:italic;font-weight:700;font-display:swap;src:url(fonts/lora-latin-700-italic.woff2) format('woff2')}
+:root{
+  --ink:#2B3433; --muted:#6A7472; --white:#fff;
+  --mint:#EEF6F1; --mint2:#D9ECE1; --teal:#4E9A83; --tealdk:#1F4E4A;
+  --peach:#FDF3EB; --peach2:#F8DDCB; --coral:#E0896B; --coraldk:#8A4630;
+  --sky:#EDF4FA; --sky2:#D5E5F2; --blue:#5B8DB8; --bluedk:#2C4F6E;
+  --lav:#F5F1FA; --lav2:#E3DAF1; --purple:#8D78B8; --purpledk:#4D3D72;
+  --sun:#FBF6E6; --sun2:#F3E6BE; --amber:#D6A23E; --amberdk:#6E5216;
+  --bg:var(--mint); --bg2:var(--mint2); --acc:var(--teal); --dk:var(--tealdk);
+  --r:20px; --banner:0px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{font-family:Nunito,system-ui,sans-serif;color:var(--ink);background:var(--bg);transition:background .4s;
+  padding:0 env(safe-area-inset-right) 0 env(safe-area-inset-left);min-height:100vh}
+body[data-t=p1]{--bg:var(--peach);--bg2:var(--peach2);--acc:var(--coral);--dk:var(--coraldk)}
+body[data-t=p2]{--bg:var(--sky);--bg2:var(--sky2);--acc:var(--blue);--dk:var(--bluedk)}
+body[data-t=p3]{--bg:var(--lav);--bg2:var(--lav2);--acc:var(--purple);--dk:var(--purpledk)}
+body[data-t=plan]{--bg:var(--sun);--bg2:var(--sun2);--acc:var(--amber);--dk:var(--amberdk)}
+.wrap{max-width:560px;margin:0 auto;padding:calc(18px + env(safe-area-inset-top)) 18px calc(120px + var(--banner,0px));position:relative}
+.blob{position:fixed;border-radius:50%;background:var(--bg2);opacity:.7;z-index:-1;transition:background .4s}
+.b1{width:260px;height:260px;right:-90px;top:-90px}.b2{width:200px;height:200px;left:-80px;bottom:60px}
+h1,h2,h3{font-family:Lora,Georgia,serif;color:var(--dk);margin:0}
+h1{font-size:28px;line-height:1.15}h2{font-size:23px;margin-bottom:6px}h3{font-size:18px;margin:4px 0 8px}
+p{line-height:1.55;margin:6px 0 10px}
+.muted{color:var(--muted)}
+.card{background:#fff;border-radius:var(--r);padding:16px 16px;margin:12px 0;box-shadow:0 2px 10px rgba(40,60,60,.06)}
+.soft{background:var(--bg2)}
+.pill{display:inline-block;background:var(--acc);color:#fff;font-weight:800;font-size:12px;padding:4px 12px;border-radius:99px;letter-spacing:.04em}
+.btn{appearance:none;border:0;border-radius:16px;padding:13px 18px;font:800 16px Nunito,sans-serif;background:var(--acc);color:#fff;cursor:pointer;width:100%}
+.btn.ghost{background:#fff;color:var(--dk);border:2px solid var(--bg2)}
+.btn.small{width:auto;padding:9px 14px;font-size:14px;border-radius:12px}
+.btn:active{transform:scale(.98)}
+.sos{background:linear-gradient(135deg,#E98B73,#D4714F);font-size:19px;padding:18px;border-radius:22px;box-shadow:0 8px 20px rgba(212,113,79,.3)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{background:#fff;border-radius:18px;padding:14px;cursor:pointer;border:0;text-align:left;font:inherit;color:inherit}
+.tile b{display:block;font-size:15px;color:var(--dk)}.tile span{font-size:13px;color:var(--muted)}
+.tile .ic{font-size:24px;display:block;margin-bottom:4px}
+nav{position:fixed;left:0;right:0;bottom:0;background:#fff;display:flex;justify-content:space-around;align-items:flex-start;
+  padding:8px 6px max(calc(var(--banner,0px) + 2px), calc(8px + env(safe-area-inset-bottom)));border-radius:22px 22px 0 0;
+  box-shadow:0 -4px 18px rgba(0,0,0,.07);z-index:10}
+nav button{border:0;background:none;font:700 11px Nunito,sans-serif;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 8px;border-radius:12px;cursor:pointer;min-width:58px}
+nav button .ic{font-size:21px}
+nav button.on{color:var(--dk);background:var(--bg2)}
+.view{display:none;animation:fade .35s}.view.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.hero{display:flex;align-items:center;gap:8px;background:var(--bg2);border-radius:24px;padding:16px;margin:10px 0}
+.hero svg{flex:0 0 120px;height:120px}
+/* breathing */
+.breath{position:relative;width:240px;height:240px;margin:12px auto}
+.breath .ring{position:absolute;inset:0;border-radius:50%;background:var(--bg2)}
+.breath .ball{position:absolute;left:50%;top:50%;width:110px;height:110px;margin:-55px 0 0 -55px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,#fff,var(--acc));transform:scale(.7);transition:transform 4s ease-in-out;box-shadow:0 10px 30px rgba(0,0,0,.08)}
+.breath .txt{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:800;color:var(--dk);pointer-events:none}
+.breath .txt .big{font-size:22px}.breath .txt .n{font-size:40px;font-family:Lora,serif}
+.jeda{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:8px 0}
+.jeda button{border:0;border-radius:18px;padding:10px 4px;background:#fff;font:inherit;cursor:pointer;color:var(--ink)}
+.jeda .L{width:44px;height:44px;border-radius:50%;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;color:#fff;font:700 22px Lora,serif}
+.jeda small{font-size:11.5px;font-weight:700;line-height:1.2;display:block}
+.jeda button.on{outline:3px solid var(--acc)}
+.meter{display:flex;gap:4px;margin:10px 0}
+.meter button{flex:1;border:0;border-radius:10px;padding:12px 0;font:800 15px Nunito;cursor:pointer;color:#2B3433}
+.meter button.on{outline:3px solid var(--dk);transform:scale(1.08)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 10px}
+.chip{border:2px solid var(--bg2);background:#fff;border-radius:99px;padding:7px 12px;font:700 13.5px Nunito;cursor:pointer;color:var(--ink)}
+.chip.on{background:var(--acc);border-color:var(--acc);color:#fff}
+label.l{display:block;font-weight:800;font-size:14px;color:var(--dk);margin:10px 0 4px}
+textarea,input[type=text]{width:100%;border:2px solid var(--bg2);border-radius:14px;padding:11px 12px;font:16px Nunito;color:var(--ink);background:#fff;resize:vertical}
+textarea:focus,input:focus{outline:none;border-color:var(--acc)}
+.entry{border-left:4px solid var(--acc);padding:8px 10px;margin:8px 0;background:var(--bg);border-radius:0 12px 12px 0;font-size:14px}
+.entry .top{display:flex;justify-content:space-between;font-weight:800;color:var(--dk)}
+.del{border:0;background:none;color:var(--muted);cursor:pointer;font-size:13px}
+.bar{height:12px;border-radius:99px;background:var(--bg2);overflow:hidden;margin:3px 0 9px}
+.bar i{display:block;height:100%;background:var(--acc);border-radius:99px}
+.tabs{display:flex;gap:6px;background:var(--bg2);padding:5px;border-radius:14px;margin:8px 0}
+.tabs button{flex:1;border:0;border-radius:10px;padding:9px 4px;font:800 13px Nunito;background:none;color:var(--dk);cursor:pointer}
+.tabs button.on{background:#fff}
+.quote{font-family:Lora,serif;font-style:italic;font-size:17px;color:var(--dk);line-height:1.5;margin:8px 0}
+.day{display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:16px;background:#fff;margin:8px 0;cursor:pointer}
+.day .chk{flex:0 0 34px;height:34px;border-radius:50%;border:3px solid var(--bg2);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--dk)}
+.day.done .chk{background:var(--acc);border-color:var(--acc);color:#fff}
+.day.done .t{text-decoration:line-through;color:var(--muted)}
+.ring{--p:0}
+.prog{width:84px;height:84px;border-radius:50%;background:conic-gradient(var(--acc) calc(var(--p)*1%),var(--bg2) 0);display:flex;align-items:center;justify-content:center}
+.prog span{width:64px;height:64px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--dk)}
+.say{background:var(--bg);border-radius:14px;padding:10px 12px;margin:8px 0;font-size:15px}
+.say b{color:var(--dk);font-size:13px;display:block}
+.say q{font-style:italic}
+.row{display:flex;gap:8px;align-items:center}
+.offline{display:none;position:fixed;top:calc(10px + env(safe-area-inset-top));right:14px;background:#fff;color:var(--dk);font:700 12px Nunito;padding:5px 12px;border-radius:99px;box-shadow:0 2px 10px rgba(0,0,0,.1);z-index:30}
+body.is-off .offline{display:block;white-space:nowrap}
+.toast{position:fixed;left:50%;bottom:calc(90px + var(--banner,0px));transform:translateX(-50%);background:var(--dk);color:#fff;padding:10px 16px;border-radius:99px;font-weight:700;font-size:14px;opacity:0;transition:.3s;z-index:20;pointer-events:none}
+.toast.on{opacity:1}
+.help{border-left:4px solid var(--coral)}
+details summary{cursor:pointer;font-weight:800;color:var(--dk);padding:4px 0}
+.steps4{counter-reset:s;padding:0;list-style:none}
+.steps4 li{counter-increment:s;position:relative;padding:8px 0 8px 46px;line-height:1.45}
+.steps4 li:before{content:counter(s);position:absolute;left:0;top:6px;width:34px;height:34px;border-radius:50%;background:var(--acc);color:#fff;font:700 17px Lora;display:flex;align-items:center;justify-content:center}
+</style>
+</head>
+<body data-t="intro">
+<div class="blob b1"></div><div class="blob b2"></div>
+<div class="wrap">
+
+<!-- ================= UTAMA ================= -->
+<section class="view on" id="v-home">
+  <span class="pill">MODUL IBU BAPA</span>
+  <h1 style="margin-top:10px">Keep Calm,<br><span style="color:#D4714F;font-style:italic">and Keep On Parenting</span></h1>
+  <div class="hero">
+    <svg viewBox="0 0 200 200" aria-hidden="true">
+      <circle cx="100" cy="100" r="92" fill="#fff" opacity=".6"/>
+      <circle cx="150" cy="70" r="26" fill="#F5C65A"/>
+      <ellipse cx="100" cy="178" rx="80" ry="10" fill="#B9D6C5"/>
+      <!-- mom -->
+      <ellipse cx="82" cy="116" rx="40" ry="16" fill="#E7A497"/>
+      <rect x="54" y="110" width="56" height="70" rx="22" fill="#6FA596"/>
+      <ellipse cx="82" cy="118" rx="36" ry="12" fill="#E7A497"/>
+      <circle cx="82" cy="88" r="27" fill="#E7A497"/>
+      <circle cx="82" cy="90" r="19" fill="#F2CBA8"/>
+      <path d="M71 89q4 4 8 0M85 89q4 4 8 0" stroke="#5A4636" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <path d="M77 98q5 5 10 0" stroke="#5A4636" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <circle cx="71" cy="95" r="2.5" fill="#F0A8A0"/><circle cx="93" cy="95" r="2.5" fill="#F0A8A0"/>
+      <!-- kid -->
+      <rect x="104" y="138" width="34" height="42" rx="14" fill="#F2C35E"/>
+      <circle cx="121" cy="126" r="13" fill="#E6B48E"/>
+      <path d="M107 125a14 14 0 0 1 28 0z" fill="#4A3428"/>
+      <path d="M115 128q2.5 2.5 5 0M122 128q2.5 2.5 5 0" stroke="#5A4636" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+      <path d="M102 134 Q121 140 136 156" stroke="#6FA596" stroke-width="9" fill="none" stroke-linecap="round"/>
+      <path d="M150 112c-4-6-14-2-10 6l10 9 10-9c4-8-6-12-10-6z" fill="#E8837A"/>
+    </svg>
+    <div>
+      <p class="quote" style="margin:0">Tak perlu jadi ibu bapa yang sempurna. Cukup terus mencuba.</p>
+    </div>
+  </div>
+
+  <button class="btn sos" onclick="go('calm')">🫧 Saya rasa nak meletup sekarang</button>
+  <p class="muted" style="text-align:center;font-size:13px;margin-top:8px">Tekan ini bila marah mula naik. Kita bernafas sama-sama.</p>
+
+  <div class="card soft" id="todayCard"></div>
+  <div class="card" id="installCard" style="display:none">
+    <h3>📲 Pasang app ni di telefon</h3>
+    <p style="font-size:14px;margin-top:0" id="installTxt"></p>
+    <button class="btn small" id="installBtn" style="display:none">Pasang sekarang</button>
+  </div>
+
+  <div class="grid2">
+    <button class="tile" onclick="go('trig')"><span class="ic">📝</span><b>Catat pencetus</b><span>Kenal apa yang buat anda marah</span></button>
+    <button class="tile" onclick="go('calm')"><span class="ic">🌬️</span><b>Formula JEDA</b><span>Apa nak buat dalam 30 saat</span></button>
+    <button class="tile" onclick="go('repair')"><span class="ic">💜</span><b>Pulihkan hubungan</b><span>Lepas terlanjur marah</span></button>
+    <button class="tile" onclick="go('plan')"><span class="ic">🌱</span><b>Pelan 7 hari</b><span>Latihan kecil, 10 minit sehari</span></button>
+  </div>
+
+  <div class="card">
+    <h3>Kad rujukan pantas</h3>
+    <div class="say"><b>Sebelum marah</b>Lapar, letih, terdesak? Isi tangki dulu. Dengar loceng awal badan.</div>
+    <div class="say"><b>Masa marah</b>JEDA: Jangan cakap, Embus nafas, Dekat dan rendahkan, Ambil satu tindakan.</div>
+    <div class="say"><b>Bila kata tidak</b>Akui perasaan, cakap tidak, alasan sepatah, tawar alternatif.</div>
+    <div class="say"><b>Lepas marah</b>Tenang dulu. Dekati, akui, minta maaf, sambung.</div>
+    <div class="say"><b>Untuk diri sendiri</b>Saya sedang belajar. Perbuatan boleh dibaiki.</div>
+  </div>
+
+  <div class="card help">
+    <b style="color:var(--coraldk)">Bila perlu bantuan profesional</b>
+    <p style="font-size:14px;margin-bottom:0">Kalau marah sampai mencederakan anak, atau rasa sedih dan bersalah berterusan berminggu-minggu, sila jumpa doktor atau kaunselor. Talian Kasih: 15999 (sila semak nombor terkini).</p>
+  </div>
+  <p class="muted" style="text-align:center;font-size:12.5px">Dr. Sakinah Azami</p>
+</section>
+
+<!-- ================= TENANG ================= -->
+<section class="view" id="v-calm">
+  <span class="pill">MASA MARAH</span>
+  <h2 style="margin-top:8px">Jom tenang sekejap</h2>
+  <p>Anak selamat? Kalau ya, ikut bulatan ni. Tarik nafas bila ia membesar, hembus perlahan bila ia mengecil.</p>
+
+  <div class="card" style="text-align:center">
+    <div class="breath">
+      <div class="ring"></div><div class="ball" id="ball"></div>
+      <div class="txt"><span class="big" id="bWord">Sedia?</span><span class="n" id="bNum"></span><span id="bRound" style="font-size:13px;color:var(--muted)"></span></div>
+    </div>
+    <div class="row" style="justify-content:center">
+      <button class="btn small" id="bBtn" onclick="toggleBreath()">Mula bernafas</button>
+    </div>
+    <p class="muted" style="font-size:13px;margin-bottom:0">Tarik 4 kiraan, hembus 6 kiraan, 5 pusingan.</p>
+  </div>
+
+  <div class="card">
+    <h3>Formula JEDA</h3>
+    <p class="muted" style="margin-top:-4px;font-size:14px">Tekan setiap huruf.</p>
+    <div class="jeda" id="jeda"></div>
+    <div class="say" id="jedaTxt">Pilih J untuk mula.</div>
+  </div>
+
+  <div class="card">
+    <h3>Meter ketegangan badan</h3>
+    <p style="font-size:14px">Rahang diketap? Bahu naik? Dada sesak? Pilih tahap anda sekarang.</p>
+    <div class="meter" id="meter"></div>
+    <div class="say" id="meterTxt">Pilih satu nombor.</div>
+  </div>
+
+  <div class="card">
+    <h3>Ayat tenang untuk situasi sukar</h3>
+    <div class="chips" id="sitChips"></div>
+    <div id="sitOut"></div>
+  </div>
+
+  <div class="card">
+    <h3>Cara kata "tidak" tanpa drama</h3>
+    <ol class="steps4">
+      <li><b>Akui perasaan.</b> <q>Mama tahu awak betul-betul nak benda tu.</q></li>
+      <li><b>Cakap tidak dengan jelas.</b> <q>Tapi jawapannya tidak.</q></li>
+      <li><b>Alasan sepatah.</b> <q>Sebab dah lewat.</q></li>
+      <li><b>Tawar alternatif.</b> <q>Esok petang kita boleh main sekejap.</q></li>
+    </ol>
+    <div class="say"><b>Kalau anak kata "Mama tak sayang saya"</b><q>Mama sayang awak. Sebab sayanglah mama tak bagi.</q> Lepas tu berhenti cakap.</div>
+  </div>
+</section>
+
+<!-- ================= PENCETUS ================= -->
+<section class="view" id="v-trig">
+  <span class="pill">SEBELUM MARAH</span>
+  <h2 style="margin-top:8px">Catat pencetus saya</h2>
+  <p>Satu catatan ringkas setiap kali marah naik. Lepas seminggu, corak anda akan nampak.</p>
+
+  <div class="card">
+    <label class="l">Apa yang jadi?</label>
+    <div class="chips" id="tChips"></div>
+    <label class="l">Keadaan diri saya masa tu</label>
+    <div class="chips" id="sChips"></div>
+    <label class="l">Tahap marah: <span id="lvlV">5</span>/10</label>
+    <input type="range" min="1" max="10" value="5" id="lvl" style="width:100%;accent-color:var(--coral)">
+    <label class="l">Di bawah marah tu, saya sebenarnya rasa…</label>
+    <div class="chips" id="fChips"></div>
+    <label class="l">Nota (pilihan)</label>
+    <input type="text" id="tNote" placeholder="Contoh: pagi nak ke sekolah, kasut hilang">
+    <div style="height:12px"></div>
+    <button class="btn" onclick="saveLog()">Simpan catatan</button>
+  </div>
+
+  <div class="card" id="pattern"></div>
+  <div class="card"><h3>Catatan terkini</h3><div id="logList"></div></div>
+
+  <div class="card soft">
+    <h3>Soalan untuk tahan marah awal</h3>
+    <ol style="padding-left:20px;line-height:1.6;margin:0">
+      <li>Apa saya rasa kat badan sekarang?</li>
+      <li>Anak sengaja, atau dia belum mampu?</li>
+      <li>Hal ni masih penting lima tahun lagi?</li>
+      <li>Saya perlukan rehat, makanan, atau bantuan?</li>
+      <li>Apa saya nak anak belajar daripada saat ni?</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ================= PULIH ================= -->
+<section class="view" id="v-repair">
+  <span class="pill">LEPAS MARAH</span>
+  <h2 style="margin-top:8px">Pulihkan hubungan</h2>
+  <p>Marah sekali-sekala tak rosakkan hubungan. Yang penting ialah apa yang anda buat selepas tu.</p>
+
+  <div class="card">
+    <h3>Tenang dulu, baru dekati</h3>
+    <p style="font-size:14px;margin-top:0">Tunggu 5 hingga 20 minit sampai nafas perlahan. Lepas tu:</p>
+    <ol class="steps4">
+      <li><b>Dekati.</b> Duduk dekat atau turun setaraf mata dia.</li>
+      <li><b>Akui.</b> Sebut apa anda buat, tanpa salahkan anak.</li>
+      <li><b>Minta maaf.</b> Atas cara anda, bukan atas sempadan.</li>
+      <li><b>Sambung.</b> Dengar sisi anak, bincang lain kali macam mana.</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h3>Ayat pembaikan ikut umur</h3>
+    <div class="tabs" id="ageTabs"></div>
+    <div class="say" style="font-size:16px" id="ageOut"></div>
+    <button class="btn small ghost" onclick="copyTxt(document.getElementById('ageOut').innerText)">Salin ayat</button>
+  </div>
+
+  <div class="card">
+    <h3>Yakinkan anak yang anda tetap sayang</h3>
+    <div class="say"><b>Katakan</b><q>Mama marah dengan perbuatan tu, tapi mama tak pernah berhenti sayang awak.</q></div>
+    <div class="say"><b>Elakkan</b>"Awak memang nakal" → tukar kepada <q>Perbuatan tadi tak betul.</q></div>
+    <div class="say"><b>Tunjukkan</b>Pelukan, senyuman, atau 10 minit masa bersama tanpa gajet.</div>
+  </div>
+
+  <div class="card soft">
+    <h3>Berhenti salahkan diri</h3>
+    <p style="font-size:14px;margin-top:0">Tulis tiga benda yang anda buat dengan baik hari ni, sekecil mana pun.</p>
+    <input type="text" class="ws" data-k="good1" placeholder="1.">
+    <div style="height:8px"></div><input type="text" class="ws" data-k="good2" placeholder="2.">
+    <div style="height:8px"></div><input type="text" class="ws" data-k="good3" placeholder="3.">
+    <p class="quote" style="margin-top:14px">"Saya menjerit tadi" boleh dibaiki. "Saya ibu bapa yang teruk" tak membantu.</p>
+  </div>
+</section>
+
+<!-- ================= PELAN ================= -->
+<section class="view" id="v-plan">
+  <span class="pill">7 HARI</span>
+  <div class="row" style="justify-content:space-between;margin-top:8px">
+    <div><h2>Pelan tindakan</h2><p style="margin:0" class="muted">Tekan untuk tanda siap.</p></div>
+    <div class="prog" id="prog"><span id="progT">0/7</span></div>
+  </div>
+  <div id="days"></div>
+  <button class="btn small ghost" onclick="resetPlan()" style="margin-top:4px">Mula semula</button>
+
+  <div class="card" style="margin-top:18px">
+    <h3>Lembaran kerja saya</h3>
+    <p class="muted" style="font-size:13.5px;margin-top:-4px">Jawapan disimpan dalam telefon ni sahaja.</p>
+    <details open><summary>1. Peta pencetus</summary>
+      <label class="l">Tiga pencetus utama saya</label><textarea class="ws" data-k="w1a" rows="2"></textarea>
+      <label class="l">Di bawah marah tu, saya rasa</label><textarea class="ws" data-k="w1b" rows="2"></textarea>
+      <label class="l">Satu benda yang saya nak ubah</label><textarea class="ws" data-k="w1c" rows="2"></textarea>
+    </details>
+    <details><summary>2. Pelan tenang</summary>
+      <label class="l">Tanda amaran paling awal saya</label><textarea class="ws" data-k="w2a" rows="2"></textarea>
+      <label class="l">Ayat tenang bila anak meragam</label><textarea class="ws" data-k="w2b" rows="2"></textarea>
+      <label class="l">Isyarat "ganti" dengan pasangan</label><textarea class="ws" data-k="w2c" rows="2"></textarea>
+    </details>
+    <details><summary>3. Skrip pemulihan</summary>
+      <label class="l">Ayat untuk akui kesilapan</label><textarea class="ws" data-k="w3a" rows="2"></textarea>
+      <label class="l">Aktiviti kecil bersama anak</label><textarea class="ws" data-k="w3b" rows="2"></textarea>
+      <label class="l">Ayat baik untuk diri sendiri</label><textarea class="ws" data-k="w3c" rows="2"></textarea>
+    </details>
+  </div>
+</section>
+
+</div>
+
+<nav id="nav">
+  <button data-v="home" class="on"><span class="ic">🏡</span>Utama</button>
+  <button data-v="calm"><span class="ic">🌬️</span>Tenang</button>
+  <button data-v="trig"><span class="ic">📝</span>Pencetus</button>
+  <button data-v="repair"><span class="ic">💜</span>Pulih</button>
+  <button data-v="plan"><span class="ic">🌱</span>Pelan</button>
+</nav>
+<div class="toast" id="toast"></div>
+<div class="offline">📴 Luar talian</div>
+
+<script>
+const $=s=>document.querySelector(s);
+const store={get(k,d){try{const v=localStorage.getItem('kc_'+k);return v?JSON.parse(v):d}catch(e){return d}},
+  set(k,v){try{localStorage.setItem('kc_'+k,JSON.stringify(v))}catch(e){}}};
+const THEME={home:'intro',calm:'p2',trig:'p1',repair:'p3',plan:'plan'};
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');setTimeout(()=>e.classList.remove('on'),1800)}
+function go(v){
+  if(!THEME[v])v='home';
+  document.querySelectorAll('.view').forEach(x=>x.classList.toggle('on',x.id==='v-'+v));
+  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
+  document.body.dataset.t=THEME[v];
+  if(location.hash.slice(1)!==v){try{history.replaceState(null,'','#'+v)}catch(e){location.hash=v}}
+  window.scrollTo(0,0);
+}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>go(b.dataset.v));
+window.addEventListener('hashchange',()=>go(location.hash.slice(1)));
+
+/* ---------- breathing ---------- */
+let bTimer=null,bRun=false;
+function toggleBreath(){
+  if(bRun){stopBreath();return}
+  bRun=true;$('#bBtn').textContent='Berhenti';
+  let round=1,phase='in',count=4;const ball=$('#ball');
+  const tick=()=>{
+    $('#bNum').textContent=count;$('#bRound').textContent='Pusingan '+round+' / 5';
+    if(count===(phase==='in'?4:6)){ball.style.transitionDuration=(phase==='in'?4:6)+'s';ball.style.transform=phase==='in'?'scale(1.9)':'scale(.7)';
+      $('#bWord').textContent=phase==='in'?'Tarik nafas':'Hembus perlahan'}
+    count--;
+    if(count===0){
+      if(phase==='in'){phase='out';count=6}
+      else{round++;phase='in';count=4;if(round>5){stopBreath(true);return}}
+    }
+  };
+  tick();bTimer=setInterval(tick,1000);
+}
+function stopBreath(done){
+  clearInterval(bTimer);bRun=false;$('#bBtn').textContent='Mula bernafas';
+  $('#ball').style.transitionDuration='1s';$('#ball').style.transform='scale(.7)';
+  $('#bNum').textContent='';$('#bRound').textContent='';
+  $('#bWord').textContent=done?'Bagus. Anda lebih tenang 💛':'Sedia?';
+}
+
+/* ---------- JEDA ---------- */
+const JEDA=[
+ ['J','Jangan cakap dulu','#5B8DB8','Diam sekejap. Kata-kata yang keluar masa marah paling susah nak ditarik balik.'],
+ ['E','Embus nafas','#6FA596','Satu hingga tiga hembusan panjang dan perlahan. Hembus lebih lama daripada tarik.'],
+ ['D','Dekat & rendahkan','#E0896B','Dekati anak, turun setaraf mata dia, rendahkan nada suara.'],
+ ['A','Ambil satu tindakan','#8D78B8','Pilih satu je: arahan ringkas, beri pilihan, atau beri ruang.']];
+$('#jeda').innerHTML=JEDA.map((j,i)=>`<button data-i="${i}"><span class="L" style="background:${j[2]}">${j[0]}</span><small>${j[1]}</small></button>`).join('');
+$('#jeda').onclick=e=>{const b=e.target.closest('button');if(!b)return;const j=JEDA[b.dataset.i];
+  document.querySelectorAll('#jeda button').forEach(x=>x.classList.toggle('on',x===b));
+  $('#jedaTxt').innerHTML=`<b>${j[0]}: ${j[1]}</b>${j[3]}`};
+
+/* ---------- meter ---------- */
+const mcol=i=>{const t=i/9,a=[140,200,160],b=[242,208,107],c=[233,120,95];
+  const m=(x,y,u)=>x.map((v,k)=>Math.round(v+(y[k]-v)*u));const r=t<.5?m(a,b,t*2):m(b,c,(t-.5)*2);return `rgb(${r})`};
+$('#meter').innerHTML=[...Array(10)].map((_,i)=>`<button style="background:${mcol(i)};color:${i>=6?'#fff':'#2B3433'}" data-n="${i+1}">${i+1}</button>`).join('');
+$('#meter').onclick=e=>{const b=e.target.closest('button');if(!b)return;const n=+b.dataset.n;
+  document.querySelectorAll('#meter button').forEach(x=>x.classList.toggle('on',x===b));
+  $('#meterTxt').innerHTML=n<=3?'<b>Tenang</b>Bagus. Teruskan, dan perasan apa yang bantu anda kekal begini.':
+   n<=6?'<b>Mula tegang</b>Longgarkan bahu, letak tapak kaki kukuh di lantai, hembus nafas panjang dua kali.':
+   '<b>7 ke atas: berhenti dulu</b>Jangan bercakap lagi. Pastikan anak selamat, kemudian tekan "Mula bernafas" di atas.'};
+
+/* ---------- situations ---------- */
+const SIT={
+ 'Menjerit / menangis':['Pastikan dia selamat, kekal dekat, jangan cuba berbincang dulu. Tunggu gelombang reda.','Mama ada kat sini. Bila awak dah sedia, kita cakap.'],
+ 'Tantrum di luar':['Bawa anak ke sudut yang lebih tenang. Abaikan pandangan orang, fokus pada anak.','Jom kita keluar kejap. Mama tunggu awak.'],
+ 'Berunding tak henti':['Ulang jawapan sama dengan nada sama, tanpa tambah penjelasan baru.','Mama dah dengar. Jawapannya masih tidak.'],
+ 'Menjawab kasar':['Jangan balas kasar. Tangguh bincang sampai dua-dua dah tenang.','Mama nak dengar, tapi bukan dengan cara tu. Cuba sekali lagi.'],
+ 'Saya nak meletup':['Berhenti, jauhkan diri beberapa langkah (anak masih selamat), bernafas dan beritahu anak.','Mama perlukan seminit untuk tenang. Mama datang balik.']};
+$('#sitChips').innerHTML=Object.keys(SIT).map(k=>`<button class="chip">${k}</button>`).join('');
+$('#sitChips').onclick=e=>{const b=e.target.closest('.chip');if(!b)return;
+  document.querySelectorAll('#sitChips .chip').forEach(x=>x.classList.toggle('on',x===b));
+  const s=SIT[b.textContent];$('#sitOut').innerHTML=`<div class="say"><b>Apa nak buat</b>${s[0]}</div><div class="say"><b>Cuba cakap</b><q>${s[1]}</q></div>`};
+
+/* ---------- trigger log ---------- */
+const TRIG=['Arahan tak dipatuhi','Tergesa-gesa','Adik-beradik bergaduh','Rumah bersepah / bising','Anak melawan','Lain-lain'];
+const STATE=['Lapar','Letih','Terdesak masa','Keseorangan','Okey je'];
+const FEEL=['Tak didengar','Tak berdaya','Malu','Takut','Penat sangat'];
+function chipSet(el,list,multi){el.innerHTML=list.map(x=>`<button class="chip">${x}</button>`).join('');
+  el.onclick=e=>{const b=e.target.closest('.chip');if(!b)return;
+    if(!multi)el.querySelectorAll('.chip').forEach(x=>x!==b&&x.classList.remove('on'));b.classList.toggle('on')}}
+chipSet($('#tChips'),TRIG,false);chipSet($('#sChips'),STATE,true);chipSet($('#fChips'),FEEL,true);
+$('#lvl').oninput=e=>$('#lvlV').textContent=e.target.value;
+const sel=el=>[...el.querySelectorAll('.chip.on')].map(x=>x.textContent);
+function saveLog(){
+  const t=sel($('#tChips'))[0];if(!t){toast('Pilih apa yang jadi dulu');return}
+  const log=store.get('log',[]);
+  log.unshift({d:Date.now(),t,s:sel($('#sChips')),f:sel($('#fChips')),l:+$('#lvl').value,n:$('#tNote').value.trim()});
+  store.set('log',log.slice(0,200));
+  document.querySelectorAll('#v-trig .chip.on').forEach(x=>x.classList.remove('on'));$('#tNote').value='';
+  renderLog();toast('Catatan disimpan');
+}
+function delLog(i){const log=store.get('log',[]);log.splice(i,1);store.set('log',log);renderLog()}
+function renderLog(){
+  const log=store.get('log',[]);
+  const fmt=d=>new Date(d).toLocaleString('ms-MY',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+  $('#logList').innerHTML=log.length?log.slice(0,15).map((e,i)=>`<div class="entry"><div class="top"><span>${e.t}</span><span>${e.l}/10</span></div>
+    <div class="muted" style="font-size:12.5px">${fmt(e.d)}</div>
+    ${e.s.length?`<div>Keadaan: ${e.s.join(', ')}</div>`:''}${e.f.length?`<div>Rasa: ${e.f.join(', ')}</div>`:''}
+    ${e.n?`<div><i>${e.n.replace(/</g,'&lt;')}</i></div>`:''}<button class="del" onclick="delLog(${i})">Padam</button></div>`).join('')
+    :'<p class="muted">Belum ada catatan. Mula dengan yang pertama hari ni.</p>';
+  const cnt=(arr)=>{const m={};arr.forEach(x=>m[x]=(m[x]||0)+1);return Object.entries(m).sort((a,b)=>b[1]-a[1]).slice(0,3)};
+  if(log.length<3){$('#pattern').innerHTML=`<h3>Corak saya</h3><p class="muted" style="margin:0">Corak akan muncul selepas 3 catatan. Sekarang: ${log.length}.</p>`;return}
+  const tops=cnt(log.map(e=>e.t)),states=cnt(log.flatMap(e=>e.s)),max=tops[0][1];
+  const avg=(log.reduce((a,e)=>a+e.l,0)/log.length).toFixed(1);
+  $('#pattern').innerHTML=`<h3>Corak saya</h3><p style="margin-top:0;font-size:14px">${log.length} catatan · purata tahap marah ${avg}/10</p>
+   ${tops.map(([k,v])=>`<div style="font-weight:700;font-size:14px">${k} <span class="muted">(${v})</span></div><div class="bar"><i style="width:${v/max*100}%"></i></div>`).join('')}
+   ${states.length?`<div class="say"><b>Keadaan diri paling kerap</b>${states.map(s=>s[0]).join(', ')}. Isi tangki ni dulu sebelum waktu sibuk.</div>`:''}`;
+}
+
+/* ---------- repair by age ---------- */
+const AGE={'2–5 tahun':'Tadi mama marah dan suara mama kuat. Mama minta maaf. Mama sayang awak. Mari peluk.',
+ '6–11 tahun':'Mama tak patut menjerit tadi. Mama tengah penat dan tak urus dengan baik. Awak okey? Boleh cerita apa awak rasa tadi?',
+ 'Remaja':'Cara mama cakap tadi tak adil untuk awak. Mama minta maaf. Mama nak dengar pandangan awak, bila awak dah sedia.'};
+$('#ageTabs').innerHTML=Object.keys(AGE).map((k,i)=>`<button class="${i?'':'on'}">${k}</button>`).join('');
+$('#ageOut').textContent='“'+AGE['2–5 tahun']+'”';
+$('#ageTabs').onclick=e=>{const b=e.target.closest('button');if(!b)return;
+  document.querySelectorAll('#ageTabs button').forEach(x=>x.classList.toggle('on',x===b));$('#ageOut').textContent='“'+AGE[b.textContent]+'”'};
+function copyTxt(t){try{navigator.clipboard.writeText(t).then(()=>toast('Ayat disalin'),()=>toast('Tak dapat salin'))}catch(e){toast('Tak dapat salin')}}
+
+/* ---------- plan ---------- */
+const PLAN=[['Mula catat pencetus','Guna tab Pencetus setiap kali marah naik.','trig'],
+ ['Isi tangki','Makan, minum, tidur cukup. Siapkan keperluan esok malam ni.',''],
+ ['Imbas badan 3 kali','Cari tanda amaran paling awal anda.','calm'],
+ ['Cuba Formula JEDA','Sekali bila anda mula rasa marah.','calm'],
+ ['Nada rendah & satu "tidak"','Amalkan nada perlahan, cuba satu "tidak" tanpa drama.','calm'],
+ ['Satu pembaikan kecil','Dan 10 minit masa bersama anak tanpa gajet.','repair'],
+ ['Semak & kongsi','Apa yang menjadi? Pilih satu teknik, kongsi dengan pasangan.','trig']];
+function renderPlan(){
+  const done=store.get('plan',[]);
+  $('#days').innerHTML=PLAN.map((p,i)=>`<div class="day ${done.includes(i)?'done':''}" data-i="${i}"><div class="chk">${done.includes(i)?'✓':i+1}</div>
+    <div><div class="t" style="font-weight:800;color:var(--dk)">Hari ${i+1}: ${p[0]}</div><div style="font-size:14px">${p[1]}</div></div></div>`).join('');
+  const p=Math.round(done.length/7*100);$('#prog').style.setProperty('--p',p);$('#progT').textContent=done.length+'/7';
+  const next=PLAN.findIndex((_,i)=>!done.includes(i));
+  $('#todayCard').innerHTML=next<0?`<h3>Tahniah! 🌻</h3><p style="margin:0">Pelan 7 hari dah siap. Teruskan satu teknik yang paling menjadi untuk anda.</p>`:
+   `<div class="row" style="justify-content:space-between"><div><span class="pill" style="background:var(--amber)">LATIHAN HARI ${next+1}</span>
+    <h3 style="margin-top:8px">${PLAN[next][0]}</h3><p style="margin:0;font-size:14px">${PLAN[next][1]}</p></div></div>
+    <div style="height:10px"></div><button class="btn small" onclick="go('plan')">Lihat pelan (${done.length}/7)</button>`;
+}
+$('#days').onclick=e=>{const d=e.target.closest('.day');if(!d)return;const i=+d.dataset.i;let done=store.get('plan',[]);
+  done=done.includes(i)?done.filter(x=>x!==i):[...done,i];store.set('plan',done);renderPlan();if(!done.includes(i))return;toast(done.length===7?'Pelan siap! 🌻':'Bagus, hari '+(i+1)+' siap')};
+function resetPlan(){store.set('plan',[]);renderPlan();toast('Pelan dimulakan semula')}
+
+/* ---------- worksheets autosave ---------- */
+const ws=store.get('ws',{});
+document.querySelectorAll('.ws').forEach(el=>{el.value=ws[el.dataset.k]||'';
+  el.addEventListener('input',()=>{ws[el.dataset.k]=el.value;store.set('ws',ws)})});
+
+renderLog();renderPlan();
+/* ---------- PWA ---------- */
+function netState(){document.body.classList.toggle('is-off',!navigator.onLine)}
+window.addEventListener('online',netState);window.addEventListener('offline',netState);netState();
+try{if('serviceWorker' in navigator && window.isSecureContext)navigator.serviceWorker.register('sw.js')}catch(e){}
+(function(){
+  const standalone=(window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone;
+  if(standalone||location.protocol!=='https:')return;
+  const card=$('#installCard'),txt=$('#installTxt'),btn=$('#installBtn');
+  const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);
+  if(ios){card.style.display='block';txt.innerHTML='Buka dalam Safari, tekan butang <b>Kongsi</b> (petak dengan anak panah), kemudian pilih <b>Add to Home Screen</b>.';}
+  let ev=null;
+  window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();ev=e;card.style.display='block';
+    txt.textContent='Pasang supaya app ni ada di skrin utama dan boleh dibuka tanpa internet.';btn.style.display='inline-block'});
+  btn.onclick=async()=>{if(!ev)return;ev.prompt();await ev.userChoice;ev=null;card.style.display='none'};
+})();
+go(location.hash.slice(1)||'home');
+</script>
+</body>
+</html>
