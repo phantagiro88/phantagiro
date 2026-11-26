@@ -37,6 +37,7 @@ header.scrolled{border-bottom-color:var(--line)}
 .ptitle{flex:1;text-align:left;min-width:0}
 .ptitle h1{margin:0;font-size:22px;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ptitle small{color:var(--mute);font-size:13px}
+#off{flex:none;font-size:12px;font-weight:600;color:var(--gold);background:var(--goldbg);border-radius:99px;padding:4px 10px}
 .iconbtn{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--card);box-shadow:var(--shadow);font-size:20px}
 
 /* summary */
@@ -122,7 +123,7 @@ label.f input:focus,label.f textarea:focus{border-color:var(--gold)}
 <body>
 <header id="hdr"><div class="wrap"><div class="hrow">
   <button class="ptitle" data-act="period"><h1 class="serif" id="ptitle">Belanjawan</h1><small id="pdate"></small></button>
-  <button class="iconbtn" data-act="menu" aria-label="Menu">⋯</button>
+  <span id="off" hidden>Luar talian</span><button class="iconbtn" data-act="menu" aria-label="Menu">⋯</button>
 </div><div id="sum"></div></div></header>
 <main class="wrap" id="app"></main>
 <div id="sheetbg"></div><div id="sheet" role="dialog"></div>
@@ -450,6 +451,9 @@ document.addEventListener('keydown', e => {
 addEventListener('scroll', () => $('#hdr').classList.toggle('scrolled', scrollY > 4), {passive:true});
 
 render();
+function netState(){ $('#off').hidden = navigator.onLine; }
+addEventListener('online', netState); addEventListener('offline', netState); netState();
+try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch(e){}
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
 </script>
 </body>
