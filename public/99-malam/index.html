@@ -12,9 +12,12 @@
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="icon-192.png">
 <title>99 Malam di Dalam Hutan</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Pirata+One&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/bc500.ttf) format('truetype')}
+@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:600;font-display:swap;src:url(fonts/bc600.ttf) format('truetype')}
+@font-face{font-family:'Barlow Condensed';font-style:normal;font-weight:700;font-display:swap;src:url(fonts/bc700.ttf) format('truetype')}
+@font-face{font-family:'Pirata One';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/pirata.ttf) format('truetype')}
+</style>
 <style>
 /* Layout idea: full-bleed top-down forest canvas; thin HUD strip on top; modal sheets for menu, upgrades and results. */
 :root{
@@ -1847,7 +1850,12 @@ function boot(d){
   if(ck0){ckpt=ck0;sset('n99_ckpt',ck0)}
   requestAnimationFrame(loop);
 }
-if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){navigator.serviceWorker.register('sw.js').catch(function(){})}
+if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol)){var hadSW=!!navigator.serviceWorker.controller;
+  navigator.serviceWorker.addEventListener('controllerchange',function(){
+    if(hadSW){if(!S||S.paused||S.over||$('menu').classList.contains('on'))location.reload()}
+    else{hadSW=true;try{toast('Sedia digunakan tanpa internet')}catch(e){}}
+  });
+  navigator.serviceWorker.register('sw.js').catch(function(){})}
 const hot=window.claude&&window.claude.hot;
 if(hot&&hot.snapshot)hot.snapshot(()=>S?snapshot():{});
 if(hot&&hot.ready)hot.ready(boot);else boot((hot&&hot.data)||{});
