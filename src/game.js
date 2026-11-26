@@ -57,7 +57,7 @@ const L = {
     noMoney: '💰 Duit tak cukup', noMoneyPlot: '💰 Duit tak cukup untuk tanah baru',
     lock: (e, a) => `🔒 Jual sehingga ${a} untuk buka ${e}`, harvestFirst: '🧺 Tuai dulu, baru jual!',
     allFull: '🌱 Semua tanah dah penuh', notRipe: '⏳ Belum ada yang masak', gift: '🎁 Hadiah $10 untuk kamu!',
-    lockedSeed: '🔒 Benih ini belum dibuka', stUnlocked: n => `🎉 ${n} dibuka!`, langBtn: 'BM'
+    lockedSeed: '🔒 Benih ini belum dibuka', offlineReady: '✅ Boleh main tanpa internet!', stUnlocked: n => `🎉 ${n} dibuka!`, langBtn: 'BM'
   },
   en: {
     hint: '👆 Tap the soil to plant!', plantAll: '🌱 Plant all', harvestAll: '🧺 Harvest all', sell: '🏪 Sell',
@@ -75,7 +75,7 @@ const L = {
     noMoney: '💰 Not enough money', noMoneyPlot: '💰 Not enough money for new land',
     lock: (e, a) => `🔒 Sell up to ${a} to unlock ${e}`, harvestFirst: '🧺 Harvest first, then sell!',
     allFull: '🌱 All plots are full', notRipe: '⏳ Nothing is ripe yet', gift: '🎁 A $10 gift for you!',
-    lockedSeed: '🔒 This seed is still locked', stUnlocked: n => `🎉 ${n} unlocked!`, langBtn: 'EN'
+    lockedSeed: '🔒 This seed is still locked', offlineReady: '✅ Works without internet!', stUnlocked: n => `🎉 ${n} unlocked!`, langBtn: 'EN'
   }
 };
 
@@ -828,4 +828,10 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
   navigator.serviceWorker.register('sw.js').then(reg => {
     document.addEventListener('visibilitychange', () => { if (!document.hidden) reg.update().catch(() => {}); });
   }).catch(() => {});
+  // beritahu sekali sahaja bila game sudah sedia untuk offline
+  navigator.serviceWorker.ready.then(() => {
+    try { if (!localStorage.getItem('kj.offline')) { localStorage.setItem('kj.offline', '1'); setTimeout(() => toast(t('offlineReady')), 1500); } } catch (e) {}
+  });
+  // minta penyemak imbas jangan buang data game
+  if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
 }
